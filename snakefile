@@ -30,7 +30,8 @@ rule all:
 	  expand(config["out_de"] + "de_{sample}.rds", sample = sample),
 	  expand(config["out_type"] + "type_{sample}_sce.rds", sample = sample), 
 	  expand(config["out_summary"] + "summary_{sample}.rds", sample = sample),
-	  expand(config["docs"] + "batch_effect_{sample}.html", sample = sample)
+	  expand(config["docs"] + "batch_effect_{sample}.html", sample = sample),
+	  config["docs"] + "index.html"
 
 # --- Main Build Rules --- #
 
@@ -176,6 +177,19 @@ rule summary:
         '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{input.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', de ='{input.de}', gs = '{input.gs}', abund = '{input.abund}', out_file = '{output.out_file}'))"'''
         
 
+## -------------------------------------------------------------------------- ##
+## Update index file
+## -------------------------------------------------------------------------- ##
+
+rule index:
+    input:
+        script = config["src_summary"] + "index.Rmd",
+        outdir = config["docs"]
+    output:
+        out = config["docs"] + "index.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{input.outdir}', knit_root_dir=getwd(), params = list(in_dir='{input.outdir}'))"'''
+        
 
 
 # --- Optional Rules  --- #

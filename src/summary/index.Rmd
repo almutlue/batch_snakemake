@@ -1,0 +1,46 @@
+---
+title: "index"
+author: "Almut Lütge"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+params:
+  in_dir:
+output: 
+  html_document:  
+    self_contained: no
+    lib_dir: '../../docs/site_libs'
+    code_folding: show
+    theme: journal
+    highlight: tango
+  number_sections: no
+  toc: yes
+  toc_depth: 3
+  toc_float:
+    collapsed: no
+    smooth_scroll: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r parameter, include=FALSE}
+#list all html files in "docs"
+in_dir <- params$in_dir
+batch_list <- list.files(path = paste0("../..", in_dir), pattern = '^batch_effect.*.html')
+fyle_names <- gsub("batch_effect_", "", batch_list)
+fyle_names <- gsub(".html", "", fyle_names)
+
+
+```
+
+
+A systematic analysis of different kinds of unwanted varaition in single cell RNAseq datasets.
+
+# Analysis
+
+## Batch effects
+
+`r for (x in fyle_names){ cat("+ [", x, "]('", "batch_effect_",x, ".html')",'\n', sep = "")}`
+
+## Simulation
+
