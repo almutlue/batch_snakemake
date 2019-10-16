@@ -1,0 +1,51 @@
+### Note: To keep the suggested file and directory structure run "snakemake dir_setup"
+### This will generate a subfolder structure as presented here within your directory. 
+### It will only work if an 'out' and a 'log' folder already exist
+
+## general settings
+ROOT: "."
+R_lib: "packrat/lib/"
+src: "src/"
+log: "logs/"
+out: "out/"
+
+## Path to scripts
+src_data: "src/data/"
+src_meta: "src/meta_files/"
+src_data_mgt: "src/data_management/"
+src_analysis: "src/analysis/"
+src_summary: "src/summary/"
+
+## Path to output 
+out_set: "out/settings/"
+out_norm: "out/normalization/"
+out_vp: "out/variance_part/"
+out_abund: "out/abundance/"
+out_cms: "out/cms/"
+out_de: "out/de/"
+out_type: "out/type/"
+out_summary: "out/summary/"
+
+
+## Path to logs
+log_dir: "log/dir_setup/"
+log_set: "log/settings/"
+log_norm: "log/normalization/"
+log_vp: "log/variance/"
+log_abund: "log/abundance/"
+log_cms: "log/cms/"
+log_de: "log/de/"
+log_type: "log/type/"
+log_summary: "log/summary/"
+
+## Path to website files
+docs: "docs/"
+docs_libs: "docs/site_libs"
+
+
+## Subdirectory names 
+### Names of subfdirectories to be generated in output and log directories
+### Here they correspond to the rule names
+dir_names: settings,normalization,abundance,variance_part,cms,de,type,summary
+
+
