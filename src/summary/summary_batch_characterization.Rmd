@@ -185,20 +185,33 @@ t1 + facet_grid(~expr_class)
 ```
 
 
-### Cellspecific Mixing score
+### Cellspecific Mixing score  {.tabset .tabset-pills}
 
+#### Overall
 ```{r cms}
 #visualize overall cms score
 visHist(sce, n_col = 2, prefix = FALSE)
 visMetric(sce, metric = "cms_smooth", dim_red = "UMAP")
 visGroup(sce, celltype, dim_red = "UMAP")
 
+#summarize
+mean_cms <- mean(sce$cms)
+n_cms_0.01 <- length(which(sce$cms < 0.01))
+cluster_mean_cms <- as_tibble(colData(sce)) %>% group_by_at(celltype) %>% summarize(cms_mean = mean(cms))
+var_cms <- var(cluster_mean_cms$cms_mean)
+
+```
+
+#### Celltypes cms smooth
+```{r cms celltypes}
 #compare by celltypes
 visCluster(sce, metric_var = "cms_smooth", cluster_var = celltype)
 visCluster(sce, metric_var = "cms_smooth", cluster_var = celltype, violin = TRUE)
+```
 
+#### Celltypes histogram
+```{r cms histogram}
 #compare histogram by celltype
-cluster_mean_cms <- as_tibble(colData(sce)) %>% group_by_at(celltype) %>% summarize(cms_mean = mean(cms))
 
 p <- ggplot(as.data.frame(colData(sce)), 
             aes_string(x = "cms", fill = celltype)) + 
@@ -211,15 +224,7 @@ p + geom_vline(aes_string(xintercept = "cms_mean",
                    colour = celltype), 
                cluster_mean_cms, linetype=2) + 
   scale_color_manual(values = cols) 
-
-#summarize
-mean_cms <- mean(sce$cms)
-n_cms_0.01 <- length(which(sce$cms < 0.01))
-cluster_mean_cms <- as_tibble(colData(sce)) %>% group_by_at(celltype) %>% summarize(cms_mean = mean(cms))
-var_cms <- var(cluster_mean_cms$cms_mean)
-
 ```
-
 
 
 ## Celltype specificity

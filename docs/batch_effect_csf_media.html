@@ -414,8 +414,10 @@ m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="
 <p><img src="batch_effect_csf_media_files/figure-html/tern%20plots%20gene%20class-1.svg" width="672" /></p>
 </div>
 </div>
-<div id="cellspecific-mixing-score" class="section level3">
+<div id="cellspecific-mixing-score" class="section level3 tabset tabset-pills">
 <h3>Cellspecific Mixing score</h3>
+<div id="overall" class="section level4">
+<h4>Overall</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#visualize overall cms score</span>
 <span class="kw">visHist</span>(sce, <span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="batch_effect_csf_media_files/figure-html/cms-1.svg" width="672" /></p>
@@ -423,14 +425,24 @@ m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="
 <p><img src="batch_effect_csf_media_files/figure-html/cms-2.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visGroup</span>(sce, celltype, <span class="dt">dim_red =</span> <span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
 <p><img src="batch_effect_csf_media_files/figure-html/cms-3.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summarize</span>
+mean_cms &lt;-<span class="st"> </span><span class="kw">mean</span>(sce$cms)
+n_cms_0<span class="fl">.01</span> &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">which</span>(sce$cms &lt;<span class="st"> </span><span class="fl">0.01</span>))
+cluster_mean_cms &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">colData</span>(sce)) %&gt;%<span class="st"> </span><span class="kw">group_by_at</span>(celltype) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">cms_mean =</span> <span class="kw">mean</span>(cms))
+var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_cms$cms_mean)</code></pre></div>
+</div>
+<div id="celltypes-cms-smooth" class="section level4">
+<h4>Celltypes cms smooth</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare by celltypes</span>
 <span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype)</code></pre></div>
 <pre><code>## Picking joint bandwidth of 0.0034</code></pre>
-<p><img src="batch_effect_csf_media_files/figure-html/cms-4.svg" width="672" /></p>
+<p><img src="batch_effect_csf_media_files/figure-html/cms%20celltypes-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype, <span class="dt">violin =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p><img src="batch_effect_csf_media_files/figure-html/cms-5.svg" width="672" /></p>
+<p><img src="batch_effect_csf_media_files/figure-html/cms%20celltypes-2.svg" width="672" /></p>
+</div>
+<div id="celltypes-histogram" class="section level4">
+<h4>Celltypes histogram</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare histogram by celltype</span>
-cluster_mean_cms &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">colData</span>(sce)) %&gt;%<span class="st"> </span><span class="kw">group_by_at</span>(celltype) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">cms_mean =</span> <span class="kw">mean</span>(cms))
 
 p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="kw">as.data.frame</span>(<span class="kw">colData</span>(sce)), 
             <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">fill =</span> celltype)) +<span class="st"> </span>
@@ -444,12 +456,8 @@ p +<span class="st"> </span><span class="kw">geom_vline</span>(<span class="kw">
                cluster_mean_cms, <span class="dt">linetype=</span><span class="dv">2</span>) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> cols) </code></pre></div>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="batch_effect_csf_media_files/figure-html/cms-6.svg" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summarize</span>
-mean_cms &lt;-<span class="st"> </span><span class="kw">mean</span>(sce$cms)
-n_cms_0<span class="fl">.01</span> &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">which</span>(sce$cms &lt;<span class="st"> </span><span class="fl">0.01</span>))
-cluster_mean_cms &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">colData</span>(sce)) %&gt;%<span class="st"> </span><span class="kw">group_by_at</span>(celltype) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">cms_mean =</span> <span class="kw">mean</span>(cms))
-var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_cms$cms_mean)</code></pre></div>
+<p><img src="batch_effect_csf_media_files/figure-html/cms%20histogram-1.svg" width="672" /></p>
+</div>
 </div>
 </div>
 <div id="celltype-specificity" class="section level2">
