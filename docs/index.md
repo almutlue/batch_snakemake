@@ -27,7 +27,7 @@ A systematic analysis of different kinds of unwanted varaition in single cell RN
 # Analysis
 
 ## Batch effects
-(csf_media)[csf_media.html]
+(csf_media)[batch_effect_csf_media.html]
 
 ## Simulation
 
