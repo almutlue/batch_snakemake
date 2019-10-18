@@ -16,7 +16,7 @@ echo $index_file
 ### Add html files to script
 for sample in $files
 do
-    link="+[${sample}](batch_effect_${sample}.html)"
+    link="+ [${sample}](batch_effect_${sample}.html)"
     echo $link
     sed -i "/^## Batch effects/a $link" $index_new
 done

@@ -16,10 +16,10 @@ output:
     code_folding: show
     theme: journal
     highlight: tango
-  number_sections: no
-  toc: yes
-  toc_depth: 3
-  toc_float:
+    number_sections: no
+    toc: yes
+    toc_depth: 3
+    toc_float: true
     collapsed: no
     smooth_scroll: yes
 ---
