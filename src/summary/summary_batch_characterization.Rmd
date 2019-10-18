@@ -1,5 +1,5 @@
 ---
-title: "Summary_batch_characterization"
+title: "Characterize batch effects"
 author: "Almut Lütge"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 params:
@@ -25,7 +25,15 @@ output:
 ---
 
 
-## Characterize batch effects
+```{r dataset name, include=FALSE}
+param <- readRDS(params$param)
+dataset_name <- param[["dataset_name"]]
+
+```
+
+## `r paste(dataset_name)`
+
+[Back to home](index.html)
 
 ```{r libraries, warning=FALSE}
 suppressPackageStartupMessages({
