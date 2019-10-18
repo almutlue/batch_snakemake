@@ -41,7 +41,7 @@ A systematic analysis of different kinds of unwanted varaition in single cell RN
 
 ## Batch effects
 
-`r I(links)`
+`r params$in_dir`
 
 ## Simulation
 

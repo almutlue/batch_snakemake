@@ -31,7 +31,7 @@ rule all:
 	  expand(config["out_type"] + "type_{sample}_sce.rds", sample = sample), 
 	  expand(config["out_summary"] + "summary_{sample}.rds", sample = sample),
 	  expand(config["docs"] + "batch_effect_{sample}.html", sample = sample),
-	  config["docs"] + "index.html"
+	  config["docs"] + "index.md"
 
 # --- Main Build Rules --- #
 
@@ -183,13 +183,12 @@ rule summary:
 
 rule index:
     input:
-        script = config["src_summary"] + "index.Rmd",
-        outdir = config["docs"]
+        script = config["src_summary"] + "write_index.sh",
+        ind_template = config["src_summary"] + "index_template.md"
     output:
-        out = config["docs"] + "index.html"
+        out = config["docs"] + "index.md"
     shell:
-        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{input.outdir}', knit_root_dir=getwd(), params = list(in_dir='{input.outdir}'))"'''
-        
+        "./{input.script} {input.ind_template} {output.out} {sample}"
 
 
 # --- Optional Rules  --- #
