@@ -111,9 +111,12 @@ sce <- add_dim_adj(Xadj2, "Xadj2")
 sce <- add_dim_adj(Xadj3, "Xadj3")
 
 # calculate cms
-sce <- cms(sce, group = batch, k = k, k_min = k_min, dim_red = "pca_Xadj1", res_name = "Xadj1")
-sce <- cms(sce, group = batch, k = k, k_min = k_min, dim_red = "pca_Xadj2", res_name = "Xadj2")
-sce <- cms(sce, group = batch, k = k, k_min = k_min, dim_red = "pca_Xadj3", res_name = "Xadj3")
+sce <- cms(sce, group = batch, k = k, k_min = k_min, dim_red = "PCA_Xadj1", 
+           res_name = "Xadj1", n_dim = 10)
+sce <- cms(sce, group = batch, k = k, k_min = k_min, dim_red = "PCA_Xadj2", 
+           res_name = "Xadj2", n_dim = 10)
+sce <- cms(sce, group = batch, k = k, k_min = k_min, dim_red = "PCA_Xadj3", 
+           res_name = "Xadj3", n_dim = 10)
 
 
 ### -------------- save sce object ----------------------###

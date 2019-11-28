@@ -1,0 +1,199 @@
+# Subworkflow Simulation
+#
+# Contributors: @almutlue 
+#
+
+# --- Imports --- #
+
+configfile: "config.yaml"
+import glob
+import os
+import logging
+
+
+# --- Build --- #
+
+
+## -------------------------------------------------------------------------- ##
+## EdgeR
+## -------------------------------------------------------------------------- ##
+rule edgeR:
+    input: 
+        data = config["out_type"] + "type_{sample}_sce.rds",
+        param = config["out_set"] + "settings_{sample}.rds",
+        script = config["src_sim"] + "run_edgeR.R"
+    output:
+        out = config["out_edger"] + "edgeR_{sample}.rds"
+    log:
+        config["log_edger"] + "edgeR_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
+
+
+## -------------------------------------------------------------------------- ##
+## Simulation
+## -------------------------------------------------------------------------- ##
+rule sim:
+    input: 
+        data = config["out_edger"] + "edgeR_{sample}.rds",
+        param = config["out_set"] + "settings_{sample}.rds",
+        script = config["src_sim"] + "sim_sce.R",
+        sim = config["src_meta_sim"] + "{sim_name}.rds"
+    params:
+        out_path = config["out_sim"] + "{sample}"
+    output:
+        out = config["out_sim"] + "{sample}/sim_{sample}_{sim_name}_sce.rds"
+    log:
+        config["log_sim"] + "sim_{sample}_{sim_name}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' sim='{input.sim}' out_path='{params.out_path}' outputfile='{output.out}'" {input.script} {log}'''
+
+
+## -------------------------------------------------------------------------- ##
+## Characterize all simulations
+## -------------------------------------------------------------------------- ##
+rule char_sim:
+    input: 
+        sim_sce = config["out_sim"] + "{sample}/sim_{sample}_{sim_name}_sce.rds",
+        param = config["out_set"] + "settings_{sample}.rds",
+        script = config["src_sim"] + "char_sim_sce.R"
+    params:
+        out_path = config["out_sim_char"] + "{sample}"
+    output:
+        out = config["out_sim_char"] + "{sample}/sim_{sample}_{sim_name}_sce.rds"
+    log:
+        config["log_sim_char"] + "sim_{sample}_{sim_name}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args params='{input.param}' sim_sce='{input.sim_sce}' out_path='{params.out_path}' outputfile='{output.out}'" {input.script} {log}'''
+
+
+## -------------------------------------------------------------------------- ##
+## Characterize realistic simulation
+## -------------------------------------------------------------------------- ##
+
+## -------------------------------------------------------------------------- ##
+## Adjust params to simulation
+## -------------------------------------------------------------------------- ##
+
+rule change_params:
+    input: 
+        param = config["out_set"] + "settings_{sample}.rds",
+        script = config["src_data_mgt"] + "adjust_params_simdata.R"
+    output:
+        out = config["out_adjust_params"] + "adjust_params_{sample}.rds"
+    log:
+        config["log_adjust_params"] + "adjust_params_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
+        
+
+## -------------------------------------------------------------------------- ##
+## Variance partitioning simulation
+## -------------------------------------------------------------------------- ##
+
+rule variance_part:
+    input: 
+        data = config["out_sim_char"] + "{sample}/sim_{sample}_1__1_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        script = config["src_analysis"] + "variance_part.R"
+    output:
+        out = config["out_sim_vp"] + "vp_sim_{sample}_sce.rds"
+    log:
+        config["log_sim_vp"] + "vp_sim_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
+        
+
+        
+## -------------------------------------------------------------------------- ##
+## Differential abundance
+## -------------------------------------------------------------------------- ##
+
+rule abundance:
+    input: 
+        data = config["out_sim_vp"] + "vp_sim_{sample}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        script = config["src_analysis"] + "abundance.R"
+    output:
+        out = config["out_sim_abund"] + "abundance_sim_{sample}.rds"
+    log:
+        config["log_sim_abund"] + "abundance_sim_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
+
+
+
+## -------------------------------------------------------------------------- ##
+## Differential expression
+## -------------------------------------------------------------------------- ##
+
+rule de:
+    input: 
+        data = config["out_sim_vp"] + "vp_sim_{sample}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        script = config["src_analysis"] + "de.R"
+    output:
+        out = config["out_sim_de"] + "de_sim_{sample}.rds",
+        out_sce = config["out_sim_de"] + "de_sim_{sample}_sce.rds"
+    log:
+        config["log_sim_de"] + "de_sim_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}' outputsce='{output.out_sce}'" {input.script} {log}'''
+        
+        
+
+## -------------------------------------------------------------------------- ##
+## Batch type
+## -------------------------------------------------------------------------- ##
+
+rule batch_type:
+    input: 
+        data = config["out_sim_de"] + "de_sim_{sample}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        script = config["src_analysis"] + "batch_type.R"
+    output:
+        out = config["out_sim_type"] + "type_sim_{sample}_sce.rds"
+    log:
+        config["log_sim_type"] + "type_sim_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
+    
+  
+  
+  ## -------------------------------------------------------------------------- ##
+## Summarize cms
+## -------------------------------------------------------------------------- ##
+
+rule summarize_cms:
+    input: 
+        data = config["out_sim_type"] + "type_sim_{sample}_sce.rds",
+        script = config["src_sim"] + "summarise_cms.R"
+    params:
+        param = ",".join(sim_name),
+    output:
+        out = config["out_sim_sumcms"] + "summarize_cms_sim_{sample}_sce.rds"
+    log:
+        config["log_sim_sumcms"] + "summarize_cms_sim_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{params.param}' outputfile='{output.out}'" {input.script} {log}'''
+  
+  
+## -------------------------------------------------------------------------- ##
+## Summarize Simulation
+## -------------------------------------------------------------------------- ##
+
+rule summary_sim:
+    input: 
+        data = config["out_sim_sumcms"] + "summarize_cms_sim_{sample}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        de = config["out_sim_de"] + "de_sim_{sample}.rds",
+        gs = config["src_data"] + "c5.mf.v6.2.symbols.gmt",
+        abund = config["out_sim_abund"] + "abundance_sim_{sample}.rds",
+        script = config["src_sim"] + "summary_simulation.Rmd",
+        outdir = config["docs"]
+    output:
+        out = config["docs"] + "simulation_{sample}.html",
+        out_file = config["out_sim_summary"] + "summary_sim_{sample}.rds"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{input.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', de ='{input.de}', gs = '{input.gs}', abund = '{input.abund}', out_file = '{output.out_file}'))"'''
+        

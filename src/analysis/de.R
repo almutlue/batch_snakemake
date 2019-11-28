@@ -11,6 +11,7 @@ set.seed(1000)
 ## Show arguments
 print(data)
 print(outputfile)
+print(outputsce)
 print(params)
 
 
@@ -19,6 +20,7 @@ suppressPackageStartupMessages({
   library(SingleCellExperiment)
   library(limma)
   library(purrr)
+  library(dplyr)
 })
 
 
@@ -61,8 +63,8 @@ doDE <- function(sce, lfc_cutoff = 0){
     grp <- group[n]
     design <- model.matrix( ~ 0 + grp)
     colnames(design) <- levels(group)
-    k1 <- rowSums(es_tmp > 0) >= .2 * min(table(grp))
-    es_tmp <- es_tmp[k1, ]
+    #k1 <- rowSums(es_tmp > 0) >= .2 * min(table(grp))
+    #es_tmp <- es_tmp[k1, ]
     f <- lmFit(es_tmp, design)
     f <- eBayes(f, trend = TRUE)
     tt <- lapply(cont, function(c) {
@@ -96,7 +98,29 @@ doDE <- function(sce, lfc_cutoff = 0){
 }
 res <- doDE(sce,lfc_cutoff = 0)
 
-### -------------- save sce object ----------------------###
+##### ----------- Update rowData --------------- ######
+
+combine_folds <- function(cont_var){
+    #extract the contrast of interest and change log2fold colums names to be unique
+    B <- res[["table"]][[cont_var]]
+    new_name <- function(p){
+        colnames(B[[p]])[3] <- paste0(cont_var, "_logFC_", p)
+        return(B[[p]][,c(1,3)])
+    }
+    B_new_names <- lapply(names(B),new_name)
+    names(B_new_names) <- names(B)
+    #combine log2fold colums
+    Folds <- Reduce(function(...){inner_join(..., by="gene")}, B_new_names)
+}
+
+all_folds <- lapply(cs, combine_folds)
+rd <- Reduce(function(...){inner_join(..., by="gene")}, all_folds)
+rd <- rd[match(rownames(sce), rd$gene),]
+rd <- rd %>% mutate_all( ~replace(., is.na(.), 0))
+rowData(sce)[,colnames(rd)] <- rd
+
+### -------------- save output  ----------------------###
 saveRDS(res, file = outputfile)
+saveRDS(sce, file = outputsce)
 
 

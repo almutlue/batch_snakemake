@@ -1,0 +1,706 @@
+---
+title: "Characterize simulated batch effects"
+author: "Almut Lütge"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+params:
+  data:
+  param:
+  de:
+  gs:
+  abund:
+  out_file:
+output:
+  html_document:
+    self_contained: no
+    lib_dir: '../../docs/site_libs'
+    code_folding: show
+    theme: journal
+    highlight: tango
+    number_sections: no
+    toc: yes
+    toc_depth: 3
+    toc_float: true
+    collapsed: no
+    smooth_scroll: yes
+---
+
+
+```{r dataset name, include=FALSE}
+param <- readRDS(params$param)
+dataset_name <- param[["dataset_name"]]
+
+```
+
+## `r paste(dataset_name)`
+
+[Back to home](index.html)
+
+```{r libraries, warning=FALSE}
+suppressPackageStartupMessages({
+  library(CellBench)
+  library(scater)
+  library(CellMixS)
+  library(variancePartition)
+  library(purrr)
+  library(jcolors)
+  library(here)
+  library(tidyr)
+  library(dplyr)
+  library(stringr)
+  library(ComplexHeatmap)
+  library(ggtern)
+  library(scran)
+  library(cowplot)
+  library(CAMERA)
+  library(ggrepel)
+  library(readr)
+})
+```
+
+
+### Dataset and parameter
+```{r data}
+sce <- readRDS(params$data)
+
+param <- readRDS(params$param)
+celltype <- param[["celltype"]]
+batch <- param[["batch"]]
+sample <- param[["sample"]]
+dataset_name <- param[["dataset_name"]]
+dataset_name
+n_genes <- nrow(sce)
+
+table(colData(sce)[,celltype])
+table(colData(sce)[,batch])
+table(colData(sce)[,sample])
+
+res_de <- readRDS(params$de)
+abund <- readRDS(params$abund)
+outputfile <- params$out_file
+
+cols <-c(c(jcolors('pal6'),jcolors('pal8'))[c(1,8,14,5,2:4,6,7,9:13,15:20)],jcolors('pal4'))
+names(cols) <- c()
+```
+
+### Visualize data
+How are sample, celltypes and batches distributed within normalized, but not batch corrected data?
+```{r vis}
+feature_list <- c(batch, celltype, sample)
+feature_list <- feature_list[which(!is.na(feature_list))]
+
+lapply(feature_list, function(feature_name){
+  visGroup(sce, feature_name, dim_red= "UMAP")
+})
+```
+
+## Batch strength/size
+
+To compare or describe the severity of a batch effect there are different meassures.
+In general they can either give an estimate of the relative strength compared to the 
+signal of interest e.g. the celltype signal or an absolut estimate e.g. the number 
+of batch affected genes.    
+  
+### Variance partitioning 
+
+How much of the variance within the datasets can we attributed to the batch effect and how much could be explained by the celltype? Which genes are mostly affected?
+
+```{r variance part}
+vp_vars <- c("vp_batch", "vp_celltype", "vp_residuals")
+vp <- as_tibble(rowData(sce)[, vp_vars])  %>% dplyr::mutate(gene= rownames(sce)) %>% dplyr::arrange(-vp_batch)
+vp_sub <- vp[1:3] %>% set_rownames(vp$gene)
+
+#plot
+plotPercentBars( vp_sub[1:10,] )
+plotVarPart( vp_sub )
+```
+
+### Variance and gene expression {.tabset .tabset-pills}
+
+Are general expression and batch effect related? Does the batch effect or the celltype effect preferable manifest within highly, medium or low expressed genes?
+
+```{r var expr}
+
+#define expression classes by mean expression quantiles 
+th <- quantile(rowMeans(assays(sce)$logcounts), c(.33, .66))
+high_th <- th[2]
+mid_th <- th[1]
+
+rowData(sce)$expr_class <- ifelse(rowMeans(assays(sce)$logcounts) > high_th, "high",
+                                  ifelse(rowMeans(assays(sce)$logcounts) <= high_th &
+                                           rowMeans(assays(sce)$logcounts) > mid_th, 
+                                         "medium", "low"))
+rowData(sce)$mean_expr <- rowMeans(assays(sce)$logcounts)
+
+#plot 
+plot_dev <- function(var, var_col){
+  ggplot(as.data.frame(rowData(sce)), aes_string(x = "mean_expr", y = var, colour = var_col)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+}
+
+#Ternary plots
+ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + 
+  stat_density_tern(aes(fill=..level.., alpha=..level..),geom='polygon') +
+  scale_fill_gradient2(high = "red") +
+  guides(color = "none", fill = "none", alpha = "none") +
+  geom_point(size= 0.1, alpha = 0.5)  + 
+  Llab("batch") +
+  Tlab("celltype") +
+  Rlab("other") +
+  theme_bw()
+
+t1 <- ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + 
+  geom_point(size = 0.1) +
+  geom_density_tern() + 
+  Llab("batch") +
+  Tlab("celltype") +
+  Rlab("other") +
+  theme_bw()
+
+## Summarize variance partitioning
+# How many genes have a variance component affected by batch with > 1%
+n_batch_gene <- vp_sub %>% dplyr::filter("vp_batch" > 0.01) %>% nrow()/n_genes
+n_batch_gene10 <- vp_sub %>% dplyr::filter("vp_batch" > 0.1) %>% nrow()/n_genes
+n_celltype_gene <- vp_sub %>% dplyr::filter("vp_celltype"> 0.01) %>% nrow()/n_genes
+n_rel <- n_batch_gene/n_celltype_gene
+
+# Mean variance that is explained by the batch effect/celltype
+m_batch <- mean(asin(vp_sub[, "vp_batch"]), na.rm = TRUE)
+m_celltype <- mean(asin(vp_sub[, "vp_celltype"]), na.rm = TRUE)
+m_rel <- m_batch/m_celltype
+
+```
+
+#### Scatterplot batch
+```{r var_plot_batch, warning=FALSE}
+plot_dev("vp_batch", "vp_batch")
+```
+
+#### Scatterplot celltype
+```{r var_plot_celltype, warning=FALSE}
+plot_dev("vp_celltype", "vp_celltype")
+```
+
+
+#### Ternary plot all genes
+```{r tern plots, warning=FALSE}
+t1
+
+```
+
+#### Ternary plot gene expression classes
+```{r tern plots gene class, fig.asp=0.5, warning=FALSE}
+t1 + facet_grid(~expr_class)
+```
+
+
+### Cellspecific Mixing score  {.tabset .tabset-pills}
+
+#### Overall
+```{r cms}
+#visualize overall cms score
+visHist(sce, n_col = 2, prefix = FALSE)
+visMetric(sce, metric = "cms_smooth", dim_red = "UMAP")
+visGroup(sce, celltype, dim_red = "UMAP")
+
+#summarize
+mean_cms <- mean(sce$cms)
+n_cms_0.01 <- length(which(sce$cms < 0.01))
+cluster_mean_cms <- as_tibble(colData(sce)) %>% group_by_at(celltype) %>% summarize(cms_mean = mean(cms))
+var_cms <- var(cluster_mean_cms$cms_mean)
+
+```
+
+#### Celltypes cms smooth
+```{r cms celltypes}
+#compare by celltypes
+visCluster(sce, metric_var = "cms_smooth", cluster_var = celltype)
+visCluster(sce, metric_var = "cms_smooth", cluster_var = celltype, violin = TRUE)
+```
+
+#### Celltypes histogram
+```{r cms histogram}
+#compare histogram by celltype
+
+p <- ggplot(as.data.frame(colData(sce)), 
+            aes_string(x = "cms", fill = celltype)) + 
+                geom_histogram() + 
+                facet_wrap(celltype, scales = "free_y", ncol = 3) +
+                scale_fill_manual(values = cols) +
+                theme_classic()
+
+p + geom_vline(aes_string(xintercept = "cms_mean", 
+                   colour = celltype), 
+               cluster_mean_cms, linetype=2) + 
+  scale_color_manual(values = cols) 
+```
+
+
+### Cellspecific Mixing score simulations {.tabset .tabset-pills}
+
+
+```{r sim cms}
+#get all cms scores
+cms_all <- names(colData(sce))[grep("cms_sim", names(colData(sce)))]
+
+# plot list
+sim_list <- lapply(cms_all, function(sim){
+    dim_nam <- gsub("cms_sim_","X", sim)
+    p <- visMetric(sce, metric = sim, dim_red = dim_nam)
+    p2 <- visGroup(sce, group = "batch_id", dim_red = dim_nam)
+    p3 <- plot_grid(p, p2, nrow = 2)
+})
+
+```
+
+
+
+```{r, results='asis', echo = FALSE}
+for (i in 1:length(cms_all)) {
+  cat("#### ", cms_all[i], "\n")
+  print(sim_list[[i]])
+  cat('\n\n')
+}
+```
+
+
+## Celltype specificity
+
+### Celltype abundance
+```{r celltype abundance}
+meta_tib <- as_tibble(colData(sce)) %>% group_by_at(c(batch, celltype)) %>% summarize(n = n()) %>% dplyr::mutate(cell_freq = n / sum(n))
+
+plot_abundance <- function(cluster_var, tib, x_var){
+  meta_df <- as.data.frame(eval(tib))
+  p <- ggplot(data=meta_df, aes_string(x=x_var, y="cell_freq", fill = cluster_var)) +
+    geom_bar(stat="identity") + scale_fill_manual(values=cols, name = "celltype")
+  p + coord_flip() + theme_minimal() 
+}
+
+plot_abundance(cluster_var = celltype, tib = meta_tib, x_var = batch)
+
+#summarize diff abundance
+mean_rel_abund_diff <- mean(unlist(abund))
+min_rel_abund_diff <- min(unlist(abund))
+max_rel_abund_diff <- max(unlist(abund))
+
+```
+
+### Batch and celltype specific count distributions
+Do the overall count distribution vary between batches? Are count distributions celltype depended
+  
+```{r count distributions, fig.width = 10, fig.height = 9}
+#batch level
+bids <- levels(as.factor(colData(sce)[, batch]))
+names(bids) <- bids
+cids <- levels(as.factor(colData(sce)[, celltype]))
+names(cids) <- cids
+
+#mean gene expression by batch and cluster
+mean_list <- lapply(bids, function(batch_var){
+  mean_cluster <- lapply(cids, function(cluster_var){
+    counts_sc <- as.matrix(logcounts(
+      sce[, colData(sce)[, batch] %in% batch_var & 
+            colData(sce)[, celltype] %in% cluster_var]))
+  })
+  mean_c <- mean_cluster %>% map(rowMeans) %>% bind_rows %>%
+    dplyr::mutate(gene=rownames(sce)) %>% 
+    gather(cluster, logcounts, cids)
+})
+
+mean_expr <- mean_list %>% bind_rows(.id= "batch")
+
+ggplot(mean_expr, aes(x=logcounts, colour=batch)) + geom_density(alpha=.3) +
+  theme_classic() +
+  facet_wrap( ~ cluster, ncol = 3) +
+  scale_colour_manual(values = cols[c(1:3,7)]) +
+  scale_x_continuous(limits =  c(0, 7))
+
+```
+
+### Batch to batch comparisons of expression distributions
+```{r mean expression, fig.height=8}
+
+#mean expression
+mean_expr <- mean_list %>% bind_rows(.id = "batch" ) %>% spread(batch, logcounts)
+batch_all <- levels(as.factor(colData(sce)[,batch]))
+
+lapply(batch_all, function(batch_var){
+  batch_var_2 <- batch_all[-which(batch_all %in% batch_var)]
+  lapply(batch_var_2, function(batch_var_3){
+    ggplot(mean_expr, aes_string(x=batch_var, y = batch_var_3)) +
+      geom_point(alpha = .3, aes(color=cluster)) +
+      ggtitle(batch_var) + 
+      geom_abline(slope = 1) + 
+      coord_fixed() +
+      facet_wrap( ~ cluster, ncol = 3) +
+      scale_color_manual(values=cols) +
+      theme_classic()
+  })
+})
+
+```
+
+## Differentially expressed genes
+### Upset plot
+```{r de res}
+## Upset plot\
+cont <- param[["cont"]]
+cs <- names(cont)
+names(cs) <- cs
+
+# Filter DEG by pvalue
+FilterDEGs <- function (degDF = df, filter = c(FDR = 5)){
+  rownames(degDF) <- degDF$gene
+  pval <- degDF[, grep("adj.P.Val$", colnames(degDF)), drop = FALSE]
+  pf <- pval <= filter["FDR"]/100
+  pf[is.na(pf)] <- FALSE
+  DEGlistUPorDOWN <- sapply(colnames(pf), function(x) rownames(pf[pf[, x, drop = FALSE], , drop = FALSE]), simplify = FALSE)
+}
+
+result <- list()
+m2 <- list()
+
+for(jj in 1:length(cs)){
+  result[[jj]] <- sapply(res_de[[1]][[names(cs)[jj]]], function(x) FilterDEGs(x))
+  names(result[[jj]]) <- cids
+  m2[[jj]] = make_comb_mat(result[[jj]], mode = "intersect")
+}
+
+names(result) <- names(cs)
+names(m2) <- names(cs)
+
+lapply(m2, function(x) UpSet(x))
+
+```
+
+
+### Logfold_change 
+```{r pval lfc}
+# DE genes (per cluster and mean)
+res <- res_de[["table"]]
+n_de <- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val < 0.05), numeric(1)))
+n_genes_lfc1 <- lapply(res, function(y) vapply(y, function(x) sum(abs(x$logFC) > 1), numeric(1)))
+mean_n_genes_lfc1 <- mean(unlist(n_genes_lfc1))/n_genes
+
+# plot DE for all comparison 
+gs <- read_delim(params$gs, delim = "\n", col_names = "cat")
+cats <- sapply(gs$cat, function(u) strsplit(u, "\t")[[1]][-2], 
+               USE.NAMES = FALSE)
+names(cats) <- sapply(cats, .subset, 1)
+cats <- lapply(cats, function(u) u[-1])
+
+plotDE <- function(cont_var){
+  res_s <- res[[cont_var]] %>% map(filter, adj.P.Val < .05) %>% map(filter, abs(logFC) > 1)
+  
+  #plot
+  lapply(names(res[[cont_var]]), function(ct){
+    ct_de <- res[[cont_var]][[ct]]
+    ct_de$gene <- gsub('[A-z0-9]*\\.', '', ct_de$gene)
+    res_s[[ct]]$gene <- gsub('[A-z0-9]*\\.', '', res_s[[ct]]$gene)
+    
+    p <- ggplot(ct_de, aes(x = AveExpr, y = logFC, colour = abs(logFC) > 1, label = gene)) + 
+      geom_point(size = 2, alpha = .5) +
+      geom_label_repel(data = res_s[[ct]]) +
+      ggtitle(paste0(ct,": ", cont_var)) +
+      theme_classic()
+    print(p)
+    
+    cat("Cluster:", ct, "Contrast:", cont_var, 
+        "Num genes:", nrow(ct_de), "Num DE:", nrow(res_s[[ct]]), "\n" )
+
+  })
+}
+
+pathways <- lapply(names(res), plotDE)
+
+```
+
+Summarize differential expression analysis
+```{r summarize de}
+# DE genes (per cluster and mean)
+n_de <- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val < 0.05), numeric(1)))
+n_de_cl <- lapply(res, function(y) vapply(y, function(x) nrow(x), numeric(1)))
+mean_n_de <- lapply(n_de, function(x) mean(x))
+mean_mean_n_de <- mean(unlist(mean_n_de))/n_genes
+min_mean_n_de <- min(unlist(mean_n_de))/n_genes
+max_mean_n_de <- max(unlist(mean_n_de))/n_genes
+
+# Genes with lfc > 1
+n_genes_lfc1 <- lapply(res, function(y) vapply(y, function(x) sum(abs(x$logFC) > 1), numeric(1)))
+mean_n_genes_lfc1 <- mean(unlist(n_genes_lfc1))/n_genes
+min_n_genes_lfc1 <- min(unlist(n_genes_lfc1))/n_genes
+max_n_genes_lfc1 <- max(unlist(n_genes_lfc1))/n_genes
+
+# DE genes overlap between celltypes (celltype specific de genes)
+# Genes are "overlapping" if they are present in all clusters with at least 10% of all cells
+de_overlap <- lapply(result, function(x){
+  result2 <- x[table(colData(sce)[, celltype]) > ncol(sce) * 0.1]
+  de_overlap <- length(Reduce(intersect, result2))
+  de_overlap
+})
+
+mean_de_overlap <- mean(unlist(de_overlap))/n_genes
+min_de_overlap <- min(unlist(de_overlap))/n_genes
+max_de_overlap <- max(unlist(de_overlap))/n_genes
+
+#Genes unique to single celltypes
+unique_genes_matrix <- NULL
+unique_genes <- NULL
+cb <- length(names(result[[1]]))
+unique_genes <- lapply(result,function(x){
+  for( i in 1:cb ){
+    unique_genes[i] <-as.numeric(length(setdiff(unlist(x[i]),unlist(x[-i]))))
+  }
+  unique_genes_matrix <- cbind(unique_genes_matrix, unique_genes)
+  unique_genes_matrix
+})
+
+unique_genes <- Reduce('cbind', unique_genes)
+colnames(unique_genes) <- names(result)
+rownames(unique_genes) <- names(result[[1]])
+
+# Relative cluster specificity (unique/overlapping)
+rel_spec1 <- NULL
+for( i in 1:dim(unique_genes)[2] ){
+  rel_spec <- unique_genes[,i]/de_overlap[[i]]
+  rel_spec1 <- cbind(rel_spec1,rel_spec)
+}
+
+mean_rel_spec <- mean(rel_spec1)
+min_rel_spec <- min(rel_spec1)
+max_rel_spec <- max(rel_spec1)
+
+```
+
+### Celltype specific DE distributions
+
+How similar is the batch effect between celltypes. 
+Do we have similar logFC distributions or different?
+```{r ct de dist , fig.width=20, fig.height=20}
+
+combine_folds <- function(cont_var){
+  #extract the contrast of interest and change log2fold colums names to be unique
+  B <- res[[cont_var]] 
+  new_name <- function(p){
+    colnames(B[[p]])[3] <- paste0("logFC_", p)
+    return(B[[p]][,c(1,3)])
+    }
+  B_new_names <- lapply(names(B),new_name)
+  names(B_new_names) <- names(B)
+  #combine log2fold colums
+  Folds <- Reduce(function(...){inner_join(..., by="gene")}, B_new_names)
+}
+
+all_folds <- lapply(cs, combine_folds)
+
+#define pannels for pairs() function
+panel.cor <- function(x, y, digits = 2, cex.cor){
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits=digits)[1]
+  test <- cor.test(x,y)
+  Signif <- ifelse(round(test$p.value, 3) < 0.001,
+                   "p<0.001",
+                   paste("p=",round(test$p.value,3)))  
+  text(0.5, 0.25, paste("r=",txt), cex = 3)
+  text(.5, .75, Signif, cex = 3)
+}
+
+panel.smooth <- function (x, y, col = "blue", bg = NA, pch = 18, cex = 1.5, 
+                          col.smooth = "red", span = 2/3, iter = 3, ...){
+  points(x, y, pch = pch, col = col, bg = bg, cex = cex)
+  ok <- is.finite(x) & is.finite(y)
+  if( any(ok) ) 
+    lines(stats::lowess(x[ok], y[ok], f = span, iter = iter), 
+          col = col.smooth, ...)
+}
+
+panel.hist <- function(x, ...){
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(usr[1:2], 0, 1.5) )
+  h <- hist(x, plot = FALSE)
+  breaks <- h$breaks
+  nB <- length(breaks)
+  y <- h$counts
+  y <- y/max(y)
+  rect(breaks[-nB], 0, breaks[-1], y, col="cyan", ...)
+}
+#plot correlations
+lapply(names(all_folds), function(x) pairs(all_folds[[x]][,-1],
+                                           lower.panel = panel.smooth, 
+                                           upper.panel = panel.cor, 
+                                           diag.panel = panel.hist, main = x))
+```
+
+
+## Batch categorization {.tabset .tabset-pills}
+
+How does the batch effect manifest? Can we describe it by “simple” mean shifts of expression levels for some genes for all the cells in a given celltype and batch? Can we "remove" the batch effcet using 
+a linear model with batch, batch and celltype or batch and celltype interacting?
+
+```{r batch types}
+#Visualize different models
+vis_type <- function(dim_red){
+  g <- visGroup(sce, batch, dim_red = dim_red) + 
+    ggtitle("unadjusted")
+  g1 <- visGroup(sce, batch, dim_red = paste0(dim_red, "_Xadj1")) + 
+    ggtitle("constant batch effect")
+  g2 <- visGroup(sce, batch, dim_red = paste0(dim_red, "_Xadj1")) + 
+    ggtitle("constant batch effect, different ct composition")
+  g3 <- visGroup(sce, batch, dim_red = paste0(dim_red, "_Xadj1")) + 
+    ggtitle("celltype and batch effect interact")
+  do.call("grid.arrange", c(list(g, g1, g2, g3), ncol = 2))
+}
+
+
+
+```
+
+### PCA
+```{r batchtype pca}
+vis_type("PCA")
+```
+
+### UMAP
+```{r batchtype umap}
+vis_type("UMAP")
+```
+
+### Cellspecific Mixing Score
+```{r batchtype cms}
+# #Cellspecific Mixing score (Batch effect strength after "removal")
+visHist(sce, metric = c("cms", "cms.Xadj1", "cms.Xadj2", "cms.Xadj3"), prefix = FALSE)
+visIntegration(sce, metric = c("cms", "cms.Xadj1", "cms.Xadj2", "cms.Xadj3"), metric_name = "cms", prefix = FALSE)
+```
+
+
+## Simulation parameter
+Extract parameter to use as input into simualation
+```{r sim_param}
+#percentage of batch affected genes
+cond <- gsub("-.*", "", names(n_de))
+cond <- c(cond, unique(gsub(".*-", "", names(n_de))))
+cond <- unique(cond)
+de_be_tab <- n_de %>% bind_cols()
+de_cl_tab <- n_de_cl %>% bind_cols()
+
+de_be <- cond %>% map(function(x){
+  de_tab <- de_be_tab[, grep(x, colnames(de_be_tab))]
+  de_be <- rowMeans(de_tab)
+}) %>% bind_cols() %>% set_colnames(cond)
+
+n_cl <- cond %>% map(function(x){
+  cl_tab <- de_cl_tab[, grep(x, colnames(de_cl_tab))]
+  de_cl <- rowMeans(cl_tab)
+}) %>% bind_cols() %>% set_colnames(cond)
+
+
+p_be <- de_be/n_cl
+mean_p_be <- mean(colMeans(p_be))
+min_p_be <- min(colMins(as.matrix(p_be)))
+max_p_be <- max(colMaxs(as.matrix(p_be)))
+sd_p_be <- mean(colSds(as.matrix(p_be)))
+if(is.na(sd_p_be)){ sd_p_be <- 0 }
+
+
+#### Percentage of celltype specific genes "p_ct"
+n_de_unique <- lapply(result,function(x){
+  de_genes <- unlist(x) %>% unique() %>% length()
+  de_genes <- de_genes/length(x)
+}) %>% bind_cols()
+
+
+rel_spec2 <- NULL
+for(i in 1:length(de_overlap)){
+  rel_spec <- de_overlap[[i]]/mean(n_de[[i]][table(colData(sce)[, celltype]) > dim(expr)[2] * 0.1])
+  rel_spec2 <- cbind(rel_spec2, rel_spec)
+}
+
+mean_p_ct <- 1 - mean(rel_spec2)
+max_p_ct <- 1 - min(rel_spec2)
+min_p_ct <- 1 - max(rel_spec2)
+sd_p_ct <- sd(rel_spec2)
+if(is.na(sd_p_ct)){ sd_p_ct <- 0 }
+
+# Logfold change
+#logFoldchange batch effect distribution
+mean_lfc_cl <- lapply(res, function(y) vapply(y, function(x){
+  de_genes <- which(x$adj.P.Val < 0.05)
+  mean_de <- mean(abs(x[, "logFC"]))}
+  , numeric(1))) %>% bind_cols()
+
+mean_lfc_be <- mean(colMeans(mean_lfc_cl, na.rm = TRUE))
+min_lfc_be <- min(colMins(as.matrix(mean_lfc_cl), na.rm = TRUE))
+max_lfc_be <- max(colMaxs(as.matrix(mean_lfc_cl), na.rm = TRUE))
+
+```
+
+
+## Summarize batch effect
+- Batch size
+- Celltype specificity
+- "Batch genes"
+- batch type
+
+```{r summarize }
+#Size? How much of the variance can be attributed to the batch effect?
+size <- data.frame("batch_genes_1per" = n_batch_gene,       # 1.variance partition
+                   "batch_genes_10per" = n_batch_gene10,
+                   "celltype_gene_1per" = n_celltype_gene,
+                   "relative_batch_celltype" = n_rel,
+                   "mean_var_batch" = m_batch,
+                   "mean_var_celltype" = m_celltype,
+                   "rel_mean_ct_batch" = m_rel,
+                   "mean_cms" = mean_cms,                    #2.cms
+                   "n_cells_cms_0.01" = n_cms_0.01,
+                   "mean_mean_n_de_genes" = mean_mean_n_de,  #3.de genes
+                   "max_mean_n_de_genes" = max_mean_n_de,
+                   "min_mean_n_de_genes" = min_mean_n_de,
+                   "mean_n_genes_lfc1" = mean_n_genes_lfc1,
+                   "min_n_genes_lfc1" = min_n_genes_lfc1,
+                   "max_n_genes_lfc1" = max_n_genes_lfc1,
+                   "n_cells_total" = ncol(sce),              #4.general
+                   "n_genes_total" = nrow(sce))
+
+
+#Celltype-specificity? How celltype/cluster specific are batch effects? 
+# Differences in size, distribution or abundance? Do we find correlations between lfcs,
+# overlap in de genes, pathways? Interaction between ct and be?
+celltype <- data.frame('mean_rel_abund_diff' = mean_rel_abund_diff, #1.abundance
+                       'min_rel_abund_diff' = min_rel_abund_diff,
+                       'max_rel_abund_diff' = max_rel_abund_diff,
+                       "celltype_var_cms" = var_cms,                 #2.size/strength
+                       "mean_de_overlap" = mean_de_overlap,
+                       "min_de_overlap" = min_de_overlap,
+                       "max_de_overlap" = max_de_overlap,
+                       "mean_rel_cluster_spec"= mean_rel_spec,
+                       "min_rel_cluster_spec"= min_rel_spec,
+                       "max_rel_cluster_spec"= max_rel_spec)
+
+
+sim <- data.frame("mean_p_be" = mean_p_be,
+                  "max_p_be" = max_p_be,
+                  "min_p_be" = min_p_be,
+                  "sd_p_be" = sd_p_be,
+                  "mean_lfc_be" = mean_lfc_be,
+                  "min_lfc_be" = min_lfc_be,
+                  "max_lfc_be" = max_lfc_be,
+                  "mean_p_ct"= mean_p_ct,
+                  "min_p_ct"= min_p_ct,
+                  "max_p_ct"= max_p_ct,
+                  "sd_p_ct" = sd_p_ct)
+
+
+summary <- cbind(size, celltype, sim) %>% set_rownames(dataset_name)
+
+### -------------- save summary object ----------------------###
+saveRDS(summary, file = outputfile)
+```
+
+
+```{r}
+sessionInfo()
+```
+

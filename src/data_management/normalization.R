@@ -41,7 +41,7 @@ if( !all(c(batch, celltype, sample) %in% names(colData(sce))) ){
 clusters <- quickCluster(sce, use.ranks=FALSE)
 table(clusters)
 sce <- computeSumFactors(sce, min.mean=0.1, cluster=clusters)
-sce <- normalize(sce)
+sce <-  logNormCounts(sce)
 
 
 ### ------------ Check reduced dimensions----------------###

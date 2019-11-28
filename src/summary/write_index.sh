@@ -17,8 +17,11 @@ echo $index_file
 for sample in $files
 do
     link="+ [${sample}](batch_effect_${sample}.html)"
+    link_sim="+ [${sample}](simulation_${sample}.html)"
     echo $link
+    echo $link_sim
     sed -i "/^## Batch effects/a $link" $index_new
+    sed -i "/^## Simulation/a $link_sim" $index_new
 done
 
 

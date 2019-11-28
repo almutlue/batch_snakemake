@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Almut Lütge" />
+
+
+<title>Characterize batch effects</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code > span.dt { color: #204a87; } /* DataType */
+code > span.dv { color: #0000cf; } /* DecVal */
+code > span.bn { color: #0000cf; } /* BaseN */
+code > span.fl { color: #0000cf; } /* Float */
+code > span.ch { color: #4e9a06; } /* Char */
+code > span.st { color: #4e9a06; } /* String */
+code > span.co { color: #8f5902; font-style: italic; } /* Comment */
+code > span.ot { color: #8f5902; } /* Other */
+code > span.al { color: #ef2929; } /* Alert */
+code > span.fu { color: #000000; } /* Function */
+code > span.er { color: #a40000; font-weight: bold; } /* Error */
+code > span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #000000; } /* Constant */
+code > span.sc { color: #000000; } /* SpecialChar */
+code > span.vs { color: #4e9a06; } /* VerbatimString */
+code > span.ss { color: #4e9a06; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #000000; } /* Variable */
+code > span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code > span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code > span.ex { } /* Extension */
+code > span.at { color: #c4a000; } /* Attribute */
+code > span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code > span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Characterize batch effects</h1>
+<h4 class="author">Almut Lütge</h4>
+<h4 class="date">28 November, 2019</h4>
+
+</div>
+
+
+<div id="csf_patient" class="section level2">
+<h2>csf_patient</h2>
+<p><a href="index.html">Back to home</a></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">suppressPackageStartupMessages</span>({
+  <span class="kw">library</span>(CellBench)
+  <span class="kw">library</span>(scater)
+  <span class="kw">library</span>(CellMixS)
+  <span class="kw">library</span>(variancePartition)
+  <span class="kw">library</span>(purrr)
+  <span class="kw">library</span>(jcolors)
+  <span class="kw">library</span>(here)
+  <span class="kw">library</span>(tidyr)
+  <span class="kw">library</span>(dplyr)
+  <span class="kw">library</span>(stringr)
+  <span class="kw">library</span>(ComplexHeatmap)
+  <span class="kw">library</span>(ggtern)
+  <span class="kw">library</span>(scran)
+  <span class="kw">library</span>(cowplot)
+  <span class="kw">library</span>(CAMERA)
+  <span class="kw">library</span>(ggrepel)
+  <span class="kw">library</span>(readr)
+})</code></pre></div>
+<div id="dataset-and-parameter" class="section level3">
+<h3>Dataset and parameter</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sce &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$data)
+
+param &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$param)
+celltype &lt;-<span class="st"> </span>param[[<span class="st">&quot;celltype&quot;</span>]]
+batch &lt;-<span class="st"> </span>param[[<span class="st">&quot;batch&quot;</span>]]
+sample &lt;-<span class="st"> </span>param[[<span class="st">&quot;sample&quot;</span>]]
+dataset_name &lt;-<span class="st"> </span>param[[<span class="st">&quot;dataset_name&quot;</span>]]
+dataset_name</code></pre></div>
+<pre><code>## [1] &quot;csf_patient&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n_genes &lt;-<span class="st"> </span><span class="kw">nrow</span>(sce)
+
+<span class="kw">table</span>(<span class="kw">colData</span>(sce)[,celltype])</code></pre></div>
+<pre><code>## 
+##    0    1    2    3    4    5    6    7 
+## 1378  776  131   81   62   46   47   29</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(<span class="kw">colData</span>(sce)[,batch])</code></pre></div>
+<pre><code>## 
+## pat2 pat3 
+## 1377 1173</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_de &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$de)
+abund &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$abund)
+outputfile &lt;-<span class="st"> </span>params$out_file
+
+cols &lt;-<span class="kw">c</span>(<span class="kw">c</span>(<span class="kw">jcolors</span>(<span class="st">&#39;pal6&#39;</span>),<span class="kw">jcolors</span>(<span class="st">&#39;pal8&#39;</span>))[<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">8</span>,<span class="dv">14</span>,<span class="dv">5</span>,<span class="dv">2</span>:<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">9</span>:<span class="dv">13</span>,<span class="dv">15</span>:<span class="dv">20</span>)],<span class="kw">jcolors</span>(<span class="st">&#39;pal4&#39;</span>))
+<span class="kw">names</span>(cols) &lt;-<span class="st"> </span><span class="kw">c</span>()</code></pre></div>
+</div>
+<div id="visualize-data" class="section level3">
+<h3>Visualize data</h3>
+<p>How are sample, celltypes and batches distributed within normalized, but not batch corrected data?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">feature_list &lt;-<span class="st"> </span><span class="kw">c</span>(batch, celltype, sample)
+feature_list &lt;-<span class="st"> </span>feature_list[<span class="kw">which</span>(!<span class="kw">is.na</span>(feature_list))]
+
+<span class="kw">lapply</span>(feature_list, function(feature_name){
+  <span class="kw">visGroup</span>(sce, feature_name, <span class="dt">dim_red=</span> <span class="st">&quot;UMAP&quot;</span>)
+})</code></pre></div>
+<pre><code>## [[1]]</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/vis-1.svg" width="672" /></p>
+<pre><code>## 
+## [[2]]</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/vis-2.svg" width="672" /></p>
+<pre><code>## 
+## [[3]]</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/vis-3.svg" width="672" /></p>
+</div>
+</div>
+<div id="batch-strengthsize" class="section level2">
+<h2>Batch strength/size</h2>
+<p>To compare or describe the severity of a batch effect there are different meassures. In general they can either give an estimate of the relative strength compared to the signal of interest e.g. the celltype signal or an absolut estimate e.g. the number of batch affected genes.</p>
+<div id="variance-partitioning" class="section level3">
+<h3>Variance partitioning</h3>
+<p>How much of the variance within the datasets can we attributed to the batch effect and how much could be explained by the celltype? Which genes are mostly affected?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vp_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;vp_batch&quot;</span>, <span class="st">&quot;vp_celltype&quot;</span>, <span class="st">&quot;vp_residuals&quot;</span>)
+vp &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">rowData</span>(sce)[, vp_vars])  %&gt;%<span class="st"> </span>dplyr::<span class="kw">mutate</span>(<span class="dt">gene=</span> <span class="kw">rownames</span>(sce)) %&gt;%<span class="st"> </span>dplyr::<span class="kw">arrange</span>(-vp_batch)
+vp_sub &lt;-<span class="st"> </span>vp[<span class="dv">1</span>:<span class="dv">3</span>] %&gt;%<span class="st"> </span><span class="kw">set_rownames</span>(vp$gene)</code></pre></div>
+<pre><code>## Warning: Setting row names on a tibble is deprecated.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot</span>
+<span class="kw">plotPercentBars</span>( vp_sub[<span class="dv">1</span>:<span class="dv">10</span>,] )</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/variance%20part-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotVarPart</span>( vp_sub )</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/variance%20part-2.svg" width="672" /></p>
+</div>
+<div id="variance-and-gene-expression" class="section level3 tabset tabset-pills">
+<h3>Variance and gene expression</h3>
+<p>Are general expression and batch effect related? Does the batch effect or the celltype effect preferable manifest within highly, medium or low expressed genes?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#define expression classes by mean expression quantiles </span>
+th &lt;-<span class="st"> </span><span class="kw">quantile</span>(<span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts), <span class="kw">c</span>(.<span class="dv">33</span>, .<span class="dv">66</span>))
+high_th &lt;-<span class="st"> </span>th[<span class="dv">2</span>]
+mid_th &lt;-<span class="st"> </span>th[<span class="dv">1</span>]
+
+<span class="kw">rowData</span>(sce)$expr_class &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts) &gt;<span class="st"> </span>high_th, <span class="st">&quot;high&quot;</span>,
+                                  <span class="kw">ifelse</span>(<span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts) &lt;=<span class="st"> </span>high_th &amp;
+<span class="st">                                           </span><span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts) &gt;<span class="st"> </span>mid_th, 
+                                         <span class="st">&quot;medium&quot;</span>, <span class="st">&quot;low&quot;</span>))
+<span class="kw">rowData</span>(sce)$mean_expr &lt;-<span class="st"> </span><span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts)
+
+<span class="co">#plot </span>
+plot_dev &lt;-<span class="st"> </span>function(var, var_col){
+  <span class="kw">ggplot</span>(<span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)), <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;mean_expr&quot;</span>, <span class="dt">y =</span> var, <span class="dt">colour =</span> var_col)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+}
+
+<span class="co">#Ternary plots</span>
+<span class="kw">ggtern</span>(<span class="dt">data=</span><span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)),<span class="kw">aes</span>(vp_batch, vp_celltype, vp_residuals)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">stat_density_tern</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>..level.., <span class="dt">alpha=</span>..level..),<span class="dt">geom=</span><span class="st">&#39;polygon&#39;</span>) +
+<span class="st">  </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">high =</span> <span class="st">&quot;red&quot;</span>) +
+<span class="st">  </span><span class="kw">guides</span>(<span class="dt">color =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">alpha =</span> <span class="st">&quot;none&quot;</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size=</span> <span class="fl">0.1</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>)  +<span class="st"> </span>
+<span class="st">  </span><span class="kw">Llab</span>(<span class="st">&quot;batch&quot;</span>) +
+<span class="st">  </span><span class="kw">Tlab</span>(<span class="st">&quot;celltype&quot;</span>) +
+<span class="st">  </span><span class="kw">Rlab</span>(<span class="st">&quot;other&quot;</span>) +
+<span class="st">  </span><span class="kw">theme_bw</span>()</code></pre></div>
+<pre><code>## Warning: Removed 1309 rows containing non-finite values (StatDensityTern).</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/var%20expr-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1 &lt;-<span class="st"> </span><span class="kw">ggtern</span>(<span class="dt">data=</span><span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)),<span class="kw">aes</span>(vp_batch, vp_celltype, vp_residuals)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.1</span>) +
+<span class="st">  </span><span class="kw">geom_density_tern</span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw">Llab</span>(<span class="st">&quot;batch&quot;</span>) +
+<span class="st">  </span><span class="kw">Tlab</span>(<span class="st">&quot;celltype&quot;</span>) +
+<span class="st">  </span><span class="kw">Rlab</span>(<span class="st">&quot;other&quot;</span>) +
+<span class="st">  </span><span class="kw">theme_bw</span>()
+
+## Summarize variance partitioning
+<span class="co"># How many genes have a variance component affected by batch with &gt; 1%</span>
+n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_celltype&quot;</span>&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_rel &lt;-<span class="st"> </span>n_batch_gene/n_celltype_gene
+
+<span class="co"># Mean variance that is explained by the batch effect/celltype</span>
+m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_batch&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_batch&quot;]), na.rm = TRUE): argument
+## is not numeric or logical: returning NA</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_celltype&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_celltype&quot;]), na.rm = TRUE):
+## argument is not numeric or logical: returning NA</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
+<div id="scatterplot-batch" class="section level4">
+<h4>Scatterplot batch</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_batch&quot;</span>, <span class="st">&quot;vp_batch&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/var_plot_batch-1.svg" width="672" /></p>
+</div>
+<div id="scatterplot-celltype" class="section level4">
+<h4>Scatterplot celltype</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_celltype&quot;</span>, <span class="st">&quot;vp_celltype&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/var_plot_celltype-1.svg" width="672" /></p>
+</div>
+<div id="ternary-plot-all-genes" class="section level4">
+<h4>Ternary plot all genes</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/tern%20plots-1.svg" width="672" /></p>
+</div>
+<div id="ternary-plot-gene-expression-classes" class="section level4">
+<h4>Ternary plot gene expression classes</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1 +<span class="st"> </span><span class="kw">facet_grid</span>(~expr_class)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/tern%20plots%20gene%20class-1.svg" width="672" /></p>
+</div>
+</div>
+<div id="cellspecific-mixing-score" class="section level3 tabset tabset-pills">
+<h3>Cellspecific Mixing score</h3>
+<div id="overall" class="section level4">
+<h4>Overall</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#visualize overall cms score</span>
+<span class="kw">visHist</span>(sce, <span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/cms-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visMetric</span>(sce, <span class="dt">metric =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">dim_red =</span> <span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/cms-2.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visGroup</span>(sce, celltype, <span class="dt">dim_red =</span> <span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/cms-3.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summarize</span>
+mean_cms &lt;-<span class="st"> </span><span class="kw">mean</span>(sce$cms)
+n_cms_0<span class="fl">.01</span> &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">which</span>(sce$cms &lt;<span class="st"> </span><span class="fl">0.01</span>))
+cluster_mean_cms &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">colData</span>(sce)) %&gt;%<span class="st"> </span><span class="kw">group_by_at</span>(celltype) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">cms_mean =</span> <span class="kw">mean</span>(cms))
+var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_cms$cms_mean)</code></pre></div>
+</div>
+<div id="celltypes-cms-smooth" class="section level4">
+<h4>Celltypes cms smooth</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare by celltypes</span>
+<span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype)</code></pre></div>
+<pre><code>## Picking joint bandwidth of 0.00794</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/cms%20celltypes-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype, <span class="dt">violin =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/cms%20celltypes-2.svg" width="672" /></p>
+</div>
+<div id="celltypes-histogram" class="section level4">
+<h4>Celltypes histogram</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare histogram by celltype</span>
+
+p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="kw">as.data.frame</span>(<span class="kw">colData</span>(sce)), 
+            <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">fill =</span> celltype)) +<span class="st"> </span>
+<span class="st">                </span><span class="kw">geom_histogram</span>() +<span class="st"> </span>
+<span class="st">                </span><span class="kw">facet_wrap</span>(celltype, <span class="dt">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="dt">ncol =</span> <span class="dv">3</span>) +
+<span class="st">                </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> cols) +
+<span class="st">                </span><span class="kw">theme_classic</span>()
+
+p +<span class="st"> </span><span class="kw">geom_vline</span>(<span class="kw">aes_string</span>(<span class="dt">xintercept =</span> <span class="st">&quot;cms_mean&quot;</span>, 
+                   <span class="dt">colour =</span> celltype), 
+               cluster_mean_cms, <span class="dt">linetype=</span><span class="dv">2</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> cols) </code></pre></div>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/cms%20histogram-1.svg" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="celltype-specificity" class="section level2">
+<h2>Celltype specificity</h2>
+<div id="celltype-abundance" class="section level3">
+<h3>Celltype abundance</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">meta_tib &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">colData</span>(sce)) %&gt;%<span class="st"> </span><span class="kw">group_by_at</span>(<span class="kw">c</span>(batch, celltype)) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">n =</span> <span class="kw">n</span>()) %&gt;%<span class="st"> </span>dplyr::<span class="kw">mutate</span>(<span class="dt">cell_freq =</span> n /<span class="st"> </span><span class="kw">sum</span>(n))
+
+plot_abundance &lt;-<span class="st"> </span>function(cluster_var, tib, x_var){
+  meta_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">eval</span>(tib))
+  p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data=</span>meta_df, <span class="kw">aes_string</span>(<span class="dt">x=</span>x_var, <span class="dt">y=</span><span class="st">&quot;cell_freq&quot;</span>, <span class="dt">fill =</span> cluster_var)) +
+<span class="st">    </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>) +<span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span>cols, <span class="dt">name =</span> <span class="st">&quot;celltype&quot;</span>)
+  p +<span class="st"> </span><span class="kw">coord_flip</span>() +<span class="st"> </span><span class="kw">theme_minimal</span>() 
+}
+
+<span class="kw">plot_abundance</span>(<span class="dt">cluster_var =</span> celltype, <span class="dt">tib =</span> meta_tib, <span class="dt">x_var =</span> batch)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/celltype%20abundance-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summarize diff abundance</span>
+mean_rel_abund_diff &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(abund))
+min_rel_abund_diff &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(abund))
+max_rel_abund_diff &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">unlist</span>(abund))</code></pre></div>
+</div>
+<div id="batch-and-celltype-specific-count-distributions" class="section level3">
+<h3>Batch and celltype specific count distributions</h3>
+<p>Do the overall count distribution vary between batches? Are count distributions celltype depended</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#batch level</span>
+bids &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[, batch]))
+<span class="kw">names</span>(bids) &lt;-<span class="st"> </span>bids
+cids &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[, celltype]))
+<span class="kw">names</span>(cids) &lt;-<span class="st"> </span>cids
+
+<span class="co">#mean gene expression by batch and cluster</span>
+mean_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(bids, function(batch_var){
+  mean_cluster &lt;-<span class="st"> </span><span class="kw">lapply</span>(cids, function(cluster_var){
+    counts_sc &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">logcounts</span>(
+      sce[, <span class="kw">colData</span>(sce)[, batch] %in%<span class="st"> </span>batch_var &amp;<span class="st"> </span>
+<span class="st">            </span><span class="kw">colData</span>(sce)[, celltype] %in%<span class="st"> </span>cluster_var]))
+  })
+  mean_c &lt;-<span class="st"> </span>mean_cluster %&gt;%<span class="st"> </span><span class="kw">map</span>(rowMeans) %&gt;%<span class="st"> </span>bind_rows %&gt;%
+<span class="st">    </span>dplyr::<span class="kw">mutate</span>(<span class="dt">gene=</span><span class="kw">rownames</span>(sce)) %&gt;%<span class="st"> </span>
+<span class="st">    </span><span class="kw">gather</span>(cluster, logcounts, cids)
+})
+
+mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id=</span> <span class="st">&quot;batch&quot;</span>)
+
+<span class="kw">ggplot</span>(mean_expr, <span class="kw">aes</span>(<span class="dt">x=</span>logcounts, <span class="dt">colour=</span>batch)) +<span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha=</span>.<span class="dv">3</span>) +
+<span class="st">  </span><span class="kw">theme_classic</span>() +
+<span class="st">  </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
+<span class="st">  </span><span class="kw">scale_colour_manual</span>(<span class="dt">values =</span> cols[<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>,<span class="dv">7</span>)]) +
+<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">limits =</span>  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>))</code></pre></div>
+<pre><code>## Warning: Removed 11 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/count%20distributions-1.svg" width="960" /></p>
+</div>
+<div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
+<h3>Batch to batch comparisons of expression distributions</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#mean expression</span>
+mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;batch&quot;</span> ) %&gt;%<span class="st"> </span><span class="kw">spread</span>(batch, logcounts)
+batch_all &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[,batch]))
+
+<span class="kw">lapply</span>(batch_all, function(batch_var){
+  batch_var_2 &lt;-<span class="st"> </span>batch_all[-<span class="kw">which</span>(batch_all %in%<span class="st"> </span>batch_var)]
+  <span class="kw">lapply</span>(batch_var_2, function(batch_var_3){
+    <span class="kw">ggplot</span>(mean_expr, <span class="kw">aes_string</span>(<span class="dt">x=</span>batch_var, <span class="dt">y =</span> batch_var_3)) +
+<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> .<span class="dv">3</span>, <span class="kw">aes</span>(<span class="dt">color=</span>cluster)) +
+<span class="st">      </span><span class="kw">ggtitle</span>(batch_var) +<span class="st"> </span>
+<span class="st">      </span><span class="kw">geom_abline</span>(<span class="dt">slope =</span> <span class="dv">1</span>) +<span class="st"> </span>
+<span class="st">      </span><span class="kw">coord_fixed</span>() +
+<span class="st">      </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
+<span class="st">      </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span>cols) +
+<span class="st">      </span><span class="kw">theme_classic</span>()
+  })
+})</code></pre></div>
+<pre><code>## [[1]]
+## [[1]][[1]]</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/mean%20expression-1.svg" width="672" /></p>
+<pre><code>## 
+## 
+## [[2]]
+## [[2]][[1]]</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/mean%20expression-2.svg" width="672" /></p>
+</div>
+</div>
+<div id="differentially-expressed-genes" class="section level2">
+<h2>Differentially expressed genes</h2>
+<div id="upset-plot" class="section level3">
+<h3>Upset plot</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Upset plot\
+cont &lt;-<span class="st"> </span>param[[<span class="st">&quot;cont&quot;</span>]]
+cs &lt;-<span class="st"> </span><span class="kw">names</span>(cont)
+<span class="kw">names</span>(cs) &lt;-<span class="st"> </span>cs
+
+<span class="co"># Filter DEG by pvalue</span>
+FilterDEGs &lt;-<span class="st"> </span>function (<span class="dt">degDF =</span> df, <span class="dt">filter =</span> <span class="kw">c</span>(<span class="dt">FDR =</span> <span class="dv">5</span>)){
+  <span class="kw">rownames</span>(degDF) &lt;-<span class="st"> </span>degDF$gene
+  pval &lt;-<span class="st"> </span>degDF[, <span class="kw">grep</span>(<span class="st">&quot;adj.P.Val$&quot;</span>, <span class="kw">colnames</span>(degDF)), drop =<span class="st"> </span><span class="ot">FALSE</span>]
+  pf &lt;-<span class="st"> </span>pval &lt;=<span class="st"> </span>filter[<span class="st">&quot;FDR&quot;</span>]/<span class="dv">100</span>
+  pf[<span class="kw">is.na</span>(pf)] &lt;-<span class="st"> </span><span class="ot">FALSE</span>
+  DEGlistUPorDOWN &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(pf), function(x) <span class="kw">rownames</span>(pf[pf[, x, <span class="dt">drop =</span> <span class="ot">FALSE</span>], , <span class="dt">drop =</span> <span class="ot">FALSE</span>]), <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
+}
+
+result &lt;-<span class="st"> </span><span class="kw">list</span>()
+m2 &lt;-<span class="st"> </span><span class="kw">list</span>()
+
+for(jj in <span class="dv">1</span>:<span class="kw">length</span>(cs)){
+  result[[jj]] &lt;-<span class="st"> </span><span class="kw">sapply</span>(res_de[[<span class="dv">1</span>]][[<span class="kw">names</span>(cs)[jj]]], function(x) <span class="kw">FilterDEGs</span>(x))
+  <span class="kw">names</span>(result[[jj]]) &lt;-<span class="st"> </span>cids
+  m2[[jj]] =<span class="st"> </span><span class="kw">make_comb_mat</span>(result[[jj]], <span class="dt">mode =</span> <span class="st">&quot;intersect&quot;</span>)
+}
+
+<span class="kw">names</span>(result) &lt;-<span class="st"> </span><span class="kw">names</span>(cs)
+<span class="kw">names</span>(m2) &lt;-<span class="st"> </span><span class="kw">names</span>(cs)
+
+<span class="kw">lapply</span>(m2, function(x) <span class="kw">UpSet</span>(x))</code></pre></div>
+<pre><code>## $`pat2-pat3`</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/de%20res-1.svg" width="672" /></p>
+</div>
+<div id="logfold_change-and-gsea" class="section level3">
+<h3>Logfold_change and GSEA</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
+res &lt;-<span class="st"> </span>res_de[[<span class="st">&quot;table&quot;</span>]]
+n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$adj.P.Val &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(<span class="kw">abs</span>(x$logFC) &gt;<span class="st"> </span><span class="dv">1</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+mean_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
+
+<span class="co"># plot DE for all comparison and check gene sets</span>
+<span class="co">#get geneset</span>
+gs &lt;-<span class="st"> </span><span class="kw">read_delim</span>(params$gs, <span class="dt">delim =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">col_names =</span> <span class="st">&quot;cat&quot;</span>)</code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   cat = col_character()
+## )</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cats &lt;-<span class="st"> </span><span class="kw">sapply</span>(gs$cat, function(u) <span class="kw">strsplit</span>(u, <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)[[<span class="dv">1</span>]][-<span class="dv">2</span>], 
+               <span class="dt">USE.NAMES =</span> <span class="ot">FALSE</span>)
+<span class="kw">names</span>(cats) &lt;-<span class="st"> </span><span class="kw">sapply</span>(cats, .subset, <span class="dv">1</span>)
+cats &lt;-<span class="st"> </span><span class="kw">lapply</span>(cats, function(u) u[-<span class="dv">1</span>])
+
+plotDE &lt;-<span class="st"> </span>function(cont_var){
+  res_s &lt;-<span class="st"> </span>res[[cont_var]] %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, adj.P.Val &lt;<span class="st"> </span>.<span class="dv">05</span>) %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>)
+  
+  <span class="co">#plot</span>
+  <span class="kw">lapply</span>(<span class="kw">names</span>(res[[cont_var]]), function(ct){
+    ct_de &lt;-<span class="st"> </span>res[[cont_var]][[ct]]
+    ct_de$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, ct_de$gene)
+    res_s[[ct]]$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, res_s[[ct]]$gene)
+    
+    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> AveExpr, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
+<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> .<span class="dv">5</span>) +
+<span class="st">      </span><span class="kw">geom_label_repel</span>(<span class="dt">data =</span> res_s[[ct]]) +
+<span class="st">      </span><span class="kw">ggtitle</span>(<span class="kw">paste0</span>(ct,<span class="st">&quot;: &quot;</span>, cont_var)) +
+<span class="st">      </span><span class="kw">theme_classic</span>()
+    <span class="kw">print</span>(p)
+    
+    <span class="kw">cat</span>(<span class="st">&quot;Cluster:&quot;</span>, ct, <span class="st">&quot;Contrast:&quot;</span>, cont_var, 
+        <span class="st">&quot;Num genes:&quot;</span>, <span class="kw">nrow</span>(ct_de), <span class="st">&quot;Num DE:&quot;</span>, <span class="kw">nrow</span>(res_s[[ct]]), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span> )
+
+    <span class="co"># run &#39;camera&#39; for this comparison</span>
+    inds &lt;-<span class="st"> </span><span class="kw">ids2indices</span>(cats, ct_de$gene)
+    cm &lt;-<span class="st"> </span><span class="kw">cameraPR</span>(ct_de$t, inds)
+    <span class="kw">print</span>(cm %&gt;%<span class="st"> </span><span class="kw">rownames_to_column</span>(<span class="st">&quot;category&quot;</span>) %&gt;%<span class="st"> </span>
+<span class="st">      </span><span class="kw">filter</span>(FDR &lt;<span class="st"> </span>.<span class="dv">05</span> &amp;<span class="st"> </span>NGenes &gt;=<span class="st"> </span><span class="dv">5</span>) %&gt;%<span class="st"> </span><span class="kw">head</span>(<span class="dv">8</span>))
+  })
+}
+
+pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-1.svg" width="672" /></p>
+<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4097 Num DE: 6 
+##                                category NGenes Direction       PValue
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 4.124427e-90
+## 2                       GO_RRNA_BINDING     38      Down 6.713286e-50
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 6.724957e-39
+## 4                        GO_RNA_BINDING    782      Down 2.969275e-08
+## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 4.256255e-08
+## 6                 GO_POLY_A_RNA_BINDING    644      Down 3.869561e-07
+## 7                       GO_MRNA_BINDING     78      Down 1.454603e-05
+##            FDR
+## 1 3.460394e-87
+## 2 2.816224e-47
+## 3 1.880746e-36
+## 4 6.228054e-06
+## 5 7.141995e-06
+## 6 5.410936e-05
+## 7 1.743446e-03</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-2.svg" width="672" /></p>
+<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4097 Num DE: 4 
+##                                category NGenes Direction       PValue
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 5.191545e-53
+## 2                       GO_RRNA_BINDING     38      Down 1.111221e-33
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 1.115089e-24
+## 4                        GO_RNA_BINDING    782      Down 5.160400e-06
+## 5     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 7.188334e-06
+## 6   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 8.044669e-06
+## 7                 GO_POLY_A_RNA_BINDING    644      Down 4.500049e-05
+## 8                       GO_MRNA_BINDING     78      Down 4.175992e-04
+##            FDR
+## 1 4.355706e-50
+## 2 4.661573e-31
+## 3 3.118533e-22
+## 4 1.082394e-03
+## 5 1.124913e-03
+## 6 1.124913e-03
+## 7 5.393630e-03
+## 8 4.379572e-02</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-3.svg" width="672" /></p>
+<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4097 Num DE: 10 
+##                                       category NGenes Direction
+## 1        GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down
+## 2                              GO_RRNA_BINDING     38      Down
+## 3              GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down
+## 4                   GO_PEPTIDE_ANTIGEN_BINDING     16        Up
+## 5                           GO_ANTIGEN_BINDING     42        Up
+## 6            GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up
+## 7 GO_LOW_DENSITY_LIPOPROTEIN_RECEPTOR_ACTIVITY      6        Up
+## 8    GO_LIPOPROTEIN_PARTICLE_RECEPTOR_ACTIVITY      6        Up
+##         PValue          FDR
+## 1 5.326783e-26 4.469171e-23
+## 2 1.358473e-21 5.698795e-19
+## 3 1.546395e-14 4.324750e-12
+## 4 5.000890e-05 9.236830e-03
+## 5 5.504666e-05 9.236830e-03
+## 6 1.357608e-04 1.898389e-02
+## 7 2.651166e-04 2.497849e-02
+## 8 2.651166e-04 2.497849e-02</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-4.svg" width="672" /></p>
+<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4097 Num DE: 6 
+##                                category NGenes Direction       PValue
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 1.558167e-50
+## 2                       GO_RRNA_BINDING     38      Down 2.563737e-24
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 8.037206e-23
+## 4                        GO_RNA_BINDING    782      Down 2.217604e-06
+## 5                 GO_POLY_A_RNA_BINDING    644      Down 4.349444e-06
+## 6     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 4.425539e-06
+##            FDR
+## 1 1.307302e-47
+## 2 1.075488e-21
+## 3 2.247739e-20
+## 4 4.651425e-04
+## 5 6.188379e-04
+## 6 6.188379e-04</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
+<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4097 Num DE: 7 
+## [1] category  NGenes    Direction PValue    FDR      
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-6.svg" width="672" /></p>
+<pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4097 Num DE: 7 
+##                                category NGenes Direction       PValue
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 7.389617e-23
+## 2                       GO_RRNA_BINDING     38      Down 1.362454e-12
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 2.716832e-11
+## 4   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 3.981812e-08
+##            FDR
+## 1 6.199889e-20
+## 2 5.715493e-10
+## 3 7.598072e-09
+## 4 8.351851e-06</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-7.svg" width="672" /></p>
+<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4097 Num DE: 9 
+##                                category NGenes Direction       PValue
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 2.596689e-23
+## 2                       GO_RRNA_BINDING     38      Down 2.915841e-13
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 3.312461e-12
+## 4     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.162949e-06
+##            FDR
+## 1 2.178622e-20
+## 2 1.223195e-10
+## 3 9.263848e-10
+## 4 2.439285e-04</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-8.svg" width="672" /></p>
+<pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4097 Num DE: 6 
+##                                category NGenes Direction       PValue
+## 1                       GO_RRNA_BINDING     38      Down 2.590187e-06
+## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 3.043694e-05
+##           FDR
+## 1 0.002173167
+## 2 0.012768295</code></pre>
+<p>Summarize differential expression analysis</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
+n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$adj.P.Val &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+n_de_cl &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">nrow</span>(x), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+mean_n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(n_de, function(x) <span class="kw">mean</span>(x))
+mean_mean_n_de &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(mean_n_de))/n_genes
+min_mean_n_de &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(mean_n_de))/n_genes
+max_mean_n_de &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">unlist</span>(mean_n_de))/n_genes
+
+<span class="co"># Genes with lfc &gt; 1</span>
+n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(<span class="kw">abs</span>(x$logFC) &gt;<span class="st"> </span><span class="dv">1</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+mean_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
+min_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
+max_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
+
+<span class="co"># DE genes overlap between celltypes (celltype specific de genes)</span>
+<span class="co"># Genes are &quot;overlapping&quot; if they are present in all clusters with at least 10% of all cells</span>
+de_overlap &lt;-<span class="st"> </span><span class="kw">lapply</span>(result, function(x){
+  result2 &lt;-<span class="st"> </span>x[<span class="kw">table</span>(<span class="kw">colData</span>(sce)[, celltype]) &gt;<span class="st"> </span><span class="kw">ncol</span>(sce) *<span class="st"> </span><span class="fl">0.1</span>]
+  de_overlap &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">Reduce</span>(intersect, result2))
+  de_overlap
+})
+
+mean_de_overlap &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(de_overlap))/n_genes
+min_de_overlap &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(de_overlap))/n_genes
+max_de_overlap &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">unlist</span>(de_overlap))/n_genes
+
+<span class="co">#Genes unique to single celltypes</span>
+unique_genes_matrix &lt;-<span class="st"> </span><span class="ot">NULL</span>
+unique_genes &lt;-<span class="st"> </span><span class="ot">NULL</span>
+cb &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">names</span>(result[[<span class="dv">1</span>]]))
+unique_genes &lt;-<span class="st"> </span><span class="kw">lapply</span>(result,function(x){
+  for( i in <span class="dv">1</span>:cb ){
+    unique_genes[i] &lt;-<span class="kw">as.numeric</span>(<span class="kw">length</span>(<span class="kw">setdiff</span>(<span class="kw">unlist</span>(x[i]),<span class="kw">unlist</span>(x[-i]))))
+  }
+  unique_genes_matrix &lt;-<span class="st"> </span><span class="kw">cbind</span>(unique_genes_matrix, unique_genes)
+  unique_genes_matrix
+})
+
+unique_genes &lt;-<span class="st"> </span><span class="kw">Reduce</span>(<span class="st">&#39;cbind&#39;</span>, unique_genes)
+<span class="kw">colnames</span>(unique_genes) &lt;-<span class="st"> </span><span class="kw">names</span>(result)
+<span class="kw">rownames</span>(unique_genes) &lt;-<span class="st"> </span><span class="kw">names</span>(result[[<span class="dv">1</span>]])
+
+<span class="co"># Relative cluster specificity (unique/overlapping)</span>
+rel_spec1 &lt;-<span class="st"> </span><span class="ot">NULL</span>
+for( i in <span class="dv">1</span>:<span class="kw">dim</span>(unique_genes)[<span class="dv">2</span>] ){
+  rel_spec &lt;-<span class="st"> </span>unique_genes[,i]/de_overlap[[i]]
+  rel_spec1 &lt;-<span class="st"> </span><span class="kw">cbind</span>(rel_spec1,rel_spec)
+}
+
+mean_rel_spec &lt;-<span class="st"> </span><span class="kw">mean</span>(rel_spec1)
+min_rel_spec &lt;-<span class="st"> </span><span class="kw">min</span>(rel_spec1)
+max_rel_spec &lt;-<span class="st"> </span><span class="kw">max</span>(rel_spec1)</code></pre></div>
+</div>
+<div id="celltype-specific-de-distributions" class="section level3">
+<h3>Celltype specific DE distributions</h3>
+<p>How similar is the batch effect between celltypes. Do we have similar logFC distributions or different?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">combine_folds &lt;-<span class="st"> </span>function(cont_var){
+  <span class="co">#extract the contrast of interest and change log2fold colums names to be unique</span>
+  B &lt;-<span class="st"> </span>res[[cont_var]] 
+  new_name &lt;-<span class="st"> </span>function(p){
+    <span class="kw">colnames</span>(B[[p]])[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;logFC_&quot;</span>, p)
+    <span class="kw">return</span>(B[[p]][,<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)])
+    }
+  B_new_names &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(B),new_name)
+  <span class="kw">names</span>(B_new_names) &lt;-<span class="st"> </span><span class="kw">names</span>(B)
+  <span class="co">#combine log2fold colums</span>
+  Folds &lt;-<span class="st"> </span><span class="kw">Reduce</span>(function(...){<span class="kw">inner_join</span>(..., <span class="dt">by=</span><span class="st">&quot;gene&quot;</span>)}, B_new_names)
+}
+
+all_folds &lt;-<span class="st"> </span><span class="kw">lapply</span>(cs, combine_folds)
+
+<span class="co">#define pannels for pairs() function</span>
+panel.cor &lt;-<span class="st"> </span>function(x, y, <span class="dt">digits =</span> <span class="dv">2</span>, cex.cor){
+  usr &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="st">&quot;usr&quot;</span>); <span class="kw">on.exit</span>(<span class="kw">par</span>(usr))
+  <span class="kw">par</span>(<span class="dt">usr =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))
+  r &lt;-<span class="st"> </span><span class="kw">abs</span>(<span class="kw">cor</span>(x, y))
+  txt &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">c</span>(r, <span class="fl">0.123456789</span>), <span class="dt">digits=</span>digits)[<span class="dv">1</span>]
+  test &lt;-<span class="st"> </span><span class="kw">cor.test</span>(x,y)
+  Signif &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">round</span>(test$p.value, <span class="dv">3</span>) &lt;<span class="st"> </span><span class="fl">0.001</span>,
+                   <span class="st">&quot;p&lt;0.001&quot;</span>,
+                   <span class="kw">paste</span>(<span class="st">&quot;p=&quot;</span>,<span class="kw">round</span>(test$p.value,<span class="dv">3</span>)))  
+  <span class="kw">text</span>(<span class="fl">0.5</span>, <span class="fl">0.25</span>, <span class="kw">paste</span>(<span class="st">&quot;r=&quot;</span>,txt), <span class="dt">cex =</span> <span class="dv">3</span>)
+  <span class="kw">text</span>(.<span class="dv">5</span>, .<span class="dv">75</span>, Signif, <span class="dt">cex =</span> <span class="dv">3</span>)
+}
+
+panel.smooth &lt;-<span class="st"> </span>function (x, y, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">bg =</span> <span class="ot">NA</span>, <span class="dt">pch =</span> <span class="dv">18</span>, <span class="dt">cex =</span> <span class="fl">1.5</span>, 
+                          <span class="dt">col.smooth =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">span =</span> <span class="dv">2</span>/<span class="dv">3</span>, <span class="dt">iter =</span> <span class="dv">3</span>, ...){
+  <span class="kw">points</span>(x, y, <span class="dt">pch =</span> pch, <span class="dt">col =</span> col, <span class="dt">bg =</span> bg, <span class="dt">cex =</span> cex)
+  ok &lt;-<span class="st"> </span><span class="kw">is.finite</span>(x) &amp;<span class="st"> </span><span class="kw">is.finite</span>(y)
+  if( <span class="kw">any</span>(ok) ) 
+    <span class="kw">lines</span>(stats::<span class="kw">lowess</span>(x[ok], y[ok], <span class="dt">f =</span> span, <span class="dt">iter =</span> iter), 
+          <span class="dt">col =</span> col.smooth, ...)
+}
+
+panel.hist &lt;-<span class="st"> </span>function(x, ...){
+  usr &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="st">&quot;usr&quot;</span>); <span class="kw">on.exit</span>(<span class="kw">par</span>(usr))
+  <span class="kw">par</span>(<span class="dt">usr =</span> <span class="kw">c</span>(usr[<span class="dv">1</span>:<span class="dv">2</span>], <span class="dv">0</span>, <span class="fl">1.5</span>) )
+  h &lt;-<span class="st"> </span><span class="kw">hist</span>(x, <span class="dt">plot =</span> <span class="ot">FALSE</span>)
+  breaks &lt;-<span class="st"> </span>h$breaks
+  nB &lt;-<span class="st"> </span><span class="kw">length</span>(breaks)
+  y &lt;-<span class="st"> </span>h$counts
+  y &lt;-<span class="st"> </span>y/<span class="kw">max</span>(y)
+  <span class="kw">rect</span>(breaks[-nB], <span class="dv">0</span>, breaks[-<span class="dv">1</span>], y, <span class="dt">col=</span><span class="st">&quot;cyan&quot;</span>, ...)
+}
+<span class="co">#plot correlations</span>
+<span class="kw">lapply</span>(<span class="kw">names</span>(all_folds), function(x) <span class="kw">pairs</span>(all_folds[[x]][,-<span class="dv">1</span>],
+                                           <span class="dt">lower.panel =</span> panel.smooth, 
+                                           <span class="dt">upper.panel =</span> panel.cor, 
+                                           <span class="dt">diag.panel =</span> panel.hist, <span class="dt">main =</span> x))</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/ct%20de%20dist%20-1.svg" width="1920" /></p>
+<pre><code>## [[1]]
+## NULL</code></pre>
+</div>
+</div>
+<div id="batch-categorization" class="section level2 tabset tabset-pills">
+<h2>Batch categorization</h2>
+<p>How does the batch effect manifest? Can we describe it by “simple” mean shifts of expression levels for some genes for all the cells in a given celltype and batch? Can we “remove” the batch effcet using a linear model with batch, batch and celltype or batch and celltype interacting?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Visualize different models</span>
+vis_type &lt;-<span class="st"> </span>function(dim_red){
+  g &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> dim_red) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;unadjusted&quot;</span>)
+  g1 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj1&quot;</span>)) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;constant batch effect&quot;</span>)
+  g2 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj1&quot;</span>)) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;constant batch effect, different ct composition&quot;</span>)
+  g3 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj1&quot;</span>)) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;celltype and batch effect interact&quot;</span>)
+  <span class="kw">do.call</span>(<span class="st">&quot;grid.arrange&quot;</span>, <span class="kw">c</span>(<span class="kw">list</span>(g, g1, g2, g3), <span class="dt">ncol =</span> <span class="dv">2</span>))
+}</code></pre></div>
+<div id="pca" class="section level3">
+<h3>PCA</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_type</span>(<span class="st">&quot;PCA&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/batchtype%20pca-1.svg" width="672" /></p>
+</div>
+<div id="umap" class="section level3">
+<h3>UMAP</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_type</span>(<span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/batchtype%20umap-1.svg" width="672" /></p>
+</div>
+<div id="cellspecific-mixing-score-1" class="section level3">
+<h3>Cellspecific Mixing Score</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># #Cellspecific Mixing score (Batch effect strength after &quot;removal&quot;)</span>
+<span class="kw">visHist</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="batch_effect_csf_patient_files/figure-html/batchtype%20cms-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visIntegration</span>(sce, <span class="dt">metric =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">metric_name =</span> <span class="st">&quot;cms&quot;</span>)</code></pre></div>
+<pre><code>## Picking joint bandwidth of 0.0289</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/batchtype%20cms-2.svg" width="672" /></p>
+</div>
+</div>
+<div id="simulation-parameter" class="section level2">
+<h2>Simulation parameter</h2>
+<p>Extract parameter to use as input into simualation</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#percentage of batch affected genes</span>
+cond &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-.*&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">names</span>(n_de))
+cond &lt;-<span class="st"> </span><span class="kw">c</span>(cond, <span class="kw">unique</span>(<span class="kw">gsub</span>(<span class="st">&quot;.*-&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">names</span>(n_de))))
+cond &lt;-<span class="st"> </span><span class="kw">unique</span>(cond)
+de_be_tab &lt;-<span class="st"> </span>n_de %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
+de_cl_tab &lt;-<span class="st"> </span>n_de_cl %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
+
+de_be &lt;-<span class="st"> </span>cond %&gt;%<span class="st"> </span><span class="kw">map</span>(function(x){
+  de_tab &lt;-<span class="st"> </span>de_be_tab[, <span class="kw">grep</span>(x, <span class="kw">colnames</span>(de_be_tab))]
+  de_be &lt;-<span class="st"> </span><span class="kw">rowMeans</span>(de_tab)
+}) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>() %&gt;%<span class="st"> </span><span class="kw">set_colnames</span>(cond)
+
+n_cl &lt;-<span class="st"> </span>cond %&gt;%<span class="st"> </span><span class="kw">map</span>(function(x){
+  cl_tab &lt;-<span class="st"> </span>de_cl_tab[, <span class="kw">grep</span>(x, <span class="kw">colnames</span>(de_cl_tab))]
+  de_cl &lt;-<span class="st"> </span><span class="kw">rowMeans</span>(cl_tab)
+}) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>() %&gt;%<span class="st"> </span><span class="kw">set_colnames</span>(cond)
+
+
+p_be &lt;-<span class="st"> </span>de_be/n_cl
+mean_p_be &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">colMeans</span>(p_be))
+min_p_be &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">colMins</span>(<span class="kw">as.matrix</span>(p_be)))
+max_p_be &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">colMaxs</span>(<span class="kw">as.matrix</span>(p_be)))
+sd_p_be &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">colSds</span>(<span class="kw">as.matrix</span>(p_be)))
+if(<span class="kw">is.na</span>(sd_p_be)){ sd_p_be &lt;-<span class="st"> </span><span class="dv">0</span> }
+
+
+#### Percentage of celltype specific genes &quot;p_ct&quot;
+n_de_unique &lt;-<span class="st"> </span><span class="kw">lapply</span>(result,function(x){
+  de_genes &lt;-<span class="st"> </span><span class="kw">unlist</span>(x) %&gt;%<span class="st"> </span><span class="kw">unique</span>() %&gt;%<span class="st"> </span><span class="kw">length</span>()
+  de_genes &lt;-<span class="st"> </span>de_genes/<span class="kw">length</span>(x)
+}) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
+
+
+rel_spec2 &lt;-<span class="st"> </span><span class="ot">NULL</span>
+for(i in <span class="dv">1</span>:<span class="kw">length</span>(de_overlap)){
+  rel_spec &lt;-<span class="st"> </span>de_overlap[[i]]/<span class="kw">mean</span>(n_de[[i]][<span class="kw">table</span>(<span class="kw">colData</span>(sce)[, celltype]) &gt;<span class="st"> </span><span class="kw">dim</span>(expr)[<span class="dv">2</span>] *<span class="st"> </span><span class="fl">0.1</span>])
+  rel_spec2 &lt;-<span class="st"> </span><span class="kw">cbind</span>(rel_spec2, rel_spec)
+}
+
+mean_p_ct &lt;-<span class="st"> </span><span class="dv">1</span> -<span class="st"> </span><span class="kw">mean</span>(rel_spec2)
+max_p_ct &lt;-<span class="st"> </span><span class="dv">1</span> -<span class="st"> </span><span class="kw">min</span>(rel_spec2)
+min_p_ct &lt;-<span class="st"> </span><span class="dv">1</span> -<span class="st"> </span><span class="kw">max</span>(rel_spec2)
+sd_p_ct &lt;-<span class="st"> </span><span class="kw">sd</span>(rel_spec2)
+if(<span class="kw">is.na</span>(sd_p_ct)){ sd_p_ct &lt;-<span class="st"> </span><span class="dv">0</span> }
+
+<span class="co"># Logfold change</span>
+<span class="co">#logFoldchange batch effect distribution</span>
+mean_lfc_cl &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x){
+  de_genes &lt;-<span class="st"> </span><span class="kw">which</span>(x$adj.P.Val &lt;<span class="st"> </span><span class="fl">0.05</span>)
+  mean_de &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">abs</span>(x[, <span class="st">&quot;logFC&quot;</span>]))}
+  , <span class="kw">numeric</span>(<span class="dv">1</span>))) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
+
+mean_lfc_be &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">colMeans</span>(mean_lfc_cl, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+min_lfc_be &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">colMins</span>(<span class="kw">as.matrix</span>(mean_lfc_cl), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+max_lfc_be &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">colMaxs</span>(<span class="kw">as.matrix</span>(mean_lfc_cl), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</code></pre></div>
+</div>
+<div id="summarize-batch-effect" class="section level2">
+<h2>Summarize batch effect</h2>
+<ul>
+<li>Batch size</li>
+<li>Celltype specificity</li>
+<li>“Batch genes”</li>
+<li>batch type</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Size? How much of the variance can be attributed to the batch effect?</span>
+size &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;batch_genes_1per&quot;</span> =<span class="st"> </span>n_batch_gene,       <span class="co"># 1.variance partition</span>
+                   <span class="st">&quot;batch_genes_10per&quot;</span> =<span class="st"> </span>n_batch_gene10,
+                   <span class="st">&quot;celltype_gene_1per&quot;</span> =<span class="st"> </span>n_celltype_gene,
+                   <span class="st">&quot;relative_batch_celltype&quot;</span> =<span class="st"> </span>n_rel,
+                   <span class="st">&quot;mean_var_batch&quot;</span> =<span class="st"> </span>m_batch,
+                   <span class="st">&quot;mean_var_celltype&quot;</span> =<span class="st"> </span>m_celltype,
+                   <span class="st">&quot;rel_mean_ct_batch&quot;</span> =<span class="st"> </span>m_rel,
+                   <span class="st">&quot;mean_cms&quot;</span> =<span class="st"> </span>mean_cms,                    <span class="co">#2.cms</span>
+                   <span class="st">&quot;n_cells_cms_0.01&quot;</span> =<span class="st"> </span>n_cms_0<span class="fl">.01</span>,
+                   <span class="st">&quot;mean_mean_n_de_genes&quot;</span> =<span class="st"> </span>mean_mean_n_de,  <span class="co">#3.de genes</span>
+                   <span class="st">&quot;max_mean_n_de_genes&quot;</span> =<span class="st"> </span>max_mean_n_de,
+                   <span class="st">&quot;min_mean_n_de_genes&quot;</span> =<span class="st"> </span>min_mean_n_de,
+                   <span class="st">&quot;mean_n_genes_lfc1&quot;</span> =<span class="st"> </span>mean_n_genes_lfc1,
+                   <span class="st">&quot;min_n_genes_lfc1&quot;</span> =<span class="st"> </span>min_n_genes_lfc1,
+                   <span class="st">&quot;max_n_genes_lfc1&quot;</span> =<span class="st"> </span>max_n_genes_lfc1,
+                   <span class="st">&quot;n_cells_total&quot;</span> =<span class="st"> </span><span class="kw">ncol</span>(sce),              <span class="co">#4.general</span>
+                   <span class="st">&quot;n_genes_total&quot;</span> =<span class="st"> </span><span class="kw">nrow</span>(sce))
+
+
+<span class="co">#Celltype-specificity? How celltype/cluster specific are batch effects? </span>
+<span class="co"># Differences in size, distribution or abundance? Do we find correlations between lfcs,</span>
+<span class="co"># overlap in de genes, pathways? Interaction between ct and be?</span>
+celltype &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&#39;mean_rel_abund_diff&#39;</span> =<span class="st"> </span>mean_rel_abund_diff, <span class="co">#1.abundance</span>
+                       <span class="st">&#39;min_rel_abund_diff&#39;</span> =<span class="st"> </span>min_rel_abund_diff,
+                       <span class="st">&#39;max_rel_abund_diff&#39;</span> =<span class="st"> </span>max_rel_abund_diff,
+                       <span class="st">&quot;celltype_var_cms&quot;</span> =<span class="st"> </span>var_cms,                 <span class="co">#2.size/strength</span>
+                       <span class="st">&quot;mean_de_overlap&quot;</span> =<span class="st"> </span>mean_de_overlap,
+                       <span class="st">&quot;min_de_overlap&quot;</span> =<span class="st"> </span>min_de_overlap,
+                       <span class="st">&quot;max_de_overlap&quot;</span> =<span class="st"> </span>max_de_overlap,
+                       <span class="st">&quot;mean_rel_cluster_spec&quot;</span>=<span class="st"> </span>mean_rel_spec,
+                       <span class="st">&quot;min_rel_cluster_spec&quot;</span>=<span class="st"> </span>min_rel_spec,
+                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec)
+
+
+sim &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;mean_p_be&quot;</span> =<span class="st"> </span>mean_p_be,
+                  <span class="st">&quot;max_p_be&quot;</span> =<span class="st"> </span>max_p_be,
+                  <span class="st">&quot;min_p_be&quot;</span> =<span class="st"> </span>min_p_be,
+                  <span class="st">&quot;sd_p_be&quot;</span> =<span class="st"> </span>sd_p_be,
+                  <span class="st">&quot;mean_lfc_be&quot;</span> =<span class="st"> </span>mean_lfc_be,
+                  <span class="st">&quot;min_lfc_be&quot;</span> =<span class="st"> </span>min_lfc_be,
+                  <span class="st">&quot;max_lfc_be&quot;</span> =<span class="st"> </span>max_lfc_be,
+                  <span class="st">&quot;mean_p_ct&quot;</span>=<span class="st"> </span>mean_p_ct,
+                  <span class="st">&quot;min_p_ct&quot;</span>=<span class="st"> </span>min_p_ct,
+                  <span class="st">&quot;max_p_ct&quot;</span>=<span class="st"> </span>max_p_ct,
+                  <span class="st">&quot;sd_p_ct&quot;</span> =<span class="st"> </span>sd_p_ct)
+
+
+summary &lt;-<span class="st"> </span><span class="kw">cbind</span>(size, celltype, sim) %&gt;%<span class="st"> </span><span class="kw">set_rownames</span>(dataset_name)
+
+### -------------- save summary object ----------------------###
+<span class="kw">saveRDS</span>(summary, <span class="dt">file =</span> outputfile)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()</code></pre></div>
+<pre><code>## R version 3.6.1 (2019-07-05)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 16.04.6 LTS
+## 
+## Matrix products: default
+## BLAS:   /home/aluetg/R/lib/R/lib/libRblas.so
+## LAPACK: /home/aluetg/R/lib/R/lib/libRlapack.so
+## 
+## locale:
+##  [1] LC_CTYPE=C.UTF-8        LC_NUMERIC=C           
+##  [3] LC_TIME=C               LC_COLLATE=en_CA.UTF-8 
+##  [5] LC_MONETARY=C           LC_MESSAGES=en_CA.UTF-8
+##  [7] LC_PAPER=C              LC_NAME=C              
+##  [9] LC_ADDRESS=C            LC_TELEPHONE=C         
+## [11] LC_MEASUREMENT=C        LC_IDENTIFICATION=C    
+## 
+## attached base packages:
+##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
+##  [8] datasets  methods   base     
+## 
+## other attached packages:
+##  [1] readr_1.3.1                 ggrepel_0.8.1              
+##  [3] CAMERA_1.41.1               xcms_3.7.3                 
+##  [5] MSnbase_2.11.9              ProtGenerics_1.17.4        
+##  [7] mzR_2.19.6                  Rcpp_1.0.2                 
+##  [9] cowplot_1.0.0               scran_1.13.26              
+## [11] ggtern_3.1.0                ComplexHeatmap_2.1.0       
+## [13] stringr_1.4.0               dplyr_0.8.3                
+## [15] tidyr_1.0.0                 here_0.1                   
+## [17] jcolors_0.0.4               purrr_0.3.2                
+## [19] variancePartition_1.15.8    scales_1.0.0               
+## [21] foreach_1.4.7               limma_3.41.17              
+## [23] CellMixS_1.1.3              kSamples_1.2-9             
+## [25] SuppDists_1.1-9.4           scater_1.13.24             
+## [27] ggplot2_3.2.1               CellBench_1.1.3            
+## [29] tibble_2.1.3                magrittr_1.5               
+## [31] SingleCellExperiment_1.7.11 SummarizedExperiment_1.15.9
+## [33] DelayedArray_0.11.8         BiocParallel_1.19.3        
+## [35] matrixStats_0.55.0          Biobase_2.45.1             
+## [37] GenomicRanges_1.37.16       GenomeInfoDb_1.21.2        
+## [39] IRanges_2.19.16             S4Vectors_0.23.25          
+## [41] BiocGenerics_0.31.6        
+## 
+## loaded via a namespace (and not attached):
+##   [1] rappdirs_0.3.1           R.methodsS3_1.7.1       
+##   [3] acepack_1.4.1            bit64_0.9-7             
+##   [5] knitr_1.25               irlba_2.3.3             
+##   [7] R.utils_2.9.0            rpart_4.1-15            
+##   [9] data.table_1.12.4        RCurl_1.95-4.12         
+##  [11] doParallel_1.0.15        metap_1.1               
+##  [13] preprocessCore_1.47.1    RSQLite_2.1.2           
+##  [15] RANN_2.6.1               future_1.14.0           
+##  [17] bit_1.1-14               bayesm_3.1-3            
+##  [19] lubridate_1.7.4          assertthat_0.2.1        
+##  [21] viridis_0.5.1            xfun_0.10               
+##  [23] hms_0.5.1                evaluate_0.14           
+##  [25] DEoptimR_1.0-8           progress_1.2.2          
+##  [27] caTools_1.17.1.2         dbplyr_1.4.2            
+##  [29] igraph_1.2.4.1           DBI_1.0.0               
+##  [31] htmlwidgets_1.5.1        tensorA_0.36.1          
+##  [33] ellipsis_0.3.0           backports_1.1.5         
+##  [35] energy_1.7-6             gbRd_0.4-11             
+##  [37] compositions_1.40-2      RcppParallel_4.4.4      
+##  [39] vctrs_0.2.0              ROCR_1.0-7              
+##  [41] withr_2.1.2              packrat_0.5.0           
+##  [43] robustbase_0.93-5        checkmate_1.9.4         
+##  [45] sctransform_0.2.0        prettyunits_1.0.2       
+##  [47] cluster_2.1.0            ape_5.3                 
+##  [49] lazyeval_0.2.2           crayon_1.3.4            
+##  [51] labeling_0.3             edgeR_3.27.13           
+##  [53] pkgconfig_2.0.3          nlme_3.1-141            
+##  [55] vipor_0.4.5              nnet_7.3-12             
+##  [57] rlang_0.4.0              globals_0.12.4          
+##  [59] lifecycle_0.1.0          affyio_1.55.0           
+##  [61] listarrays_0.2.0         BiocFileCache_1.9.1     
+##  [63] MassSpecWavelet_1.51.0   rsvd_1.0.2              
+##  [65] rprojroot_1.3-2          lmtest_0.9-37           
+##  [67] graph_1.63.0             Matrix_1.2-17           
+##  [69] boot_1.3-23              zoo_1.8-6               
+##  [71] base64enc_0.1-3          beeswarm_0.2.3          
+##  [73] ggridges_0.5.1           GlobalOptions_0.1.1     
+##  [75] png_0.1-7                viridisLite_0.3.0       
+##  [77] rjson_0.2.20             bitops_1.0-6            
+##  [79] R.oo_1.22.0              KernSmooth_2.23-15      
+##  [81] blob_1.2.0               DelayedMatrixStats_1.7.2
+##  [83] shape_1.4.4              memoise_1.1.0           
+##  [85] plyr_1.8.4               ica_1.0-2               
+##  [87] gplots_3.0.1.1           bibtex_0.4.2            
+##  [89] gdata_2.18.0             zlibbioc_1.31.0         
+##  [91] compiler_3.6.1           lsei_1.2-0              
+##  [93] dqrng_0.2.1              RColorBrewer_1.1-2      
+##  [95] pcaMethods_1.77.0        clue_0.3-57             
+##  [97] lme4_1.1-21              fitdistrplus_1.0-14     
+##  [99] affy_1.63.1              XVector_0.25.0          
+## [101] listenv_0.7.0            pbapply_1.4-2           
+## [103] htmlTable_1.13.2         Formula_1.2-3           
+## [105] MASS_7.3-51.4            tidyselect_0.2.5        
+## [107] vsn_3.53.0               stringi_1.4.3           
+## [109] yaml_2.2.0               BiocSingular_1.1.7      
+## [111] locfit_1.5-9.1           latticeExtra_0.6-28     
+## [113] MALDIquant_1.19.3        tools_3.6.1             
+## [115] future.apply_1.3.0       rstudioapi_0.10         
+## [117] circlize_0.4.8           foreign_0.8-72          
+## [119] gridExtra_2.3            mzID_1.23.0             
+## [121] Rtsne_0.15               digest_0.6.21           
+## [123] BiocManager_1.30.7       proto_1.0.0             
+## [125] SDMTools_1.1-221.1       RcppAnnoy_0.0.13        
+## [127] ncdf4_1.16.1             httr_1.4.1              
+## [129] npsurv_0.4-0             Rdpack_0.11-0           
+## [131] colorspace_1.4-1         XML_3.98-1.20           
+## [133] reticulate_1.13          splines_3.6.1           
+## [135] uwot_0.1.4               RBGL_1.61.0             
+## [137] statmod_1.4.32           latex2exp_0.4.0         
+## [139] multtest_2.41.0          plotly_4.9.0            
+## [141] jsonlite_1.6             nloptr_1.2.1            
+## [143] zeallot_0.1.0            R6_2.4.0                
+## [145] Hmisc_4.2-0              pillar_1.4.2            
+## [147] htmltools_0.4.0          glue_1.3.1              
+## [149] minqa_1.2.4              BiocNeighbors_1.3.5     
+## [151] codetools_0.2-16         tsne_0.1-3              
+## [153] lattice_0.20-38          pbkrtest_0.4-7          
+## [155] curl_4.2                 ggbeeswarm_0.6.0        
+## [157] leiden_0.3.1             colorRamps_2.3          
+## [159] gtools_3.8.1             survival_2.44-1.1       
+## [161] rmarkdown_1.16           munsell_0.5.0           
+## [163] GetoptLong_0.1.7         GenomeInfoDbData_1.2.1  
+## [165] iterators_1.0.12         impute_1.59.0           
+## [167] reshape2_1.4.3           gtable_0.3.0            
+## [169] Seurat_3.1.1</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
