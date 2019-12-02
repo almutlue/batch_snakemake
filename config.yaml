@@ -61,6 +61,7 @@ log_sim_abund: "log/sim_abundance/"
 log_sim_de: "log/sim_de/"
 log_sim_type: "log/sim_type/"
 log_sim_sumcms: "log/sim_sumcms/"
+log_sim_QC: "log/sim_QC/"
 
 ## Path to website files
 docs: "docs/"
@@ -70,6 +71,6 @@ docs_libs: "docs/site_libs"
 ## Subdirectory names 
 ### Names of subfdirectories to be generated in output and log directories
 ### Here they correspond to the rule names
-dir_names: settings,normalization,abundance,variance_part,cms,de,type,summary,edger,sim,sim_vars,sim_char,adjust_params,sim_variance_part,sim_abundance,sim_de,sim_type,sim_summary,sim_sumcms
+dir_names: settings,normalization,abundance,variance_part,cms,de,type,summary,edger,sim,sim_vars,sim_char,adjust_params,sim_variance_part,sim_abundance,sim_de,sim_type,sim_summary,sim_sumcms,sim_QC
 
 

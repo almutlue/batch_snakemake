@@ -126,16 +126,16 @@ cats <- factor(cats, levels = cats)
         #Make sure that each celltype got at least 10 cells per sample
         if( any(table(ct_s) < 15) ){
             nk <- length(ids[[1]])
-            be_tosmall <- ceiling(which(table(ct_s) < 15)/nk)
-            ct_tosmall <- which(table(ct_s) < 15)/be_tosmall
+            be_tosmall <- ceiling(which(table(ct_s) < 10)/nk)
+            ct_tosmall <- which(table(ct_s) < 10)/be_tosmall
             new_ct <- lapply(seq_len(length(be_tosmall)), function(rep){
                 samp <- ids[[2]][be_tosmall[rep]]
                 cellt <- ids[[1]][ct_tosmall[rep]]
                 max_ct <- ids[[1]][table(ct_s[which(ct_s$sample_id %in% samp),]) %>% which.max()]
-                start <- rep*15
-                finish <- start + 14
+                start <- rep * 10
+                finish <- start + 9
                 new_ids <- which(ct_s$cluster_id %in% max_ct & ct_s$sample_id %in% samp)[start:finish]
-                new_assign <- data.frame("ids" = new_ids, "new" = c(rep(cellt, 15)))
+                new_assign <- data.frame("ids" = new_ids, "new" = c(rep(cellt, 10)))
             }) %>% bind_rows()
             ct_s[new_ct$ids,"cluster_id"] <- new_ct$new
         }
@@ -663,8 +663,7 @@ simData <- function(x, n_genes = 500, n_cells = 300,
                     cs_g2 <- sample(cs_g2_all, ng2, replace = TRUE)
                 }else{
                     cs_g1 <- sample(cs_ks, ng1, replace = TRUE)
-                    cs_g2_all <- cs_ks[-which(cs_ks %in% cs_g1)]
-                    cs_g2 <- sample(cs_g2_all, ng2, replace = TRUE)
+                    cs_g2 <- sample(cs_ks, ng2, replace = TRUE)
                 }
                 
                 #celltype specific beta
@@ -768,6 +767,6 @@ sim_batch <- simData(sce, n_genes = nrow(sce), n_cells = ncol(sce),
 
 
 ### -------------- save sce object ----------------------###
-saveRDS(sce, file = outputfile)
+saveRDS(sim_batch, file = outputfile)
 
 

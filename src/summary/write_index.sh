@@ -18,10 +18,13 @@ for sample in $files
 do
     link="+ [${sample}](batch_effect_${sample}.html)"
     link_sim="+ [${sample}](simulation_${sample}.html)"
+    link_qc="+ [${sample}](countSimQC_${sample}.html)"
     echo $link
     echo $link_sim
+    echo $link_qc
     sed -i "/^## Batch effects/a $link" $index_new
     sed -i "/^## Simulation/a $link_sim" $index_new
+    sed -i "/^## CountSimQC/a $link_qc" $index_new
 done
 
 

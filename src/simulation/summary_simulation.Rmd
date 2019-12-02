@@ -65,7 +65,7 @@ sce <- readRDS(params$data)
 param <- readRDS(params$param)
 celltype <- param[["celltype"]]
 batch <- param[["batch"]]
-sample <- param[["sample"]]
+sample <- param[["Sample"]]
 dataset_name <- param[["dataset_name"]]
 dataset_name
 n_genes <- nrow(sce)
@@ -236,7 +236,7 @@ p + geom_vline(aes_string(xintercept = "cms_mean",
 ```
 
 
-### Cellspecific Mixing score simulations {.tabset .tabset-pills}
+### Cellspecific Mixing score simulations
 
 
 ```{r sim cms}
@@ -253,6 +253,7 @@ sim_list <- lapply(cms_all, function(sim){
 
 ```
 
+### Cellspecific Mixing score simulations {.tabset .tabset-pills}  
 
 
 ```{r, results='asis', echo = FALSE}

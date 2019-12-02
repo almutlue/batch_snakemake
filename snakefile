@@ -66,6 +66,7 @@ rule all:
 	  simulation(expand(config["out_edger"] + "edgeR_{sample}.rds", sample = sample)),
 	  simulation(expand(config["out_sim"] + "{sample}/sim_{sample}_{sim_name}_sce.rds", sample = sample, sim_name = sim_name)),
 	  simulation(expand(config["out_sim_char"] + "{sample}/sim_{sample}_{sim_name}_sce.rds", sample = sample, sim_name = sim_name)),
+	  simulation(expand(config["docs"] + "countSimQC_{sample}.html", sample = sample)),
 	  simulation(expand(config["out_adjust_params"] + "adjust_params_{sample}.rds", sample = sample)),
 	  simulation(expand(config["out_sim_vp"] + "vp_sim_{sample}_sce.rds", sample = sample)),
 	  simulation(expand(config["out_sim_abund"] + "abundance_sim_{sample}.rds", sample = sample)),

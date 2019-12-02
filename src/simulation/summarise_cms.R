@@ -48,7 +48,7 @@ new_dim <- lapply(params_list[[1]][[1]], function(sim){
     name <- gsub('_sce.rds', "", name)
     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
     new_sce <- readRDS(file = paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds"))
-    redDim <- reducedDims(sce)[["UMAP"]]
+    redDim <- reducedDims(new_sce)[["UMAP"]]
 }) %>% set_names(params_list[[1]][[1]])
 
 reducedDims(sce) <- c(reducedDims(sce), new_dim)

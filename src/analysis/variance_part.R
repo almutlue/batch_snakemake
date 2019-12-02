@@ -31,6 +31,11 @@ celltype <- params[["celltype"]]
 sample <- params[["Sample"]]
 
 ### ------------ Variance partitioning-------------------------###
+#remove genes with zrero counts only
+if( length(which(rowSums(assays(sce)$logcounts) == 0)) > 0 ){
+    sce <- sce[-which(rowSums(assays(sce)$logcounts) == 0),]
+}
+
 expr <- as.matrix(assays(sce)$logcounts)
 meta_sub <- as.data.frame(colData(sce)[, c(celltype, batch)])
 form <- as.formula(paste0("~ (1|", celltype, ") + (1|", batch, ")"))

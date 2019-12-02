@@ -72,6 +72,24 @@ rule char_sim:
 ## -------------------------------------------------------------------------- ##
 
 ## -------------------------------------------------------------------------- ##
+## Check CountSimQC
+## -------------------------------------------------------------------------- ##
+
+rule countSimQC:
+    input: 
+        sce_sim = config["out_sim_char"] + "{sample}/sim_{sample}_1__1_sce.rds",
+        sce_real = config["src_data"] + "{sample}.rds",
+        script = config["src_sim"] + "run_countSimQC.R",
+        out = config["docs"]
+    output:
+        out = config["docs"] + "countSimQC_{sample}.html"
+    log:
+        config["log_sim_QC"] + "countSimQC_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args sce_sim='{input.sce_sim}' sce_real='{input.sce_real}' outputfile='{input.out}'" {input.script} {log}'''
+
+
+## -------------------------------------------------------------------------- ##
 ## Adjust params to simulation
 ## -------------------------------------------------------------------------- ##
 
@@ -160,7 +178,7 @@ rule batch_type:
     
   
   
-  ## -------------------------------------------------------------------------- ##
+## -------------------------------------------------------------------------- ##
 ## Summarize cms
 ## -------------------------------------------------------------------------- ##
 
@@ -176,6 +194,26 @@ rule summarize_cms:
         config["log_sim_sumcms"] + "summarize_cms_sim_{sample}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{params.param}' outputfile='{output.out}'" {input.script} {log}'''
+        
+        
+## -------------------------------------------------------------------------- ##
+## Visualize Simulation
+## -------------------------------------------------------------------------- ##
+
+rule vis_sim:
+    input: 
+        data = config["out_sim_sumcms"] + "summarize_cms_sim_{sample}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        real = config["out_norm"] + "norm_{sample}_sce.rds",
+        param_real = config["out_set"] + "settings_{sample}.rds",
+        script = config["src_sim"] + "visualize_simulation.Rmd",
+        outdir = config["docs"]
+    params:
+        sim = ",".join(sim_name)
+    output:
+        out = config["docs"] + "vis_sim_{sample}.html",
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{input.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', real ='{input.real}', param_real = '{input.param_real}', sim = '{param.sim}'))"'''
   
   
 ## -------------------------------------------------------------------------- ##
