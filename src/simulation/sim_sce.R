@@ -69,13 +69,16 @@ rel_be <- rep(sim[["rel_be"]], n_be)
 rel_be <- rel_be[1:n_be]
 rel_be_c <- rep(sim[["rel_be_c"]], n_ct)
 rel_be_c <- rel_be_c[1:n_ct]
-
+rel_be
+rel_be_c
 
 lib_be <- "real"
 
 if( all(rel_be == 0) ){
     lib_be = rep(1, n_be)
 }
+
+lib_be
 
 ## Create directory for outputfiles
 dir.create(out_path, showWarnings = FALSE)
@@ -199,24 +202,23 @@ cats <- factor(cats, levels = cats)
 
 
 #Get beta coefficients
-.beta_coef <- function(x, equal, ids, sd = 0.01, new_lab = NULL){
+.beta_coef <- function(x, equal, ids, sd = 0, new_lab = NULL){
     n <- length(ids)
     if( equal ){
         #equalize m by sampling the same beta for each gene
         rd <- rowData(x)[, paste("beta", ids, sep = ".")]
-        rd <- cbind(rd[1], random = apply(rd, 1, sample, size = 1))
-        rd <- apply(rd, 1, function(gene){rnorm(n, gene["random"], sd = sd)}) %>% 
+        rd <- cbind(rd, mean = apply(rd, 1, mean))
+        rd <- apply(rd, 1, function(gene){rnorm(n, gene["mean"], sd = sd)}) %>% 
             t() %>% set_colnames(ids)
     }else{
-        #introduce variance from edgeR using sample specific beta coefficients (FROM THE SAME BATCH)
+        #introduce variance from edgeR using sample specific beta coef (FROM THE SAME BATCH)
         sel_b <- names(which.max(table(new_lab)))[1]
         s_be <- names(new_lab)[which(new_lab %in% sel_b)]
         rd <- rowData(x)[, paste("beta", s_be, sep = ".")] %>% set_colnames(s_be)
         rd <- cbind(rd, mean = apply(rd, 1, mean), sd = apply(rd, 1, sd))
         rd_new <- apply(rd, 1, function(gene){
-            rnorm(n = (n-length(s_be)), mean = gene["mean"], sd = gene["sd"])
-        })
-        rd <- cbind(rd[,s_be], rd_new) %>% set_colnames(ids)
+            rnorm(n = n, mean = gene["mean"], sd = 0.6 * gene["sd"])
+        }) %>% t() %>% set_colnames(ids)
     }
 }
 
@@ -474,8 +476,8 @@ simData <- function(x, n_genes = 500, n_cells = 300,
     cs_by_ks <- .split_cells(x)
     
     # sample nb. of genes to simulate per category & gene indices
-    n_dd <- replicate(nk, table(sample(factor(cats, levels = cats), n_genes, 
-                                       TRUE, p_dd))) %>% set_colnames(kids)
+    n_dd <- replicate(nk, table(sample(factor(cats, levels = cats), n_genes, TRUE, p_dd))) %>% 
+        set_colnames(kids)
     gs_idx <- .sample_gene_inds(gs, n_dd)
     
     # for ea. cluster, sample set of genes to simulate from
@@ -572,7 +574,6 @@ simData <- function(x, n_genes = 500, n_cells = 300,
     }
     
     
-    
     # sample logFCs group effects
     lfc_dd <- vapply(kids, function(k) 
         lapply(cats, function(c) { 
@@ -606,23 +607,20 @@ simData <- function(x, n_genes = 500, n_cells = 300,
     }
     
     # compute NB parameters
-    #Get batch bias in lib sizes
+    o <- exp(colData(x)$offset)
+    
     if( lib_be %in% "real"){
-        lib_batch <- as_tibble(colData(sce)) %>% 
-            mutate("exp_off" = exp(offset)) %>% 
-            group_by(batch_id) %>% 
-            summarize("mean" = mean(exp_off)) %>%
-            mutate("lib_be" = mean/mean(mean))
+        lib_batch <- tibble("batch_id" = bids,
+                            "lib_be" = rep(1, length(bids)))
     }
     if( is.numeric(lib_be) ){
         lib_batch <- tibble("batch_id" = bids,
                             "lib_be" = lib_be)
+        o <- sample(o, length(o), replace = FALSE)
     } 
     
     
     #libsizes * beta
-    o <- exp(colData(x)$offset)
-    o <- sample(o, length(o), replace = FALSE)
     m <- lapply(sids, function(s) {
         b <- exp(rd[,s])
         be <- new_lab[[s]]
@@ -658,9 +656,9 @@ simData <- function(x, n_genes = 500, n_cells = 300,
                 ng2 <- length(g2) 
                 
                 if( length(cs_ks) >= sum(ng1, ng2) ){
-                    cs_g1 <- sample(cs_ks, ng1, replace = TRUE)
+                    cs_g1 <- sample(cs_ks, ng1, replace = FALSE)
                     cs_g2_all <- cs_ks[-which(cs_ks %in% cs_g1)]
-                    cs_g2 <- sample(cs_g2_all, ng2, replace = TRUE)
+                    cs_g2 <- sample(cs_g2_all, ng2, replace = FALSE)
                 }else{
                     cs_g1 <- sample(cs_ks, ng1, replace = TRUE)
                     cs_g2 <- sample(cs_ks, ng2, replace = TRUE)
@@ -691,7 +689,8 @@ simData <- function(x, n_genes = 500, n_cells = 300,
         }
     }
     
-    ########################## Start simulate counts #######################################
+    
+    ########################## Finish simulate counts #######################################
     
     ########################## Prepare results #############################################
     
@@ -710,9 +709,7 @@ simData <- function(x, n_genes = 500, n_cells = 300,
     #adjust lfc_be to summary table
     red_lfc_be <- lapply(bids, function(b){
         lfc_red <-lfc_be[[b]][1,] %>% unlist() 
-    }) %>% 
-        bind_cols() %>% 
-        set_colnames(paste0("lfc_be_", colnames(.))) %>% 
+    }) %>% bind_cols() %>% set_colnames(paste0("lfc_be_", colnames(.))) %>% 
         mutate("gene" = rep(gs, nk), "cluster_id" = rep(kids, each = length(gs)))
     
     # construct gene metadata table storing ------------------------------------
@@ -721,10 +718,8 @@ simData <- function(x, n_genes = 500, n_cells = 300,
         gene = unlist(gs_idx),
         cluster_id = rep.int(rep(kids, each = length(cats)), c(n_dd)),
         category = rep.int(rep(cats, nk), c(n_dd)),
-        #logFC = unlist(lfc_dd),
         sim_gene = unlist(gs_by_kc),
         sim_disp = d[unlist(gs_by_kc)],
-        #logFC_be = unlist(lfc_be),
         logFC_ct = unlist(lfc_ct)) %>% 
         dplyr::mutate_at("gene", as.character)
     # add true simulation means

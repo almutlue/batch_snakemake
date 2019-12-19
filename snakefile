@@ -76,6 +76,7 @@ rule all:
 	  simulation(expand(config["out_sim_sumcms"] + "summarize_cms_sim_{sample}_sce.rds", sample = sample)),
 	  simulation(expand(config["out_sim_summary"] + "summary_sim_{sample}.rds", sample = sample)),
 	  simulation(expand(config["docs"] + "simulation_{sample}.html", sample = sample)),
+	  simulation(expand(config["docs"] + "vis_sim_{sample}.html", sample = sample)),
 	  characterization(config["docs"] + "index.md")
 	  
 

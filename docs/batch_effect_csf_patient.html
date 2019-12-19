@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">02 December, 2019</h4>
+<h4 class="date">17 December, 2019</h4>
 
 </div>
 
@@ -445,7 +445,7 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 <span class="st">  </span><span class="kw">Tlab</span>(<span class="st">&quot;celltype&quot;</span>) +
 <span class="st">  </span><span class="kw">Rlab</span>(<span class="st">&quot;other&quot;</span>) +
 <span class="st">  </span><span class="kw">theme_bw</span>()</code></pre></div>
-<pre><code>## Warning: Removed 1309 rows containing non-finite values (StatDensityTern).</code></pre>
+<pre><code>## Warning: Removed 1293 rows containing non-finite values (StatDensityTern).</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/var%20expr-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1 &lt;-<span class="st"> </span><span class="kw">ggtern</span>(<span class="dt">data=</span><span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)),<span class="kw">aes</span>(vp_batch, vp_celltype, vp_residuals)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.1</span>) +
@@ -512,7 +512,7 @@ var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_c
 <h4>Celltypes cms smooth</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare by celltypes</span>
 <span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.00794</code></pre>
+<pre><code>## Picking joint bandwidth of 0.01</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/cms%20celltypes-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype, <span class="dt">violin =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="batch_effect_csf_patient_files/figure-html/cms%20celltypes-2.svg" width="672" /></p>
@@ -702,113 +702,115 @@ pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span clas
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-1.svg" width="672" /></p>
 <pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4097 Num DE: 6 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 4.124427e-90
-## 2                       GO_RRNA_BINDING     38      Down 6.713286e-50
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 6.724957e-39
-## 4                        GO_RNA_BINDING    782      Down 2.969275e-08
-## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 4.256255e-08
-## 6                 GO_POLY_A_RNA_BINDING    644      Down 3.869561e-07
-## 7                       GO_MRNA_BINDING     78      Down 1.454603e-05
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 3.277976e-95
+## 2                       GO_RRNA_BINDING     38      Down 1.467507e-51
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 4.294942e-41
+## 4                        GO_RNA_BINDING    782      Down 1.413161e-08
+## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 3.306722e-08
+## 6                 GO_POLY_A_RNA_BINDING    644      Down 1.871764e-07
+## 7                       GO_MRNA_BINDING     78      Down 1.130221e-05
 ##            FDR
-## 1 3.460394e-87
-## 2 2.816224e-47
-## 3 1.880746e-36
-## 4 6.228054e-06
-## 5 7.141995e-06
-## 6 5.410936e-05
-## 7 1.743446e-03</code></pre>
+## 1 2.750222e-92
+## 2 6.156191e-49
+## 3 1.201152e-38
+## 4 2.964106e-06
+## 5 5.548679e-06
+## 6 2.617350e-05
+## 7 1.354651e-03</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-2.svg" width="672" /></p>
 <pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4097 Num DE: 4 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 5.191545e-53
-## 2                       GO_RRNA_BINDING     38      Down 1.111221e-33
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 1.115089e-24
-## 4                        GO_RNA_BINDING    782      Down 5.160400e-06
-## 5     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 7.188334e-06
-## 6   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 8.044669e-06
-## 7                 GO_POLY_A_RNA_BINDING    644      Down 4.500049e-05
-## 8                       GO_MRNA_BINDING     78      Down 4.175992e-04
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 5.106332e-55
+## 2                       GO_RRNA_BINDING     38      Down 1.828071e-34
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 1.210218e-25
+## 4                        GO_RNA_BINDING    782      Down 3.484199e-06
+## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 6.935627e-06
+## 6     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 8.574995e-06
+## 7                 GO_POLY_A_RNA_BINDING    644      Down 3.060094e-05
+## 8                       GO_MRNA_BINDING     78      Down 3.474287e-04
 ##            FDR
-## 1 4.355706e-50
-## 2 4.661573e-31
-## 3 3.118533e-22
-## 4 1.082394e-03
-## 5 1.124913e-03
-## 6 1.124913e-03
-## 7 5.393630e-03
-## 8 4.379572e-02</code></pre>
+## 1 4.284212e-52
+## 2 7.668757e-32
+## 3 3.384577e-23
+## 4 7.308106e-04
+## 5 1.163798e-03
+## 6 1.199070e-03
+## 7 3.667742e-03
+## 8 3.643658e-02</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-3.svg" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4097 Num DE: 10 
+<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4097 Num DE: 12 
 ##                                       category NGenes Direction       PValue
-## 1        GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 5.326783e-26
-## 2                              GO_RRNA_BINDING     38      Down 1.358473e-21
-## 3              GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 1.546395e-14
-## 4                   GO_PEPTIDE_ANTIGEN_BINDING     16        Up 5.000890e-05
-## 5                           GO_ANTIGEN_BINDING     42        Up 5.504666e-05
-## 6            GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.357608e-04
-## 7 GO_LOW_DENSITY_LIPOPROTEIN_RECEPTOR_ACTIVITY      6        Up 2.651166e-04
-## 8    GO_LIPOPROTEIN_PARTICLE_RECEPTOR_ACTIVITY      6        Up 2.651166e-04
+## 1        GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 5.621604e-27
+## 2                              GO_RRNA_BINDING     38      Down 4.200478e-22
+## 3              GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 4.489668e-15
+## 4                           GO_ANTIGEN_BINDING     42        Up 8.690820e-05
+## 5                   GO_PEPTIDE_ANTIGEN_BINDING     16        Up 8.706665e-05
+## 6            GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.968043e-04
+## 7 GO_LOW_DENSITY_LIPOPROTEIN_RECEPTOR_ACTIVITY      6        Up 2.916513e-04
+## 8    GO_LIPOPROTEIN_PARTICLE_RECEPTOR_ACTIVITY      6        Up 2.916513e-04
 ##            FDR
-## 1 4.469171e-23
-## 2 5.698795e-19
-## 3 4.324750e-12
-## 4 9.236830e-03
-## 5 9.236830e-03
-## 6 1.898389e-02
-## 7 2.497849e-02
-## 8 2.497849e-02</code></pre>
+## 1 4.716526e-24
+## 2 1.762100e-19
+## 3 1.255611e-12
+## 4 1.460978e-02
+## 5 1.460978e-02
+## 6 2.718838e-02
+## 7 2.718838e-02
+## 8 2.718838e-02</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-4.svg" width="672" /></p>
 <pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4097 Num DE: 6 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 1.558167e-50
-## 2                       GO_RRNA_BINDING     38      Down 2.563737e-24
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 8.037206e-23
-## 4                        GO_RNA_BINDING    782      Down 2.217604e-06
-## 5                 GO_POLY_A_RNA_BINDING    644      Down 4.349444e-06
-## 6     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 4.425539e-06
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 2.423364e-52
+## 2                       GO_RRNA_BINDING     38      Down 5.154309e-25
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 1.255035e-23
+## 4                        GO_RNA_BINDING    782      Down 1.504293e-06
+## 5                 GO_POLY_A_RNA_BINDING    644      Down 2.925548e-06
+## 6     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 5.003433e-06
+## 7     GO_TRANSLATION_REGULATOR_ACTIVITY     12      Down 3.811968e-04
 ##            FDR
-## 1 1.307302e-47
-## 2 1.075488e-21
-## 3 2.247739e-20
-## 4 4.651425e-04
-## 5 6.188379e-04
-## 6 6.188379e-04</code></pre>
+## 1 2.033203e-49
+## 2 2.162233e-22
+## 3 3.509915e-21
+## 4 3.155254e-04
+## 5 4.909069e-04
+## 6 6.996467e-04
+## 7 4.568916e-02</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4097 Num DE: 7 
+<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4097 Num DE: 8 
 ## [1] category  NGenes    Direction PValue    FDR      
 ## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-6.svg" width="672" /></p>
 <pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4097 Num DE: 7 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 7.389617e-23
-## 2                       GO_RRNA_BINDING     38      Down 1.362454e-12
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 2.716832e-11
-## 4   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 3.981812e-08
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 1.241673e-20
+## 2                       GO_RRNA_BINDING     38      Down 1.635559e-11
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 3.129317e-10
+## 4   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7      Down 5.953044e-08
 ##            FDR
-## 1 6.199889e-20
-## 2 5.715493e-10
-## 3 7.598072e-09
-## 4 8.351851e-06</code></pre>
+## 1 1.041763e-17
+## 2 6.861168e-09
+## 3 8.751657e-08
+## 4 1.248651e-05</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-7.svg" width="672" /></p>
-<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4097 Num DE: 9 
+<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4097 Num DE: 10 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 2.596689e-23
-## 2                       GO_RRNA_BINDING     38      Down 2.915841e-13
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 3.312461e-12
-## 4     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.162949e-06
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 4.084462e-21
+## 2                       GO_RRNA_BINDING     38      Down 2.706117e-12
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 3.867522e-11
+## 4     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 2.151700e-07
 ##            FDR
-## 1 2.178622e-20
-## 2 1.223195e-10
-## 3 9.263848e-10
-## 4 2.439285e-04</code></pre>
+## 1 3.426864e-18
+## 2 1.135216e-09
+## 3 1.081617e-08
+## 4 4.513191e-05</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-8.svg" width="672" /></p>
 <pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4097 Num DE: 6 
 ##                                category NGenes Direction       PValue
-## 1                       GO_RRNA_BINDING     38      Down 2.590187e-06
-## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 3.043694e-05
+## 1                       GO_RRNA_BINDING     38      Down 1.267601e-06
+## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 1.284315e-05
 ##           FDR
-## 1 0.002173167
-## 2 0.012768295</code></pre>
+## 1 0.001063517
+## 2 0.005387703</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$adj.P.Val &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
@@ -955,7 +957,7 @@ vis_type &lt;-<span class="st"> </span>function(dim_red){
 <span class="kw">visHist</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="batch_effect_csf_patient_files/figure-html/batchtype%20cms-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visIntegration</span>(sce, <span class="dt">metric =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">metric_name =</span> <span class="st">&quot;cms&quot;</span>)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.0289</code></pre>
+<pre><code>## Picking joint bandwidth of 0.0293</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/batchtype%20cms-2.svg" width="672" /></p>
 </div>
 </div>

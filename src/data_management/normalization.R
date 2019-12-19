@@ -45,17 +45,17 @@ sce <-  logNormCounts(sce)
 
 
 ### ------------ Check reduced dimensions----------------###
-if( !"PCA" %in% reducedDimNames(sce) ){
+#if( !"PCA" %in% reducedDimNames(sce) ){
   sce <- runPCA(sce, ncomponents = 10, ntop = 1000)
-}
+#}
 
-if( !"UMAP" %in% reducedDimNames(sce) ){
+#if( !"UMAP" %in% reducedDimNames(sce) ){
   sce <- runUMAP(sce)
-}
+#}
 
-if( !"TSNE" %in% reducedDimNames(sce) ){
+#if( !"TSNE" %in% reducedDimNames(sce) ){
   sce <- runTSNE(sce)
-}
+#}
 
 
 ### -------------- save sce object ----------------------###

@@ -185,7 +185,8 @@ rule batch_type:
 rule summarize_cms:
     input: 
         data = config["out_sim_type"] + "type_sim_{sample}_sce.rds",
-        script = config["src_sim"] + "summarise_cms.R"
+        script = config["src_sim"] + "summarise_cms.R",
+        sim = expand(config["out_sim_char"] + "{sample}/sim_{sample}_{sim_name}_sce.rds", sample = sample, sim_name = sim_name)
     params:
         param = ",".join(sim_name),
     output:
@@ -213,7 +214,7 @@ rule vis_sim:
     output:
         out = config["docs"] + "vis_sim_{sample}.html",
     shell:
-        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{input.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', real ='{input.real}', param_real = '{input.param_real}', sim = '{param.sim}'))"'''
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{input.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', real ='{input.real}', param_real = '{input.param_real}', sim = '{params.sim}'))"'''
   
   
 ## -------------------------------------------------------------------------- ##

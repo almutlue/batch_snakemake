@@ -17,7 +17,7 @@ output:
     highlight: tango
     number_sections: no
     toc: yes
-    toc_depth: 3
+    toc_depth: 4
     toc_float: true
     collapsed: no
     smooth_scroll: yes
@@ -43,13 +43,13 @@ suppressPackageStartupMessages({
   library(scater)
   library(CellMixS)
   library(purrr)
-  library(jcolors)
+  library(data.table)
   library(here)
   library(tidyr)
   library(dplyr)
   library(stringr)
   library(ComplexHeatmap)
-  library(ggtern)
+  library(edgeR)
   library(scran)
   library(cowplot)
   library(ggrepel)
@@ -68,14 +68,15 @@ print(sim_list[[1]][[1]])
 param <- readRDS(params$param)
 celltype <- param[["celltype"]]
 batch <- param[["batch"]]
-sample <- param[["sample"]]
+sample <- param[["Sample"]]
 dataset_name <- param[["dataset_name"]]
 
 param_real <- readRDS(params$param_real)
 batch_real <- param_real[["batch"]]
 cluster_real <- param_real[["celltype"]]
-sample_real <- param_real[["Sample"]]
+sample_real <- param_real[["sample"]]
 
+table(colData(sce_real)[,sample_real])
 #colors for plotting
 tsne_cols <- c(
   "#DC050C", "#1965B0", "#FB8072", 
@@ -87,33 +88,35 @@ mds_cols <- c(
 ```
 
 ### Visualize simulations
-```{r vis sim}
+```{r vis sim, warning=FALSE}
 
 #Plot tsne
 visUMAP <- function(simulation, title, ids){
   p <- visGroup(simulation, ids, dim_red = "UMAP") 
   p[["data"]]$cluster_id <- colData(simulation)[, "cluster_id"]
   p +  aes(shape = cluster_id) + 
-  guides(colour = guide_legend(override.aes = list(size=3, alpha = 1))) +
-  guides(shape = guide_legend(override.aes = list(size=3, alpha = 1), title = "celltype")) +
-  geom_point(size=2, alpha = 1, aes_string(color="group_var")) +
-  scale_color_manual(values = tsne_cols) +
-  ggtitle(title)
+      scale_shape_manual(values=1:nlevels(simulation$cluster_id)) +
+      guides(colour = guide_legend(override.aes = list(size=3, alpha = 1))) +
+      guides(shape = guide_legend(override.aes = list(size=3, alpha = 1), title = "celltype")) +
+      geom_point(size=2, alpha = 1, aes_string(color="group_var")) +
+      scale_color_manual(values = tsne_cols) +
+      ggtitle(title)
 }
 
 visTSNE <- function(simulation, title, ids){
   p <- visGroup(simulation, ids)
   p[["data"]]$cluster_id <- colData(simulation)[, "cluster_id"]
   p + aes(shape = cluster_id) +
-  guides(colour = guide_legend(override.aes = list(size=3, alpha = 1))) +
-  guides(shape = guide_legend(override.aes = list(size=3, alpha = 1), title = "celltype")) +
-  geom_point(size=2, alpha = 1, aes_string(color="group_var")) +
-  scale_color_manual(values = tsne_cols) +
-  ggtitle(title)
+      scale_shape_manual(values=1:nlevels(simulation$cluster_id)) +
+      guides(colour = guide_legend(override.aes = list(size=3, alpha = 1))) +
+      guides(shape = guide_legend(override.aes = list(size=3, alpha = 1), title = "celltype")) +
+      geom_point(size=2, alpha = 1, aes_string(color="group_var")) +
+      scale_color_manual(values = tsne_cols) +
+      ggtitle(title)
 }
 
 #Functions from muscat to generate pseudobulk sample and genrate a MDSplot
-pbMDS <- function(x) {
+pbMDS <- function(x, title) {
     y <- as(assays(x), "list")
     y <- do.call("cbind", y)
     d <- suppressMessages(DGEList(y))
@@ -136,16 +139,44 @@ pbMDS <- function(x) {
     
     ggplot(df, aes_string(x = "MDS1", y = "MDS2", 
         col = "sample_id", shape = "cluster_id")) +
-        scale_color_manual(values = cols) +
+        scale_color_manual(values = cols) + 
+        scale_shape_manual(values=1:nlevels(df$cluster_id)) +
         geom_point(size = 5, alpha = .8) + 
         guides(color = guide_legend(override.aes = list(alpha = 1))) +
+        ggtitle(title) +
         theme_bw() + theme(aspect.ratio = 1,
             axis.text = element_text(color = "black"),
             panel.grid.minor = element_blank(),
             panel.grid.major = element_line(size = 0.2, color = "lightgrey"))
 }
 
+#helper functions from muscat
+# Compute pseudo bulks
+.pb <- function(x, cs, assay, fun) {
+    fun <- switch(fun,
+                  rowMedians = getFromNamespace(fun, "matrixStats"),
+                  getFromNamespace(fun, "Matrix"))
+    pb <- map_depth(cs, -1, function(i) {
+        if (length(i) == 0) return(numeric(nrow(x)))
+        fun(assays(x)[[assay]][, i, drop = FALSE])
+    })
+    map_depth(pb, -2, function(u) 
+        data.frame(u, 
+                   row.names = rownames(x),
+                   check.names = FALSE))
+}
 
+
+#split cells
+.split_cells <- function(x, 
+                         by = c("cluster_id", "sample_id")) {
+    if (is(x, "SingleCellExperiment"))
+        x <- colData(x)
+    cd <- data.frame(x[by], check.names = FALSE)
+    cd <- data.table(cd, cell = rownames(cd)) %>% 
+        split(by = by, sorted = TRUE, flatten = FALSE)
+    map_depth(cd, length(by), "cell")
+}
 
 aggregateData <- function(x, assay,
     by = c("cluster_id", "sample_id"),
@@ -156,8 +187,6 @@ aggregateData <- function(x, assay,
         assay <- assayNames(x)[1]
 
     # validity checks for input arguments
-    .check_sce(x, req_group = FALSE)
-    .check_arg_assay(x, assay)
     stopifnot(is.character(by), by %in% colnames(colData(x)))
     stopifnot(is.logical(scale), length(scale) == 1)
     
@@ -196,36 +225,36 @@ aggregateData <- function(x, assay,
 visMDS <-function(simulation, title, ids){
   agg_sim <- aggregateData(simulation, by = c("cluster_id", ids),
     fun =  "mean", scale = TRUE)
-  pbMDS(agg_sim)
+  pbMDS(agg_sim, title)
 }
 
 ```
 
 #### TSNE
-```{r tsne}
+```{r tsne, warning=FALSE}
 lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-    sim_sce <- readRDS(file = paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds"))
+    sim_sce <- readRDS(file = filename)
     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
     visTSNE(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
 })
 ```
 
 #### UMAP
-```{r umap}
+```{r umap, warning=FALSE}
 lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-    sim_sce <- readRDS(file = paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds"))
+    sim_sce <- readRDS(file = filename)
     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
     visUMAP(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
 })
 ```
 
 #### MDS plot
-```{r mds}
+```{r mds, warning=FALSE}
 lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-    sim_sce <- readRDS(file = paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds"))
+    sim_sce <- readRDS(file = filename)
     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
     visMDS(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
 })
@@ -234,15 +263,40 @@ lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
 ### Real data
 ```{r real}
 # to make aggregate functions work
-reducedDims(real) <- NULL
-real$batch_id <- colData(real)[, batch_real]
-real$sample_id <- colData(real)[, sample_real]
-real$cluster_id <- colData(real)[, cluster_real]
-real$group_id <- as.factor(rep("A", ncol(real)))
-metadata(real)$experiment_info <- colData(real)[, c("batch_id", "cluster_id", "group_id", "sample_id")]
+sce_real$batch_id <- colData(sce_real)[, batch_real]
+sce_real$sample_id <- colData(sce_real)[, sample_real]
+sce_real$cluster_id <- colData(sce_real)[, cluster_real]
+sce_real$group_id <- as.factor(rep("A", ncol(sce_real)))
+metadata(sce_real)$experiment_info <- colData(sce_real)[, c("batch_id", "cluster_id", "group_id", "sample_id")]
 
-visTSNE(real, title = "Real dataset", ids = "batch_id")
-visUMAP(real, title = "Real dataset", ids = "batch_id")
-visMDS(real, title = "Real dataset", ids = "batch_id")
+visTSNE(sce_real, title = "Real dataset", ids = "batch_id")
+visUMAP(sce_real, title = "Real dataset", ids = "batch_id")
+visMDS(sce_real, title = "Real dataset", ids = "batch_id")
 ```
 
+### Cellspecific Mixing score simulations {.tabset .tabset-fade}  
+
+```{r sim cms}
+#get all cms scores
+cms_all <- names(colData(sce))[grep("cms_sim", names(colData(sce)))]
+
+# plot list
+cms_list <- lapply(cms_all, function(sim){
+    dim_nam <- gsub("cms_sim_","X", sim)
+    p <- visMetric(sce, metric = sim, dim_red = dim_nam)
+    #p2 <- visGroup(sce, group = "batch_id", dim_red = dim_nam)
+    #p3 <- plot_grid(p, p2, nrow = 2)
+})
+
+```
+
+
+```{r, results='asis', echo = FALSE}
+for (i in 1:length(cms_all)) {
+    cat("#### ", cms_all[i], " \n")
+    print(cms_list[[i]])
+    plot.new()
+    dev.off()
+    cat(' \n \n')
+}
+```

@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Almut Lütge" />
+
+
+<title>Visualize simulated batch effects</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code > span.dt { color: #204a87; } /* DataType */
+code > span.dv { color: #0000cf; } /* DecVal */
+code > span.bn { color: #0000cf; } /* BaseN */
+code > span.fl { color: #0000cf; } /* Float */
+code > span.ch { color: #4e9a06; } /* Char */
+code > span.st { color: #4e9a06; } /* String */
+code > span.co { color: #8f5902; font-style: italic; } /* Comment */
+code > span.ot { color: #8f5902; } /* Other */
+code > span.al { color: #ef2929; } /* Alert */
+code > span.fu { color: #000000; } /* Function */
+code > span.er { color: #a40000; font-weight: bold; } /* Error */
+code > span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #000000; } /* Constant */
+code > span.sc { color: #000000; } /* SpecialChar */
+code > span.vs { color: #4e9a06; } /* VerbatimString */
+code > span.ss { color: #4e9a06; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #000000; } /* Variable */
+code > span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code > span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code > span.ex { } /* Extension */
+code > span.at { color: #c4a000; } /* Attribute */
+code > span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code > span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Visualize simulated batch effects</h1>
+<h4 class="author">Almut Lütge</h4>
+<h4 class="date">17 December, 2019</h4>
+
+</div>
+
+
+<div id="csf_media" class="section level2">
+<h2>csf_media</h2>
+<p><a href="index.html">Back to home</a></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">suppressPackageStartupMessages</span>({
+  <span class="kw">library</span>(scater)
+  <span class="kw">library</span>(CellMixS)
+  <span class="kw">library</span>(purrr)
+  <span class="kw">library</span>(data.table)
+  <span class="kw">library</span>(here)
+  <span class="kw">library</span>(tidyr)
+  <span class="kw">library</span>(dplyr)
+  <span class="kw">library</span>(stringr)
+  <span class="kw">library</span>(ComplexHeatmap)
+  <span class="kw">library</span>(edgeR)
+  <span class="kw">library</span>(scran)
+  <span class="kw">library</span>(cowplot)
+  <span class="kw">library</span>(ggrepel)
+  <span class="kw">library</span>(readr)
+})</code></pre></div>
+<div id="dataset-and-parameter" class="section level3">
+<h3>Dataset and parameter</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sce &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$data)
+sce_real &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$real)
+sim_list =<span class="st"> </span><span class="kw">list</span>(<span class="kw">strsplit</span>(params$sim, <span class="st">&quot;,&quot;</span>))
+<span class="kw">print</span>(sim_list[[<span class="dv">1</span>]][[<span class="dv">1</span>]])</code></pre></div>
+<pre><code>##  [1] &quot;1__1_0&quot;   &quot;0.5__1&quot;   &quot;5__2_1&quot;   &quot;0.5__2_1&quot; &quot;0.5__1_0&quot; &quot;1__1&quot;    
+##  [7] &quot;5__1&quot;     &quot;0__0&quot;     &quot;5__1_0&quot;   &quot;1__2_1&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">param &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$param)
+celltype &lt;-<span class="st"> </span>param[[<span class="st">&quot;celltype&quot;</span>]]
+batch &lt;-<span class="st"> </span>param[[<span class="st">&quot;batch&quot;</span>]]
+sample &lt;-<span class="st"> </span>param[[<span class="st">&quot;Sample&quot;</span>]]
+dataset_name &lt;-<span class="st"> </span>param[[<span class="st">&quot;dataset_name&quot;</span>]]
+
+param_real &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$param_real)
+batch_real &lt;-<span class="st"> </span>param_real[[<span class="st">&quot;batch&quot;</span>]]
+cluster_real &lt;-<span class="st"> </span>param_real[[<span class="st">&quot;celltype&quot;</span>]]
+sample_real &lt;-<span class="st"> </span>param_real[[<span class="st">&quot;sample&quot;</span>]]
+
+<span class="kw">table</span>(<span class="kw">colData</span>(sce_real)[,sample_real])</code></pre></div>
+<pre><code>## 
+## E2490_fresh       E2528       E2547 
+##         845        1377        1173</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#colors for plotting</span>
+tsne_cols &lt;-<span class="st"> </span><span class="kw">c</span>(
+  <span class="st">&quot;#DC050C&quot;</span>, <span class="st">&quot;#1965B0&quot;</span>, <span class="st">&quot;#FB8072&quot;</span>, 
+    <span class="st">&quot;#7BAFDE&quot;</span>, <span class="st">&quot;#B17BA6&quot;</span>,  <span class="st">&quot;#FDB462&quot;</span>)
+
+mds_cols &lt;-<span class="st"> </span><span class="kw">c</span>(
+    <span class="st">&quot;#DC050C&quot;</span>, <span class="st">&quot;#1965B0&quot;</span>, <span class="st">&quot;#7BAFDE&quot;</span>, <span class="st">&quot;#882E72&quot;</span>,
+    <span class="st">&quot;#B17BA6&quot;</span>, <span class="st">&quot;#FF7F00&quot;</span>, <span class="st">&quot;#FDB462&quot;</span>) </code></pre></div>
+</div>
+<div id="visualize-simulations" class="section level3">
+<h3>Visualize simulations</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Plot tsne</span>
+visUMAP &lt;-<span class="st"> </span>function(simulation, title, ids){
+  p &lt;-<span class="st"> </span><span class="kw">visGroup</span>(simulation, ids, <span class="dt">dim_red =</span> <span class="st">&quot;UMAP&quot;</span>) 
+  p[[<span class="st">&quot;data&quot;</span>]]$cluster_id &lt;-<span class="st"> </span><span class="kw">colData</span>(simulation)[, <span class="st">&quot;cluster_id&quot;</span>]
+  p +<span class="st">  </span><span class="kw">aes</span>(<span class="dt">shape =</span> cluster_id) +<span class="st"> </span>
+<span class="st">      </span><span class="kw">scale_shape_manual</span>(<span class="dt">values=</span><span class="dv">1</span>:<span class="kw">nlevels</span>(simulation$cluster_id)) +
+<span class="st">      </span><span class="kw">guides</span>(<span class="dt">colour =</span> <span class="kw">guide_legend</span>(<span class="dt">override.aes =</span> <span class="kw">list</span>(<span class="dt">size=</span><span class="dv">3</span>, <span class="dt">alpha =</span> <span class="dv">1</span>))) +
+<span class="st">      </span><span class="kw">guides</span>(<span class="dt">shape =</span> <span class="kw">guide_legend</span>(<span class="dt">override.aes =</span> <span class="kw">list</span>(<span class="dt">size=</span><span class="dv">3</span>, <span class="dt">alpha =</span> <span class="dv">1</span>), <span class="dt">title =</span> <span class="st">&quot;celltype&quot;</span>)) +
+<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">size=</span><span class="dv">2</span>, <span class="dt">alpha =</span> <span class="dv">1</span>, <span class="kw">aes_string</span>(<span class="dt">color=</span><span class="st">&quot;group_var&quot;</span>)) +
+<span class="st">      </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> tsne_cols) +
+<span class="st">      </span><span class="kw">ggtitle</span>(title)
+}
+
+visTSNE &lt;-<span class="st"> </span>function(simulation, title, ids){
+  p &lt;-<span class="st"> </span><span class="kw">visGroup</span>(simulation, ids)
+  p[[<span class="st">&quot;data&quot;</span>]]$cluster_id &lt;-<span class="st"> </span><span class="kw">colData</span>(simulation)[, <span class="st">&quot;cluster_id&quot;</span>]
+  p +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">shape =</span> cluster_id) +
+<span class="st">      </span><span class="kw">scale_shape_manual</span>(<span class="dt">values=</span><span class="dv">1</span>:<span class="kw">nlevels</span>(simulation$cluster_id)) +
+<span class="st">      </span><span class="kw">guides</span>(<span class="dt">colour =</span> <span class="kw">guide_legend</span>(<span class="dt">override.aes =</span> <span class="kw">list</span>(<span class="dt">size=</span><span class="dv">3</span>, <span class="dt">alpha =</span> <span class="dv">1</span>))) +
+<span class="st">      </span><span class="kw">guides</span>(<span class="dt">shape =</span> <span class="kw">guide_legend</span>(<span class="dt">override.aes =</span> <span class="kw">list</span>(<span class="dt">size=</span><span class="dv">3</span>, <span class="dt">alpha =</span> <span class="dv">1</span>), <span class="dt">title =</span> <span class="st">&quot;celltype&quot;</span>)) +
+<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">size=</span><span class="dv">2</span>, <span class="dt">alpha =</span> <span class="dv">1</span>, <span class="kw">aes_string</span>(<span class="dt">color=</span><span class="st">&quot;group_var&quot;</span>)) +
+<span class="st">      </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> tsne_cols) +
+<span class="st">      </span><span class="kw">ggtitle</span>(title)
+}
+
+<span class="co">#Functions from muscat to generate pseudobulk sample and genrate a MDSplot</span>
+pbMDS &lt;-<span class="st"> </span>function(x, title) {
+    y &lt;-<span class="st"> </span><span class="kw">as</span>(<span class="kw">assays</span>(x), <span class="st">&quot;list&quot;</span>)
+    y &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;cbind&quot;</span>, y)
+    d &lt;-<span class="st"> </span><span class="kw">suppressMessages</span>(<span class="kw">DGEList</span>(y))
+    d &lt;-<span class="st"> </span><span class="kw">calcNormFactors</span>(d)
+    
+    mds &lt;-<span class="st"> </span><span class="kw">plotMDS.DGEList</span>(d, <span class="dt">plot =</span> <span class="ot">FALSE</span>)
+    ei &lt;-<span class="st"> </span><span class="kw">metadata</span>(x)$experiment_info
+    m &lt;-<span class="st"> </span><span class="kw">match</span>(<span class="kw">colnames</span>(x), ei$sample_id)
+    nk &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">assays</span>(x))
+    df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
+        <span class="dt">MDS1 =</span> mds$x, 
+        <span class="dt">MDS2 =</span> mds$y, 
+        <span class="dt">cluster_id =</span> <span class="kw">rep</span>(<span class="kw">assayNames</span>(x), <span class="dt">each =</span> <span class="kw">ncol</span>(x)),
+        <span class="dt">group_id =</span> <span class="kw">rep</span>(ei$group_id[m], nk),
+        <span class="dt">sample_id =</span> <span class="kw">colnames</span>(x))
+    
+    cols &lt;-<span class="st"> </span>mds_cols
+    if (nk &gt;<span class="st"> </span><span class="kw">length</span>(cols)) 
+        cols &lt;-<span class="st"> </span><span class="kw">colorRampPalette</span>(cols)(nk)
+    
+    <span class="kw">ggplot</span>(df, <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;MDS1&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;MDS2&quot;</span>, 
+        <span class="dt">col =</span> <span class="st">&quot;sample_id&quot;</span>, <span class="dt">shape =</span> <span class="st">&quot;cluster_id&quot;</span>)) +
+<span class="st">        </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> cols) +<span class="st"> </span>
+<span class="st">        </span><span class="kw">scale_shape_manual</span>(<span class="dt">values=</span><span class="dv">1</span>:<span class="kw">nlevels</span>(df$cluster_id)) +
+<span class="st">        </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">5</span>, <span class="dt">alpha =</span> .<span class="dv">8</span>) +<span class="st"> </span>
+<span class="st">        </span><span class="kw">guides</span>(<span class="dt">color =</span> <span class="kw">guide_legend</span>(<span class="dt">override.aes =</span> <span class="kw">list</span>(<span class="dt">alpha =</span> <span class="dv">1</span>))) +
+<span class="st">        </span><span class="kw">ggtitle</span>(title) +
+<span class="st">        </span><span class="kw">theme_bw</span>() +<span class="st"> </span><span class="kw">theme</span>(<span class="dt">aspect.ratio =</span> <span class="dv">1</span>,
+            <span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>),
+            <span class="dt">panel.grid.minor =</span> <span class="kw">element_blank</span>(),
+            <span class="dt">panel.grid.major =</span> <span class="kw">element_line</span>(<span class="dt">size =</span> <span class="fl">0.2</span>, <span class="dt">color =</span> <span class="st">&quot;lightgrey&quot;</span>))
+}
+
+<span class="co">#helper functions from muscat</span>
+<span class="co"># Compute pseudo bulks</span>
+.pb &lt;-<span class="st"> </span>function(x, cs, assay, fun) {
+    fun &lt;-<span class="st"> </span>switch(fun,
+                  <span class="dt">rowMedians =</span> <span class="kw">getFromNamespace</span>(fun, <span class="st">&quot;matrixStats&quot;</span>),
+                  <span class="kw">getFromNamespace</span>(fun, <span class="st">&quot;Matrix&quot;</span>))
+    pb &lt;-<span class="st"> </span><span class="kw">map_depth</span>(cs, -<span class="dv">1</span>, function(i) {
+        if (<span class="kw">length</span>(i) ==<span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="kw">numeric</span>(<span class="kw">nrow</span>(x)))
+        <span class="kw">fun</span>(<span class="kw">assays</span>(x)[[assay]][, i, <span class="dt">drop =</span> <span class="ot">FALSE</span>])
+    })
+    <span class="kw">map_depth</span>(pb, -<span class="dv">2</span>, function(u) 
+        <span class="kw">data.frame</span>(u, 
+                   <span class="dt">row.names =</span> <span class="kw">rownames</span>(x),
+                   <span class="dt">check.names =</span> <span class="ot">FALSE</span>))
+}
+
+
+<span class="co">#split cells</span>
+.split_cells &lt;-<span class="st"> </span>function(x, 
+                         <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;cluster_id&quot;</span>, <span class="st">&quot;sample_id&quot;</span>)) {
+    if (<span class="kw">is</span>(x, <span class="st">&quot;SingleCellExperiment&quot;</span>))
+        x &lt;-<span class="st"> </span><span class="kw">colData</span>(x)
+    cd &lt;-<span class="st"> </span><span class="kw">data.frame</span>(x[by], <span class="dt">check.names =</span> <span class="ot">FALSE</span>)
+    cd &lt;-<span class="st"> </span><span class="kw">data.table</span>(cd, <span class="dt">cell =</span> <span class="kw">rownames</span>(cd)) %&gt;%<span class="st"> </span>
+<span class="st">        </span><span class="kw">split</span>(<span class="dt">by =</span> by, <span class="dt">sorted =</span> <span class="ot">TRUE</span>, <span class="dt">flatten =</span> <span class="ot">FALSE</span>)
+    <span class="kw">map_depth</span>(cd, <span class="kw">length</span>(by), <span class="st">&quot;cell&quot;</span>)
+}
+
+aggregateData &lt;-<span class="st"> </span>function(x, assay,
+    <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;cluster_id&quot;</span>, <span class="st">&quot;sample_id&quot;</span>),
+    <span class="dt">fun =</span> <span class="kw">c</span>(<span class="st">&quot;sum&quot;</span>, <span class="st">&quot;mean&quot;</span>, <span class="st">&quot;median&quot;</span>), 
+    <span class="dt">scale =</span> <span class="ot">FALSE</span>) {
+    
+    if (<span class="kw">missing</span>(<span class="st">&quot;assay&quot;</span>))
+        assay &lt;-<span class="st"> </span><span class="kw">assayNames</span>(x)[<span class="dv">1</span>]
+
+    <span class="co"># validity checks for input arguments</span>
+    <span class="kw">stopifnot</span>(<span class="kw">is.character</span>(by), by %in%<span class="st"> </span><span class="kw">colnames</span>(<span class="kw">colData</span>(x)))
+    <span class="kw">stopifnot</span>(<span class="kw">is.logical</span>(scale), <span class="kw">length</span>(scale) ==<span class="st"> </span><span class="dv">1</span>)
+    
+    <span class="co"># get aggregation function</span>
+    fun &lt;-<span class="st"> </span><span class="kw">match.arg</span>(fun)
+    fun &lt;-<span class="st"> </span>switch(fun,
+        <span class="dt">sum =</span> <span class="st">&quot;rowSums&quot;</span>,
+        <span class="dt">mean =</span> <span class="st">&quot;rowMeans&quot;</span>,
+        <span class="dt">median =</span> <span class="st">&quot;rowMedians&quot;</span>)
+    
+    <span class="co"># split cells &amp; compute pseudo-bulks</span>
+    cs &lt;-<span class="st"> </span><span class="kw">.split_cells</span>(x, by)
+    pb &lt;-<span class="st"> </span><span class="kw">.pb</span>(x, cs, assay, fun)
+    
+    <span class="co"># scale</span>
+    if (scale) {
+        if (assay ==<span class="st"> &quot;counts&quot;</span> &amp;<span class="st"> </span>fun ==<span class="st"> &quot;rowSums&quot;</span>) {
+            pb_counts &lt;-<span class="st"> </span>pb
+        } else {
+            pb_counts &lt;-<span class="st"> </span><span class="kw">.pb</span>(x, cs, assay, <span class="st">&quot;rowSums&quot;</span>)
+        }
+        pb &lt;-<span class="st"> </span><span class="kw">map_depth</span>(pb_counts, -<span class="dv">2</span>, function(u)
+            u /<span class="st"> </span><span class="kw">colSums</span>(u)[<span class="kw">col</span>(u)] *<span class="st"> </span><span class="fl">1e6</span>)
+    }
+    pb &lt;-<span class="st"> </span><span class="kw">map_depth</span>(pb, -<span class="dv">2</span>, as.matrix)
+    
+    <span class="co"># return SCE</span>
+    md &lt;-<span class="st"> </span><span class="kw">metadata</span>(x)
+    md$agg_pars &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">assay =</span> assay, <span class="dt">fun =</span> fun)
+    
+    <span class="kw">SingleCellExperiment</span>(
+        <span class="dt">assays =</span> pb,
+        <span class="dt">metadata =</span> md)
+}
+
+visMDS &lt;-function(simulation, title, ids){
+  agg_sim &lt;-<span class="st"> </span><span class="kw">aggregateData</span>(simulation, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;cluster_id&quot;</span>, ids),
+    <span class="dt">fun =</span>  <span class="st">&quot;mean&quot;</span>, <span class="dt">scale =</span> <span class="ot">TRUE</span>)
+  <span class="kw">pbMDS</span>(agg_sim, title)
+}</code></pre></div>
+<div id="tsne" class="section level4">
+<h4>TSNE</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sim_list[[<span class="dv">1</span>]][[<span class="dv">1</span>]], function(sim, <span class="dt">name =</span> dataset_name){
+    filename &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;out/sim_char/&quot;</span>, name, <span class="st">&quot;/sim_&quot;</span>, name, <span class="st">&quot;_&quot;</span>, sim, <span class="st">&quot;_sce.rds&quot;</span>)
+    sim_sce &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="dt">file =</span> filename)
+    sim_sce$sample_id &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;</span><span class="ch">\\</span><span class="st">..&#39;</span>, <span class="st">&#39;&#39;</span>, sim_sce$sample_id)
+    <span class="kw">visTSNE</span>(sim_sce, <span class="dt">title =</span> <span class="kw">paste0</span>(<span class="st">&quot;Simulate: &quot;</span>, name, <span class="st">&quot; - &quot;</span>, sim), <span class="dt">ids =</span> batch)
+})</code></pre></div>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<pre><code>## [[1]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-1.svg" width="672" /></p>
+<pre><code>## 
+## [[2]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-2.svg" width="672" /></p>
+<pre><code>## 
+## [[3]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-3.svg" width="672" /></p>
+<pre><code>## 
+## [[4]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-4.svg" width="672" /></p>
+<pre><code>## 
+## [[5]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-5.svg" width="672" /></p>
+<pre><code>## 
+## [[6]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-6.svg" width="672" /></p>
+<pre><code>## 
+## [[7]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-7.svg" width="672" /></p>
+<pre><code>## 
+## [[8]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-8.svg" width="672" /></p>
+<pre><code>## 
+## [[9]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-9.svg" width="672" /></p>
+<pre><code>## 
+## [[10]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne-10.svg" width="672" /></p>
+</div>
+<div id="umap" class="section level4">
+<h4>UMAP</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sim_list[[<span class="dv">1</span>]][[<span class="dv">1</span>]], function(sim, <span class="dt">name =</span> dataset_name){
+    filename &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;out/sim_char/&quot;</span>, name, <span class="st">&quot;/sim_&quot;</span>, name, <span class="st">&quot;_&quot;</span>, sim, <span class="st">&quot;_sce.rds&quot;</span>)
+    sim_sce &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="dt">file =</span> filename)
+    sim_sce$sample_id &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;</span><span class="ch">\\</span><span class="st">..&#39;</span>, <span class="st">&#39;&#39;</span>, sim_sce$sample_id)
+    <span class="kw">visUMAP</span>(sim_sce, <span class="dt">title =</span> <span class="kw">paste0</span>(<span class="st">&quot;Simulate: &quot;</span>, name, <span class="st">&quot; - &quot;</span>, sim), <span class="dt">ids =</span> batch)
+})</code></pre></div>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.
+## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<pre><code>## [[1]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-1.svg" width="672" /></p>
+<pre><code>## 
+## [[2]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-2.svg" width="672" /></p>
+<pre><code>## 
+## [[3]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-3.svg" width="672" /></p>
+<pre><code>## 
+## [[4]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-4.svg" width="672" /></p>
+<pre><code>## 
+## [[5]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-5.svg" width="672" /></p>
+<pre><code>## 
+## [[6]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-6.svg" width="672" /></p>
+<pre><code>## 
+## [[7]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-7.svg" width="672" /></p>
+<pre><code>## 
+## [[8]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-8.svg" width="672" /></p>
+<pre><code>## 
+## [[9]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-9.svg" width="672" /></p>
+<pre><code>## 
+## [[10]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap-10.svg" width="672" /></p>
+</div>
+<div id="mds-plot" class="section level4">
+<h4>MDS plot</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sim_list[[<span class="dv">1</span>]][[<span class="dv">1</span>]], function(sim, <span class="dt">name =</span> dataset_name){
+    filename &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;out/sim_char/&quot;</span>, name, <span class="st">&quot;/sim_&quot;</span>, name, <span class="st">&quot;_&quot;</span>, sim, <span class="st">&quot;_sce.rds&quot;</span>)
+    sim_sce &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="dt">file =</span> filename)
+    sim_sce$sample_id &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;</span><span class="ch">\\</span><span class="st">..&#39;</span>, <span class="st">&#39;&#39;</span>, sim_sce$sample_id)
+    <span class="kw">visMDS</span>(sim_sce, <span class="dt">title =</span> <span class="kw">paste0</span>(<span class="st">&quot;Simulate: &quot;</span>, name, <span class="st">&quot; - &quot;</span>, sim), <span class="dt">ids =</span> batch)
+})</code></pre></div>
+<pre><code>## [[1]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-1.svg" width="672" /></p>
+<pre><code>## 
+## [[2]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-2.svg" width="672" /></p>
+<pre><code>## 
+## [[3]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-3.svg" width="672" /></p>
+<pre><code>## 
+## [[4]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-4.svg" width="672" /></p>
+<pre><code>## 
+## [[5]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-5.svg" width="672" /></p>
+<pre><code>## 
+## [[6]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-6.svg" width="672" /></p>
+<pre><code>## 
+## [[7]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-7.svg" width="672" /></p>
+<pre><code>## 
+## [[8]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-8.svg" width="672" /></p>
+<pre><code>## 
+## [[9]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-9.svg" width="672" /></p>
+<pre><code>## 
+## [[10]]</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/mds-10.svg" width="672" /></p>
+</div>
+</div>
+<div id="real-data" class="section level3">
+<h3>Real data</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># to make aggregate functions work</span>
+sce_real$batch_id &lt;-<span class="st"> </span><span class="kw">colData</span>(sce_real)[, batch_real]
+sce_real$sample_id &lt;-<span class="st"> </span><span class="kw">colData</span>(sce_real)[, sample_real]
+sce_real$cluster_id &lt;-<span class="st"> </span><span class="kw">colData</span>(sce_real)[, cluster_real]
+sce_real$group_id &lt;-<span class="st"> </span><span class="kw">as.factor</span>(<span class="kw">rep</span>(<span class="st">&quot;A&quot;</span>, <span class="kw">ncol</span>(sce_real)))
+<span class="kw">metadata</span>(sce_real)$experiment_info &lt;-<span class="st"> </span><span class="kw">colData</span>(sce_real)[, <span class="kw">c</span>(<span class="st">&quot;batch_id&quot;</span>, <span class="st">&quot;cluster_id&quot;</span>, <span class="st">&quot;group_id&quot;</span>, <span class="st">&quot;sample_id&quot;</span>)]
+
+<span class="kw">visTSNE</span>(sce_real, <span class="dt">title =</span> <span class="st">&quot;Real dataset&quot;</span>, <span class="dt">ids =</span> <span class="st">&quot;batch_id&quot;</span>)</code></pre></div>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/real-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visUMAP</span>(sce_real, <span class="dt">title =</span> <span class="st">&quot;Real dataset&quot;</span>, <span class="dt">ids =</span> <span class="st">&quot;batch_id&quot;</span>)</code></pre></div>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/real-2.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visMDS</span>(sce_real, <span class="dt">title =</span> <span class="st">&quot;Real dataset&quot;</span>, <span class="dt">ids =</span> <span class="st">&quot;batch_id&quot;</span>)</code></pre></div>
+<p><img src="vis_sim_csf_media_files/figure-html/real-3.svg" width="672" /></p>
+</div>
+<div id="cellspecific-mixing-score-simulations" class="section level3 tabset tabset-fade">
+<h3>Cellspecific Mixing score simulations</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#get all cms scores</span>
+cms_all &lt;-<span class="st"> </span><span class="kw">names</span>(<span class="kw">colData</span>(sce))[<span class="kw">grep</span>(<span class="st">&quot;cms_sim&quot;</span>, <span class="kw">names</span>(<span class="kw">colData</span>(sce)))]
+
+<span class="co"># plot list</span>
+cms_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(cms_all, function(sim){
+    dim_nam &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;cms_sim_&quot;</span>,<span class="st">&quot;X&quot;</span>, sim)
+    p &lt;-<span class="st"> </span><span class="kw">visMetric</span>(sce, <span class="dt">metric =</span> sim, <span class="dt">dim_red =</span> dim_nam)
+    <span class="co">#p2 &lt;- visGroup(sce, group = &quot;batch_id&quot;, dim_red = dim_nam)</span>
+    <span class="co">#p3 &lt;- plot_grid(p, p2, nrow = 2)</span>
+})</code></pre></div>
+<div id="cms_sim_1__1_0" class="section level4">
+<h4>cms_sim_1__1_0 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-1.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_0.5__1" class="section level4">
+<h4>cms_sim_0.5__1 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-2.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_5__2_1" class="section level4">
+<h4>cms_sim_5__2_1 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-3.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_0.5__2_1" class="section level4">
+<h4>cms_sim_0.5__2_1 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-4.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_0.5__1_0" class="section level4">
+<h4>cms_sim_0.5__1_0 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-5.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_1__1" class="section level4">
+<h4>cms_sim_1__1 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-6.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_5__1" class="section level4">
+<h4>cms_sim_5__1 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-7.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_0__0" class="section level4">
+<h4>cms_sim_0__0 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-8.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_5__1_0" class="section level4">
+<h4>cms_sim_5__1_0 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-9.svg" width="672" /> <br></h4>
+</div>
+<div id="cms_sim_1__2_1" class="section level4">
+<h4>cms_sim_1__2_1 <br> <img src="vis_sim_csf_media_files/figure-html/unnamed-chunk-1-10.svg" width="672" /> <br></h4>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3,h4",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

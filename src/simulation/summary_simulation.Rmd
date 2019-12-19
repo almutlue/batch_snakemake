@@ -236,35 +236,6 @@ p + geom_vline(aes_string(xintercept = "cms_mean",
 ```
 
 
-### Cellspecific Mixing score simulations
-
-
-```{r sim cms}
-#get all cms scores
-cms_all <- names(colData(sce))[grep("cms_sim", names(colData(sce)))]
-
-# plot list
-sim_list <- lapply(cms_all, function(sim){
-    dim_nam <- gsub("cms_sim_","X", sim)
-    p <- visMetric(sce, metric = sim, dim_red = dim_nam)
-    p2 <- visGroup(sce, group = "batch_id", dim_red = dim_nam)
-    p3 <- plot_grid(p, p2, nrow = 2)
-})
-
-```
-
-### Cellspecific Mixing score simulations {.tabset .tabset-pills}  
-
-
-```{r, results='asis', echo = FALSE}
-for (i in 1:length(cms_all)) {
-  cat("#### ", cms_all[i], "\n")
-  print(sim_list[[i]])
-  cat('\n\n')
-}
-```
-
-
 ## Celltype specificity
 
 ### Celltype abundance

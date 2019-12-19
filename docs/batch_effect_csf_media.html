@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">02 December, 2019</h4>
+<h4 class="date">17 December, 2019</h4>
 
 </div>
 
@@ -445,7 +445,7 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 <span class="st">  </span><span class="kw">Tlab</span>(<span class="st">&quot;celltype&quot;</span>) +
 <span class="st">  </span><span class="kw">Rlab</span>(<span class="st">&quot;other&quot;</span>) +
 <span class="st">  </span><span class="kw">theme_bw</span>()</code></pre></div>
-<pre><code>## Warning: Removed 1016 rows containing non-finite values (StatDensityTern).</code></pre>
+<pre><code>## Warning: Removed 1028 rows containing non-finite values (StatDensityTern).</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/var%20expr-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1 &lt;-<span class="st"> </span><span class="kw">ggtern</span>(<span class="dt">data=</span><span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)),<span class="kw">aes</span>(vp_batch, vp_celltype, vp_residuals)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.1</span>) +
@@ -512,7 +512,7 @@ var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_c
 <h4>Celltypes cms smooth</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare by celltypes</span>
 <span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.0034</code></pre>
+<pre><code>## Picking joint bandwidth of 0.00332</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/cms%20celltypes-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype, <span class="dt">violin =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="batch_effect_csf_media_files/figure-html/cms%20celltypes-2.svg" width="672" /></p>
@@ -702,45 +702,45 @@ pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span clas
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-1.svg" width="672" /></p>
 <pre><code>## Cluster: 0 Contrast: cryo-fresh Num genes: 4097 Num DE: 4 
 ##                                     category NGenes Direction       PValue
-## 1      GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 9.005804e-18
-## 2                GO_UNFOLDED_PROTEIN_BINDING     50        Up 4.946618e-07
-## 3            GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 1.825293e-06
-## 4  GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 2.103325e-06
-## 5 GO_TRANSLATION_FACTOR_ACTIVITY_RNA_BINDING     49        Up 2.177211e-05
-## 6                   GO_TELOMERIC_DNA_BINDING     14        Up 3.160541e-05
-## 7    GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 5.068796e-05
-## 8                            GO_TRNA_BINDING      8        Up 8.528542e-05
+## 1      GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 1.747895e-21
+## 2            GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 5.535426e-08
+## 3                GO_UNFOLDED_PROTEIN_BINDING     50        Up 1.015266e-06
+## 4  GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 4.368402e-06
+## 5 GO_TRANSLATION_FACTOR_ACTIVITY_RNA_BINDING     49        Up 4.276579e-05
+## 6                   GO_TELOMERIC_DNA_BINDING     14        Up 4.532632e-05
+## 7                   GO_ACTIN_MONOMER_BINDING      6      Down 4.942477e-05
+## 8    GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 6.870206e-05
 ##            FDR
-## 1 7.555869e-15
-## 2 1.383404e-04
-## 3 3.529379e-04
-## 4 3.529379e-04
-## 5 3.044467e-03
-## 6 3.314617e-03
-## 7 4.725244e-03
-## 8 7.155447e-03</code></pre>
+## 1 1.466484e-18
+## 2 1.548074e-05
+## 3 2.129520e-04
+## 4 7.330179e-04
+## 5 5.183423e-03
+## 6 5.183423e-03
+## 7 5.183423e-03
+## 8 5.764103e-03</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-2.svg" width="672" /></p>
-<pre><code>## Cluster: 1 Contrast: cryo-fresh Num genes: 4097 Num DE: 7 
-##                                     category NGenes Direction       PValue
-## 1      GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 1.139448e-10
-## 2                   GO_TELOMERIC_DNA_BINDING     14        Up 6.479020e-07
-## 3  GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 1.752403e-06
-## 4  GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 4.588683e-06
-## 5                GO_UNFOLDED_PROTEIN_BINDING     50        Up 8.150585e-06
-## 6            GO_BETA_2_MICROGLOBULIN_BINDING      5        Up 2.770104e-05
-## 7                 GO_PEPTIDE_ANTIGEN_BINDING     16        Up 1.914947e-04
-## 8 GO_TRANSLATION_FACTOR_ACTIVITY_RNA_BINDING     49        Up 1.996204e-04
+<pre><code>## Cluster: 1 Contrast: cryo-fresh Num genes: 4097 Num DE: 5 
+##                                    category NGenes Direction       PValue
+## 1     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 3.356581e-15
+## 2                  GO_TELOMERIC_DNA_BINDING     14        Up 1.092104e-06
+## 3 GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 5.060949e-06
+## 4               GO_UNFOLDED_PROTEIN_BINDING     50        Up 1.580902e-05
+## 5 GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 2.438687e-05
+## 6           GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 3.138518e-05
+## 7           GO_BETA_2_MICROGLOBULIN_BINDING      5        Up 5.958215e-05
+## 8   GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 3.449869e-04
 ##            FDR
-## 1 4.779985e-08
-## 2 1.811966e-04
-## 3 3.675665e-04
-## 4 7.699810e-04
-## 5 1.139724e-03
-## 6 2.582352e-03
-## 7 1.482426e-02
-## 8 1.482426e-02</code></pre>
+## 1 2.816172e-12
+## 2 3.054250e-04
+## 3 1.061534e-03
+## 4 2.652754e-03
+## 5 2.922941e-03
+## 6 3.291520e-03
+## 7 4.998943e-03
+## 8 2.631309e-02</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-3.svg" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: cryo-fresh Num genes: 4097 Num DE: 11 
+<pre><code>## Cluster: 2 Contrast: cryo-fresh Num genes: 4097 Num DE: 12 
 ##                                                      category NGenes Direction
 ## 1                       GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down
 ## 2                                   GO_14_3_3_PROTEIN_BINDING      8        Up
@@ -749,31 +749,30 @@ pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span clas
 ## 5                             GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down
 ## 6                                             GO_RRNA_BINDING     38      Down
 ##         PValue          FDR
-## 1 9.203228e-14 7.721508e-11
-## 2 2.628691e-06 8.327934e-04
-## 3 2.977807e-06 8.327934e-04
-## 4 6.170409e-06 1.294243e-03
-## 5 1.167649e-05 1.959315e-03
-## 6 2.573870e-04 3.599128e-02</code></pre>
+## 1 2.862584e-14 2.401708e-11
+## 2 2.435693e-06 7.921893e-04
+## 3 2.832620e-06 7.921893e-04
+## 4 6.757281e-06 1.152252e-03
+## 5 6.866816e-06 1.152252e-03
+## 6 1.654646e-04 2.313747e-02</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-4.svg" width="672" /></p>
-<pre><code>## Cluster: 3 Contrast: cryo-fresh Num genes: 4097 Num DE: 12 
-##                   category NGenes Direction       PValue         FDR
-## 1 GO_TELOMERIC_DNA_BINDING     14        Up 4.752049e-06 0.003986969
-## 2       GO_LAMININ_BINDING      6        Up 1.335599e-04 0.040728991</code></pre>
+<pre><code>## Cluster: 3 Contrast: cryo-fresh Num genes: 4097 Num DE: 9 
+##                   category NGenes Direction      PValue         FDR
+## 1 GO_TELOMERIC_DNA_BINDING     14        Up 5.37616e-06 0.004510598</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: cryo-fresh Num genes: 4097 Num DE: 41 
+<pre><code>## Cluster: 4 Contrast: cryo-fresh Num genes: 4097 Num DE: 42 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 1.155398e-17
-## 2       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 1.061461e-07
-## 3                       GO_RRNA_BINDING     38      Down 2.759533e-07
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151      Down 4.306811e-19
+## 2       GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down 2.254661e-08
+## 3                       GO_RRNA_BINDING     38      Down 8.144344e-08
 ##            FDR
-## 1 9.693788e-15
-## 2 4.452828e-05
-## 3 7.717493e-05</code></pre>
+## 1 3.613414e-16
+## 2 9.458304e-06
+## 3 2.277702e-05</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-6.svg" width="672" /></p>
 <pre><code>## Cluster: 5 Contrast: cryo-fresh Num genes: 4097 Num DE: 20 
 ##                     category NGenes Direction       PValue        FDR
-## 1 GO_PEPTIDE_ANTIGEN_BINDING     16        Up 1.856101e-05 0.01557268</code></pre>
+## 1 GO_PEPTIDE_ANTIGEN_BINDING     16        Up 3.291637e-05 0.02761683</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-7.svg" width="672" /></p>
 <pre><code>## Cluster: 6 Contrast: cryo-fresh Num genes: 4097 Num DE: 21 
 ##                                                      category NGenes Direction
@@ -782,18 +781,18 @@ pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span clas
 ## 3          GO_SIGNALING_PATTERN_RECOGNITION_RECEPTOR_ACTIVITY      7      Down
 ## 4                     GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up
 ## 5                              GO_MHC_PROTEIN_COMPLEX_BINDING     14        Up
-## 6 GO_OXIDOREDUCTASE_ACTIVITY_ACTING_ON_A_HEME_GROUP_OF_DONORS     15      Down
-## 7                                          GO_ANTIGEN_BINDING     42        Up
+## 6                                          GO_ANTIGEN_BINDING     42        Up
+## 7 GO_OXIDOREDUCTASE_ACTIVITY_ACTING_ON_A_HEME_GROUP_OF_DONORS     15      Down
 ## 8                             GO_STRUCTURAL_MOLECULE_ACTIVITY    238      Down
 ##         PValue          FDR
-## 1 1.932841e-09 1.621653e-06
-## 2 5.100343e-09 2.139594e-06
-## 3 1.630189e-06 4.270242e-04
-## 4 3.919227e-06 6.576463e-04
-## 5 4.073595e-05 5.696244e-03
-## 6 9.930776e-05 1.057753e-02
-## 7 1.008584e-04 1.057753e-02
-## 8 2.443535e-04 2.050126e-02</code></pre>
+## 1 5.269299e-09 3.431835e-06
+## 2 8.180775e-09 3.431835e-06
+## 3 1.501404e-06 4.130209e-04
+## 4 4.373959e-06 7.339503e-04
+## 5 4.514088e-05 6.312200e-03
+## 6 1.028528e-04 1.159921e-02
+## 7 1.106004e-04 1.159921e-02
+## 8 3.921606e-04 3.290228e-02</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-8.svg" width="672" /></p>
 <pre><code>## Cluster: 7 Contrast: cryo-fresh Num genes: 4097 Num DE: 13 
 ## [1] category  NGenes    Direction PValue    FDR      
@@ -944,7 +943,7 @@ vis_type &lt;-<span class="st"> </span>function(dim_red){
 <span class="kw">visHist</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="batch_effect_csf_media_files/figure-html/batchtype%20cms-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visIntegration</span>(sce, <span class="dt">metric =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">metric_name =</span> <span class="st">&quot;cms&quot;</span>)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.0185</code></pre>
+<pre><code>## Picking joint bandwidth of 0.0181</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/batchtype%20cms-2.svg" width="672" /></p>
 </div>
 </div>
