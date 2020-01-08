@@ -202,22 +202,19 @@ cats <- factor(cats, levels = cats)
 
 
 #Get beta coefficients
-.beta_coef <- function(x, equal, ids, sd = 0, new_lab = NULL){
+.beta_coef <- function(x, equal, ids){
     n <- length(ids)
+    beta_id <- data.frame("beta_ids" = paste("beta", ids, sep = ".")) %>%  
+        filter(beta_ids %in% colnames(rowData(x)))
+    rd <- as.data.frame(rowData(x)[, beta_id$beta_ids])
+    rd <- cbind(rd, mean = apply(rd, 1, mean), 
+                sd = abs(0.1 * apply(rd, 1, mean)))
     if( equal ){
-        #equalize m by sampling the same beta for each gene
-        rd <- rowData(x)[, paste("beta", ids, sep = ".")]
-        rd <- cbind(rd, mean = apply(rd, 1, mean))
-        rd <- apply(rd, 1, function(gene){rnorm(n, gene["mean"], sd = sd)}) %>% 
+        rd <- apply(rd, 1, function(gene){rnorm(n, gene["mean"], sd = 0)}) %>% 
             t() %>% set_colnames(ids)
     }else{
-        #introduce variance from edgeR using sample specific beta coef (FROM THE SAME BATCH)
-        sel_b <- names(which.max(table(new_lab)))[1]
-        s_be <- names(new_lab)[which(new_lab %in% sel_b)]
-        rd <- rowData(x)[, paste("beta", s_be, sep = ".")] %>% set_colnames(s_be)
-        rd <- cbind(rd, mean = apply(rd, 1, mean), sd = apply(rd, 1, sd))
-        rd_new <- apply(rd, 1, function(gene){
-            rnorm(n = n, mean = gene["mean"], sd = 0.6 * gene["sd"])
+        rd <- apply(rd, 1, function(gene){
+            rnorm(n = n, mean = gene["mean"], sd = gene["sd"])
         }) %>% t() %>% set_colnames(ids)
     }
 }
@@ -595,15 +592,13 @@ simData <- function(x, n_genes = 500, n_cells = 300,
     #Get beta values for each sample
     #Are sample ids equal to batch_ids? (Add a sample specific variance or not)
     equal <- length(unique(names(new_lab))) == length(unique(new_lab))
-    rd <- .beta_coef(x, equal = equal, sids, new_lab = new_lab)
+    rd <- .beta_coef(x, equal = equal, sids)
     
     #Get beta values for celltypes
     if( ct %in% "sim" ){
-        rd_ct <- as.data.frame(.beta_coef(x, equal = TRUE, kids[-1])) %>% set_names(kids[-1])
-        rd_ct[, kids[1]] <- c(rowMeans(as.matrix(rd_ct))) 
+        rd_ct <- as.data.frame(.beta_coef(x, equal = TRUE, kids)) %>% set_names(kids)
     }else{
-        rd_ct <- rowData(x)[, paste("beta", kids[-1], sep = ".")] %>% set_colnames(kids[-1])
-        rd_ct[, kids[1]] <- rep(0, nrow(rd_ct))
+        rd_ct <- rowData(x)[, paste("beta", kids, sep = ".")] %>% set_colnames(kids)
     }
     
     # compute NB parameters

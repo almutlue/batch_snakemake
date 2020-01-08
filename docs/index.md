@@ -34,3 +34,11 @@ A systematic analysis of different kinds of unwanted varaition in single cell RN
 + [csf_media](simulation_csf_media.html)
 + [csf_patient](simulation_csf_patient.html)
 
+## CountSimQC
++ [csf_media](countSimQC_csf_media.html)
++ [csf_patient](countSimQC_csf_patient.html)
+
+## Visualize Simulations
++ [csf_media](vis_sim_csf_media.html)
++ [csf_patient](vis_sim_csf_patient.html)
+

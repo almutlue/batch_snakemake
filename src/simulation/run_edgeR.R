@@ -48,7 +48,7 @@ fit_edgeR <- function(sample, celltype){
     # fit NB
     y <- DGEList(counts(sce))
     y <- calcNormFactors(y)
-    mm <- model.matrix(~ 0 + be + ct)
+    mm <- model.matrix(~ 0 + ct + be)
     y <- estimateDisp(y, mm)
     y <- glmFit(y, prior.count = 0)
 
@@ -59,8 +59,8 @@ fit_edgeR <- function(sample, celltype){
     rowData(sce) <- DataFrame(rowData(sce), y$coefficients) %>% 
                                   set_colnames(c(colnames(rowData(sce)),
                                       paste("beta", 
-                                            c(levels(colData(sce)[,sample]),
-                                              levels(colData(sce)[,celltype])[-1]), 
+                                            c(levels(colData(sce)[,celltype]),
+                                              levels(colData(sce)[,sample])[-1]), 
                                             sep = ".")))
     sce
 }

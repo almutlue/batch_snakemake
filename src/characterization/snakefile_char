@@ -145,13 +145,14 @@ rule summary:
         de = config["out_de"] + "de_{sample}.rds",
         gs = config["src_data"] + "c5.mf.v6.2.symbols.gmt",
         abund = config["out_abund"] + "abundance_{sample}.rds",
-        script = config["src_summary"] + "summary_batch_characterization.Rmd",
+        script = config["src_summary"] + "summary_batch_characterization.Rmd"
+    params:
         outdir = config["docs"]
     output:
         out = config["docs"] + "batch_effect_{sample}.html",
         out_file = config["out_summary"] + "summary_{sample}.rds"
     shell:
-        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{input.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', de ='{input.de}', gs = '{input.gs}', abund = '{input.abund}', out_file = '{output.out_file}'))"'''
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', de ='{input.de}', gs = '{input.gs}', abund = '{input.abund}', out_file = '{output.out_file}'))"'''
         
 
 ## -------------------------------------------------------------------------- ##

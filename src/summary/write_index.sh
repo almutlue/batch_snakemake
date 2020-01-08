@@ -30,7 +30,5 @@ do
     sed -i "/^## Visualize Simulations/a $link_vis" $index_new
 done
 
-
-
 echo ###########-------- finished index file ----------------###########
 echo "added $n files to index.md"
