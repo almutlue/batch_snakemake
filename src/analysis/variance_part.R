@@ -39,6 +39,9 @@ if( length(which(rowSums(assays(sce)$logcounts) == 0)) > 0 ){
 expr <- as.matrix(assays(sce)$logcounts)
 meta_sub <- as.data.frame(colData(sce)[, c(celltype, batch)])
 form <- as.formula(paste0("~ (1|", celltype, ") + (1|", batch, ")"))
+#meta_sub <- as.data.frame(colData(sce)[, c(batch)])
+#colnames(meta_sub) <- batch
+#form <- as.formula(paste0("~ (1|", batch, ")"))
 varPart <- fitExtractVarPartModel(expr, form, meta_sub)
 # Add to sce
 rowData(sce)$vp_celltype <- varPart[[celltype]]

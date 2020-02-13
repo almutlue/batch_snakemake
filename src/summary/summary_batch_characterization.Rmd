@@ -323,7 +323,8 @@ names(cs) <- cs
 # Filter DEG by pvalue
 FilterDEGs <- function (degDF = df, filter = c(FDR = 5)){
   rownames(degDF) <- degDF$gene
-  pval <- degDF[, grep("adj.P.Val$", colnames(degDF)), drop = FALSE]
+  #pval <- degDF[, grep("adj.P.Val$", colnames(degDF)), drop = FALSE]
+  pval <- degDF[, grep("PValue$", colnames(degDF)), drop = FALSE]
   pf <- pval <= filter["FDR"]/100
   pf[is.na(pf)] <- FALSE
   DEGlistUPorDOWN <- sapply(colnames(pf), function(x) rownames(pf[pf[, x, drop = FALSE], , drop = FALSE]), simplify = FALSE)
@@ -350,7 +351,8 @@ lapply(m2, function(x) UpSet(x))
 ```{r pval lfc}
 # DE genes (per cluster and mean)
 res <- res_de[["table"]]
-n_de <- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val < 0.05), numeric(1)))
+#n_de <- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val < 0.05), numeric(1)))
+n_de <- lapply(res, function(y) vapply(y, function(x) sum(x$adj.PValue < 0.05), numeric(1)))
 n_genes_lfc1 <- lapply(res, function(y) vapply(y, function(x) sum(abs(x$logFC) > 1), numeric(1)))
 mean_n_genes_lfc1 <- mean(unlist(n_genes_lfc1))/n_genes
 
@@ -363,7 +365,8 @@ names(cats) <- sapply(cats, .subset, 1)
 cats <- lapply(cats, function(u) u[-1])
 
 plotDE <- function(cont_var){
-  res_s <- res[[cont_var]] %>% map(filter, adj.P.Val < .05) %>% map(filter, abs(logFC) > 1)
+  #res_s <- res[[cont_var]] %>% map(filter, adj.P.Val < .05) %>% map(filter, abs(logFC) > 1)
+  res_s <- res[[cont_var]] %>% map(dplyr::filter, PValue < .05) %>% map(dplyr::filter, abs(logFC) > 1)
   
   #plot
   lapply(names(res[[cont_var]]), function(ct){
@@ -371,7 +374,8 @@ plotDE <- function(cont_var){
     ct_de$gene <- gsub('[A-z0-9]*\\.', '', ct_de$gene)
     res_s[[ct]]$gene <- gsub('[A-z0-9]*\\.', '', res_s[[ct]]$gene)
     
-    p <- ggplot(ct_de, aes(x = AveExpr, y = logFC, colour = abs(logFC) > 1, label = gene)) + 
+    #p <- ggplot(ct_de, aes(x = AveExpr, y = logFC, colour = abs(logFC) > 1, label = gene)) + 
+    p <- ggplot(ct_de, aes(x = logCPM, y = logFC, colour = abs(logFC) > 1, label = gene)) + 
       geom_point(size = 2, alpha = .5) +
       geom_label_repel(data = res_s[[ct]]) +
       ggtitle(paste0(ct,": ", cont_var)) +
@@ -383,7 +387,8 @@ plotDE <- function(cont_var){
 
     # run 'camera' for this comparison
     inds <- ids2indices(cats, ct_de$gene)
-    cm <- cameraPR(ct_de$t, inds)
+    #cm <- cameraPR(ct_de$t, inds)
+    cm <- cameraPR(ct_de$LR, inds)
     print(cm %>% rownames_to_column("category") %>% 
       filter(FDR < .05 & NGenes >= 5) %>% head(8))
   })
@@ -396,7 +401,8 @@ pathways <- lapply(names(res), plotDE)
 Summarize differential expression analysis
 ```{r summarize de}
 # DE genes (per cluster and mean)
-n_de <- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val < 0.05), numeric(1)))
+#n_de <- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val < 0.05), numeric(1)))
+n_de <- lapply(res, function(y) vapply(y, function(x) sum(x$PValue < 0.05), numeric(1)))
 n_de_cl <- lapply(res, function(y) vapply(y, function(x) nrow(x), numeric(1)))
 mean_n_de <- lapply(n_de, function(x) mean(x))
 mean_mean_n_de <- mean(unlist(mean_n_de))/n_genes
@@ -604,7 +610,8 @@ if(is.na(sd_p_ct)){ sd_p_ct <- 0 }
 # Logfold change
 #logFoldchange batch effect distribution
 mean_lfc_cl <- lapply(res, function(y) vapply(y, function(x){
-  de_genes <- which(x$adj.P.Val < 0.05)
+  #de_genes <- which(x$adj.P.Val < 0.05)
+  de_genes <- which(x$adj.PValue < 0.05)
   mean_de <- mean(abs(x[, "logFC"]))}
   , numeric(1))) %>% bind_cols()
 

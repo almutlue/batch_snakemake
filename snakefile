@@ -9,14 +9,14 @@ import os
 import logging
 
 sample = glob_wildcards(config["src_data"] + "{sample_name}.rds").sample_name
-print("=====")
-print(sample)
-print("=====")
+logger.info("=====")
+logger.info(sample)
+logger.info("=====")
 
 sim_name = glob_wildcards(config["src_meta_sim"] + "{sim_name}.rds").sim_name
-print("=====")
-print(sim_name)
-print("=====")
+logger.info("=====")
+logger.info(sim_name)
+logger.info("=====")
 
 
 # --- Subworkflows --- #

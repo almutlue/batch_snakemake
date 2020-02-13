@@ -21,6 +21,7 @@ suppressPackageStartupMessages({
   library(limma)
   library(purrr)
   library(dplyr)
+  library(edgeR)
 })
 
 
@@ -42,14 +43,14 @@ names(kids) <- kids
 group <- as.factor(colData(sce)[,batch])
 cs <- names(cont)
 names(cs) <- cs
-expr <- as.matrix(assays(sce)$logcounts)
+expr <- as.matrix(assays(sce)$counts)
 ctype <- "contrast"
 
 #prepare res dataframe
-res_df <- function(k, tt, ct, c) {
+res_df <- function(k, tt, ct, c, fc_pred) {
   df <- data.frame(
     gene = rownames(tt), cluster_id = k, tt,
-    row.names = NULL, stringsAsFactors = FALSE)
+    row.names = NULL, stringsAsFactors = FALSE, lfc_pred = fc_pred)
   df[[ct]] <- c
   return(df)
 }
@@ -61,19 +62,30 @@ doDE <- function(sce, lfc_cutoff = 0){
     n <- clust == k
     es_tmp <- expr[, n]
     grp <- group[n]
-    design <- model.matrix( ~ 0 + grp)
+    dge <- DGEList(es_tmp, group = grp)
+    dge <- calcNormFactors(dge)
+    cdr <- scale(colMeans(es_tmp > 0))
+    #design <- model.matrix(~ cdr + grp)
+    #colnames(design) <- c("(Intercept)", "cdr", levels(group)[-1])
+    design <- model.matrix(~ 0 + grp)
     colnames(design) <- levels(group)
-    #k1 <- rowSums(es_tmp > 0) >= .2 * min(table(grp))
-    #es_tmp <- es_tmp[k1, ]
-    f <- lmFit(es_tmp, design)
-    f <- eBayes(f, trend = TRUE)
-    tt <- lapply(cont, function(c) {
-      cc <- names(c)
-      fc <- contrasts.fit(f, contrasts = c)
-      tr <- treat(fc, lfc = lfc_cutoff)
-      tt <- topTreat(tr, n = Inf)
-      res_df(k, tt, ctype,cc)
-    })
+    dge <- estimateDisp(dge, design = design)
+    f <- glmFit(dge, design = design)
+    tt <- lapply(names(cont), function(cc){
+        f <- glmLRT(f, contrast = cont[[cc]])
+        # c1 <- gsub('-.*', '', cc)
+        # c2 <- gsub('.*-', '', cc)
+        # if( c1 %in% colnames(design) & c2 %in% colnames(design) ){
+        #     cont_new <- rep(0, ncol(design))
+        #     cont_new[which(colnames(design) %in% c1)] <- 1
+        #     cont_new[which(colnames(design) %in% c2)] <- -1
+        #     f <- glmQLFTest(f, contrast = cont_new)
+        # }else{
+        #     coeff <- ifelse(c2 %in% colnames(design), c2, c1)
+        #     f <- glmQLFTest(f, coef = which(colnames(design) %in% coeff))
+        # }
+        res_df(k, f[["table"]], ctype, cc, f[["table"]]$logFC)
+    }) %>% set_names(names(cont))
     return(list(tt = tt, data = es_tmp))
   })
   # remove empty clusters
@@ -101,16 +113,18 @@ res <- doDE(sce,lfc_cutoff = 0)
 ##### ----------- Update rowData --------------- ######
 
 combine_folds <- function(cont_var){
-    #extract the contrast of interest and change log2fold colums names to be unique
-    B <- res[["table"]][[cont_var]]
-    new_name <- function(p){
-        colnames(B[[p]])[3] <- paste0(cont_var, "_logFC_", p)
-        return(B[[p]][,c(1,3)])
-    }
-    B_new_names <- lapply(names(B),new_name)
-    names(B_new_names) <- names(B)
-    #combine log2fold colums
-    Folds <- Reduce(function(...){inner_join(..., by="gene")}, B_new_names)
+  #extract the contrast of interest and change log2fold colums names to be unique
+  B <- res[["table"]][[cont_var]]
+  new_name <- function(p){
+    #lfc_ind <- which(colnames(B[[p]]) %in% "lfc_pred")
+    lfc_ind <- which(colnames(B[[p]]) %in% "logFC")
+    colnames(B[[p]])[lfc_ind] <- paste0(cont_var, "_logFC_", p)
+    return(B[[p]][,c(1,lfc_ind)])
+  }
+  B_new_names <- lapply(names(B),new_name)
+  names(B_new_names) <- names(B)
+  #combine log2fold colums
+  Folds <- Reduce(function(...){inner_join(..., by="gene")}, B_new_names)
 }
 
 all_folds <- lapply(cs, combine_folds)
@@ -119,8 +133,17 @@ rd <- rd[match(rownames(sce), rd$gene),]
 rd <- rd %>% mutate_all( ~replace(., is.na(.), 0))
 rowData(sce)[,colnames(rd)] <- rd
 
+# ## Add lfc correlation
+# lapply(names(all_folds), function(x){
+#   cor_mat <- cor(all_folds[[x]][,-1])
+#   cor_mat[cor_mat == 1] <- 0
+#   max_cor <- cor_mat %>% max.col() %>% cbind(.,seq_len(nrow(cor_mat)), rowMaxs(cor_mat))
+#   colnames(max_cor) <- c("x", "y")
+#
+# })
+
+
 ### -------------- save output  ----------------------###
 saveRDS(res, file = outputfile)
 saveRDS(sce, file = outputsce)
-
 

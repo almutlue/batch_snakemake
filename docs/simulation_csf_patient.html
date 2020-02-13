@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize simulated batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">08 January, 2020</h4>
+<h4 class="date">13 February, 2020</h4>
 
 </div>
 
@@ -449,7 +449,7 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 <span class="st">  </span><span class="kw">Tlab</span>(<span class="st">&quot;celltype&quot;</span>) +
 <span class="st">  </span><span class="kw">Rlab</span>(<span class="st">&quot;other&quot;</span>) +
 <span class="st">  </span><span class="kw">theme_bw</span>()</code></pre></div>
-<pre><code>## Warning: Removed 1975 rows containing non-finite values (StatDensityTern).</code></pre>
+<pre><code>## Warning: Removed 1261 rows containing non-finite values (StatDensityTern).</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/var%20expr-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1 &lt;-<span class="st"> </span><span class="kw">ggtern</span>(<span class="dt">data=</span><span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)),<span class="kw">aes</span>(vp_batch, vp_celltype, vp_residuals)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.1</span>) +
@@ -516,7 +516,7 @@ var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_c
 <h4>Celltypes cms smooth</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare by celltypes</span>
 <span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.0605</code></pre>
+<pre><code>## Picking joint bandwidth of 0.0422</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/cms%20celltypes-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype, <span class="dt">violin =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="simulation_csf_patient_files/figure-html/cms%20celltypes-2.svg" width="672" /></p>
@@ -589,7 +589,7 @@ mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span
 <span class="st">  </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
 <span class="st">  </span><span class="kw">scale_colour_manual</span>(<span class="dt">values =</span> cols[<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>,<span class="dv">7</span>)]) +
 <span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">limits =</span>  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>))</code></pre></div>
-<pre><code>## Warning: Removed 10 rows containing non-finite values (stat_density).</code></pre>
+<pre><code>## Warning: Removed 11 rows containing non-finite values (stat_density).</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/count%20distributions-1.svg" width="960" /></p>
 </div>
 <div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
@@ -633,7 +633,8 @@ cs &lt;-<span class="st"> </span><span class="kw">names</span>(cont)
 <span class="co"># Filter DEG by pvalue</span>
 FilterDEGs &lt;-<span class="st"> </span>function (<span class="dt">degDF =</span> df, <span class="dt">filter =</span> <span class="kw">c</span>(<span class="dt">FDR =</span> <span class="dv">5</span>)){
   <span class="kw">rownames</span>(degDF) &lt;-<span class="st"> </span>degDF$gene
-  pval &lt;-<span class="st"> </span>degDF[, <span class="kw">grep</span>(<span class="st">&quot;adj.P.Val$&quot;</span>, <span class="kw">colnames</span>(degDF)), drop =<span class="st"> </span><span class="ot">FALSE</span>]
+  <span class="co">#pval &lt;- degDF[, grep(&quot;adj.P.Val$&quot;, colnames(degDF)), drop = FALSE]</span>
+  pval &lt;-<span class="st"> </span>degDF[, <span class="kw">grep</span>(<span class="st">&quot;PValue$&quot;</span>, <span class="kw">colnames</span>(degDF)), drop =<span class="st"> </span><span class="ot">FALSE</span>]
   pf &lt;-<span class="st"> </span>pval &lt;=<span class="st"> </span>filter[<span class="st">&quot;FDR&quot;</span>]/<span class="dv">100</span>
   pf[<span class="kw">is.na</span>(pf)] &lt;-<span class="st"> </span><span class="ot">FALSE</span>
   DEGlistUPorDOWN &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(pf), function(x) <span class="kw">rownames</span>(pf[pf[, x, <span class="dt">drop =</span> <span class="ot">FALSE</span>], , <span class="dt">drop =</span> <span class="ot">FALSE</span>]), <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
@@ -659,7 +660,8 @@ for(jj in <span class="dv">1</span>:<span class="kw">length</span>(cs)){
 <h3>Logfold_change</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 res &lt;-<span class="st"> </span>res_de[[<span class="st">&quot;table&quot;</span>]]
-n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$adj.P.Val &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+<span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
+n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$PValue &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
 n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(<span class="kw">abs</span>(x$logFC) &gt;<span class="st"> </span><span class="dv">1</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
 mean_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
 
@@ -675,7 +677,8 @@ gs &lt;-<span class="st"> </span><span class="kw">read_delim</span>(params$gs, <
 cats &lt;-<span class="st"> </span><span class="kw">lapply</span>(cats, function(u) u[-<span class="dv">1</span>])
 
 plotDE &lt;-<span class="st"> </span>function(cont_var){
-  res_s &lt;-<span class="st"> </span>res[[cont_var]] %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, adj.P.Val &lt;<span class="st"> </span>.<span class="dv">05</span>) %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>)
+  <span class="co">#res_s &lt;- res[[cont_var]] %&gt;% map(filter, adj.P.Val &lt; .05) %&gt;% map(filter, abs(logFC) &gt; 1)</span>
+  res_s &lt;-<span class="st"> </span>res[[cont_var]] %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, PValue &lt;<span class="st"> </span>.<span class="dv">05</span>) %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>)
   
   <span class="co">#plot</span>
   <span class="kw">lapply</span>(<span class="kw">names</span>(res[[cont_var]]), function(ct){
@@ -683,7 +686,8 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
     ct_de$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, ct_de$gene)
     res_s[[ct]]$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, res_s[[ct]]$gene)
     
-    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> AveExpr, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
+    <span class="co">#p &lt;- ggplot(ct_de, aes(x = AveExpr, y = logFC, colour = abs(logFC) &gt; 1, label = gene)) + </span>
+    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> logCPM, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>, <span class="dt">label =</span> gene)) +
 <span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> .<span class="dv">5</span>) +
 <span class="st">      </span><span class="kw">geom_label_repel</span>(<span class="dt">data =</span> res_s[[ct]]) +
 <span class="st">      </span><span class="kw">ggtitle</span>(<span class="kw">paste0</span>(ct,<span class="st">&quot;: &quot;</span>, cont_var)) +
@@ -698,24 +702,25 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
 
 pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)</code></pre></div>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-1.svg" width="672" /></p>
-<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4095 Num DE: 0</code></pre>
+<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4095 Num DE: 5</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-2.svg" width="672" /></p>
-<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4095 Num DE: 0</code></pre>
+<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4095 Num DE: 11</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-3.svg" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4095 Num DE: 2</code></pre>
+<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4095 Num DE: 319</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-4.svg" width="672" /></p>
-<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4095 Num DE: 0</code></pre>
+<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4095 Num DE: 289</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4095 Num DE: 0</code></pre>
+<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4095 Num DE: 414</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-6.svg" width="672" /></p>
-<pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4095 Num DE: 0</code></pre>
+<pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4095 Num DE: 391</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-7.svg" width="672" /></p>
-<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4095 Num DE: 3</code></pre>
+<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4095 Num DE: 562</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-8.svg" width="672" /></p>
-<pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4095 Num DE: 1</code></pre>
+<pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4095 Num DE: 770</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
-n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$adj.P.Val &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+<span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
+n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$PValue &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
 n_de_cl &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">nrow</span>(x), <span class="kw">numeric</span>(<span class="dv">1</span>)))
 mean_n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(n_de, function(x) <span class="kw">mean</span>(x))
 mean_mean_n_de &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(mean_n_de))/n_genes
@@ -837,9 +842,9 @@ vis_type &lt;-<span class="st"> </span>function(dim_red){
 <span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;unadjusted&quot;</span>)
   g1 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj1&quot;</span>)) +<span class="st"> </span>
 <span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;constant batch effect&quot;</span>)
-  g2 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj1&quot;</span>)) +<span class="st"> </span>
+  g2 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj2&quot;</span>)) +<span class="st"> </span>
 <span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;constant batch effect, different ct composition&quot;</span>)
-  g3 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj1&quot;</span>)) +<span class="st"> </span>
+  g3 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj3&quot;</span>)) +<span class="st"> </span>
 <span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;celltype and batch effect interact&quot;</span>)
   <span class="kw">do.call</span>(<span class="st">&quot;grid.arrange&quot;</span>, <span class="kw">c</span>(<span class="kw">list</span>(g, g1, g2, g3), <span class="dt">ncol =</span> <span class="dv">2</span>))
 }</code></pre></div>
@@ -859,7 +864,7 @@ vis_type &lt;-<span class="st"> </span>function(dim_red){
 <span class="kw">visHist</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="simulation_csf_patient_files/figure-html/batchtype%20cms-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visIntegration</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">metric_name =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.0448</code></pre>
+<pre><code>## Picking joint bandwidth of 0.0436</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/batchtype%20cms-2.svg" width="672" /></p>
 </div>
 </div>
@@ -914,7 +919,8 @@ if(<span class="kw">is.na</span>(sd_p_ct)){ sd_p_ct &lt;-<span class="st"> </spa
 <span class="co"># Logfold change</span>
 <span class="co">#logFoldchange batch effect distribution</span>
 mean_lfc_cl &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x){
-  de_genes &lt;-<span class="st"> </span><span class="kw">which</span>(x$adj.P.Val &lt;<span class="st"> </span><span class="fl">0.05</span>)
+  <span class="co">#de_genes &lt;- which(x$adj.P.Val &lt; 0.05)</span>
+  de_genes &lt;-<span class="st"> </span><span class="kw">which</span>(x$PValue &lt;<span class="st"> </span><span class="fl">0.05</span>)
   mean_de &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">abs</span>(x[, <span class="st">&quot;logFC&quot;</span>]))}
   , <span class="kw">numeric</span>(<span class="dv">1</span>))) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
 
