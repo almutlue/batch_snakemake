@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">13 February, 2020</h4>
+<h4 class="date">14 February, 2020</h4>
 
 </div>
 
@@ -696,8 +696,8 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
 
     <span class="co"># run &#39;camera&#39; for this comparison</span>
     inds &lt;-<span class="st"> </span><span class="kw">ids2indices</span>(cats, ct_de$gene)
-    <span class="co">#cm &lt;- cameraPR(ct_de$t, inds)</span>
-    cm &lt;-<span class="st"> </span><span class="kw">cameraPR</span>(ct_de$LR, inds)
+    <span class="co">#cm &lt;- cameraPR(ct_de$t, inds) #LR</span>
+    cm &lt;-<span class="st"> </span><span class="kw">cameraPR</span>(ct_de$F, inds)
     <span class="kw">print</span>(cm %&gt;%<span class="st"> </span><span class="kw">rownames_to_column</span>(<span class="st">&quot;category&quot;</span>) %&gt;%<span class="st"> </span>
 <span class="st">      </span><span class="kw">filter</span>(FDR &lt;<span class="st"> </span>.<span class="dv">05</span> &amp;<span class="st"> </span>NGenes &gt;=<span class="st"> </span><span class="dv">5</span>) %&gt;%<span class="st"> </span><span class="kw">head</span>(<span class="dv">8</span>))
   })
@@ -705,165 +705,109 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
 
 pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)</code></pre></div>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-1.svg" width="672" /></p>
-<pre><code>## Cluster: 0 Contrast: cryo-fresh Num genes: 4097 Num DE: 193 
-##                                     category NGenes Direction       PValue
-## 1      GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 6.785495e-42
-## 2                            GO_TRNA_BINDING      8        Up 2.599667e-32
-## 3  GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 2.231734e-30
-## 4                            GO_RRNA_BINDING     38        Up 2.076981e-28
-## 5            GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 7.075217e-24
-## 6 GO_TRANSLATION_FACTOR_ACTIVITY_RNA_BINDING     49        Up 9.806059e-07
-## 7                      GO_POLY_A_RNA_BINDING    644        Up 1.281410e-06
-## 8                             GO_RNA_BINDING    782        Up 4.035520e-06
+<pre><code>## Cluster: 0 Contrast: cryo-fresh Num genes: 4097 Num DE: 184 
+##                                    category NGenes Direction       PValue
+## 1                  GO_ACTIN_MONOMER_BINDING      6        Up 5.391356e-11
+## 2                           GO_TRNA_BINDING      8        Up 9.747316e-11
+## 3     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 1.586632e-05
+## 4 GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 3.797261e-05
+## 5       GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 5.042935e-05
+## 6               GO_UNFOLDED_PROTEIN_BINDING     50        Up 2.377795e-04
 ##            FDR
-## 1 5.693030e-39
-## 2 1.090560e-29
-## 3 6.241417e-28
-## 4 4.356468e-26
-## 5 1.187221e-21
-## 6 1.028410e-04
-## 7 1.194559e-04
-## 8 3.385801e-04</code></pre>
+## 1 4.088999e-08
+## 2 4.088999e-08
+## 3 3.327962e-03
+## 4 6.371804e-03
+## 5 7.051704e-03
+## 6 2.849957e-02</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-2.svg" width="672" /></p>
-<pre><code>## Cluster: 1 Contrast: cryo-fresh Num genes: 4097 Num DE: 162 
+<pre><code>## Cluster: 1 Contrast: cryo-fresh Num genes: 4097 Num DE: 277 
 ##                                    category NGenes Direction       PValue
-## 1 GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 3.064805e-28
-## 2                           GO_TRNA_BINDING      8        Up 2.280239e-25
-## 3     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 1.139872e-18
-## 4                           GO_RRNA_BINDING     38        Up 5.064708e-14
-## 5           GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 3.492826e-13
-## 6                GO_PEPTIDE_ANTIGEN_BINDING     16        Up 5.750877e-10
-## 7           GO_BETA_2_MICROGLOBULIN_BINDING      5        Up 2.038238e-09
-## 8 GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 2.316401e-07
+## 1 GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 9.626894e-14
+## 2                           GO_TRNA_BINDING      8        Up 2.591352e-12
+## 3                GO_PEPTIDE_ANTIGEN_BINDING     16        Up 4.352309e-07
+## 4     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 2.665259e-06
+## 5                           GO_RRNA_BINDING     38        Up 3.331700e-06
+## 6       GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 7.188667e-06
+## 7               GO_UNFOLDED_PROTEIN_BINDING     50        Up 2.688159e-05
+## 8           GO_BETA_2_MICROGLOBULIN_BINDING      5        Up 3.034733e-05
 ##            FDR
-## 1 1.285686e-25
-## 2 6.377068e-23
-## 3 2.390881e-16
-## 4 7.082150e-12
-## 5 4.186401e-11
-## 6 6.031233e-08
-## 7 1.900091e-07
-## 8 1.943461e-05</code></pre>
+## 1 2.692321e-11
+## 2 5.435361e-10
+## 3 6.085979e-05
+## 4 3.194503e-04
+## 5 3.494120e-04
+## 6 6.701435e-04
+## 7 2.255365e-03
+## 8 2.314674e-03</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-3.svg" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: cryo-fresh Num genes: 4097 Num DE: 920 
-##                                    category NGenes Direction       PValue
-## 1   GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 3.465702e-26
-## 2         GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 2.231016e-22
-## 3            GO_MHC_PROTEIN_COMPLEX_BINDING     14        Up 2.793973e-21
-## 4                        GO_ANTIGEN_BINDING     42        Up 1.783054e-19
-## 5                GO_PEPTIDE_ANTIGEN_BINDING     16        Up 1.100954e-18
-## 6 GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 3.249258e-14
-## 7               GO_UNFOLDED_PROTEIN_BINDING     50        Up 5.313611e-09
-## 8                           GO_TRNA_BINDING      8        Up 9.723946e-09
-##            FDR
-## 1 2.907724e-23
-## 2 9.359112e-20
-## 3 7.813812e-19
-## 4 3.739956e-17
-## 5 1.847401e-16
-## 6 4.543546e-12
-## 7 6.368743e-07
-## 8 1.019799e-06</code></pre>
+<pre><code>## Cluster: 2 Contrast: cryo-fresh Num genes: 4097 Num DE: 625 
+## [1] category  NGenes    Direction PValue    FDR      
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-4.svg" width="672" /></p>
-<pre><code>## Cluster: 3 Contrast: cryo-fresh Num genes: 4097 Num DE: 664 
-##                                    category NGenes Direction       PValue
-## 1     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 1.801779e-36
-## 2                           GO_RRNA_BINDING     38        Up 5.946966e-28
-## 3           GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 7.220916e-25
-## 4 GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 1.898265e-10
-## 5                        GO_LAMININ_BINDING      6        Up 1.903900e-10
-## 6                           GO_TRNA_BINDING      8        Up 1.056496e-09
-## 7 GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 2.116487e-09
-## 8         GO_TRANSLATION_REGULATOR_ACTIVITY     12        Up 3.462486e-07
-##            FDR
-## 1 1.511692e-33
-## 2 2.494752e-25
-## 3 2.019450e-22
-## 4 2.281960e-08
-## 5 2.281960e-08
-## 6 1.108000e-07
-## 7 1.973036e-07
-## 8 2.905026e-05</code></pre>
+<pre><code>## Cluster: 3 Contrast: cryo-fresh Num genes: 4097 Num DE: 374 
+##                     category NGenes Direction       PValue        FDR
+## 1 GO_AMINOPEPTIDASE_ACTIVITY     14        Up 6.615606e-05 0.01850165</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: cryo-fresh Num genes: 4097 Num DE: 257 
-##                                    category NGenes Direction       PValue
-## 1                GO_PEPTIDE_ANTIGEN_BINDING     16        Up 4.075625e-12
-## 2 GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 2.671497e-10
-## 3   GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 1.181168e-07
-## 4                           GO_TRNA_BINDING      8        Up 2.331599e-07
-## 5         GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 2.464809e-07
-## 6     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 3.319508e-07
-## 7 GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 1.377280e-06
-## 8           GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 3.035423e-06
-##            FDR
-## 1 3.419450e-09
-## 2 7.471287e-08
-## 3 2.477500e-05
-## 4 3.446624e-05
-## 5 3.446624e-05
-## 6 3.978667e-05
-## 7 1.444423e-04
-## 8 2.829689e-04</code></pre>
+<pre><code>## Cluster: 4 Contrast: cryo-fresh Num genes: 4097 Num DE: 178 
+##                                                                                                       category
+## 1                                                                            GO_ENDODEOXYRIBONUCLEASE_ACTIVITY
+## 2                                                                                GO_DEOXYRIBONUCLEASE_ACTIVITY
+## 3 GO_ENDONUCLEASE_ACTIVITY_ACTIVE_WITH_EITHER_RIBO_OR_DEOXYRIBONUCLEIC_ACIDS_AND_PRODUCING_5_PHOSPHOMONOESTERS
+## 4                                                                    GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY
+## 5                                                                                              GO_TRNA_BINDING
+## 6                                                                        GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME
+## 7                                                   GO_ENDORIBONUCLEASE_ACTIVITY_PRODUCING_5_PHOSPHOMONOESTERS
+## 8                                                                                              GO_RRNA_BINDING
+##   NGenes Direction       PValue          FDR
+## 1      8        Up 2.279379e-14 9.561997e-12
+## 2     10        Up 7.332189e-11 2.050569e-08
+## 3      9        Up 2.903960e-09 6.091055e-07
+## 4      8        Up 3.833111e-08 6.431960e-06
+## 5      8        Up 7.032241e-08 9.833417e-06
+## 6    151        Up 8.621406e-05 9.041700e-03
+## 7      8        Up 2.475390e-04 1.949447e-02
+## 8     38        Up 2.807852e-04 1.963156e-02</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-6.svg" width="672" /></p>
-<pre><code>## Cluster: 5 Contrast: cryo-fresh Num genes: 4097 Num DE: 280 
-##                                     category NGenes Direction       PValue
-## 1  GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY      8        Up 2.908522e-26
-## 2                            GO_TRNA_BINDING      8        Up 1.457335e-20
-## 3      GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 3.787391e-14
-## 4        GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 4.466428e-11
-## 5                            GO_RRNA_BINDING     38        Up 1.646865e-08
-## 6            GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 3.571701e-08
-## 7                 GO_PEPTIDE_ANTIGEN_BINDING     16        Up 1.794548e-05
-## 8 GO_TRANSLATION_FACTOR_ACTIVITY_RNA_BINDING     49        Up 4.078934e-05
-##            FDR
-## 1 2.440250e-23
-## 2 6.113519e-18
-## 3 1.059207e-11
-## 4 9.368333e-09
-## 5 2.763440e-06
-## 6 4.994429e-06
-## 7 2.150893e-03
-## 8 4.277782e-03</code></pre>
+<pre><code>## Cluster: 5 Contrast: cryo-fresh Num genes: 4097 Num DE: 415 
+##                            category NGenes Direction       PValue        FDR
+## 1 GO_METALLOAMINOPEPTIDASE_ACTIVITY      7        Up 4.879291e-05 0.01364575</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-7.svg" width="672" /></p>
-<pre><code>## Cluster: 6 Contrast: cryo-fresh Num genes: 4097 Num DE: 527 
-##                                  category NGenes Direction        PValue
-## 1       GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up  0.000000e+00
-## 2              GO_PEPTIDE_ANTIGEN_BINDING     16        Up 7.805917e-102
-## 3 GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up  4.943432e-63
-## 4                      GO_ANTIGEN_BINDING     42        Up  7.631513e-58
-## 5          GO_MHC_PROTEIN_COMPLEX_BINDING     14        Up  2.427244e-51
-## 6                        GO_AMIDE_BINDING     75        Up  7.145278e-27
-## 7              GO_VIRUS_RECEPTOR_ACTIVITY     22        Up  3.705217e-11
-## 8         GO_BETA_2_MICROGLOBULIN_BINDING      5        Up  1.394846e-10
+<pre><code>## Cluster: 6 Contrast: cryo-fresh Num genes: 4097 Num DE: 352 
+##                                  category NGenes Direction       PValue
+## 1       GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 4.766576e-18
+## 2              GO_PEPTIDE_ANTIGEN_BINDING     16        Up 6.266168e-16
+## 3 GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 2.170491e-09
+## 4          GO_MHC_PROTEIN_COMPLEX_BINDING     14        Up 1.466274e-07
+## 5                      GO_ANTIGEN_BINDING     42        Up 4.925491e-06
+## 6     GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 6.835876e-04
 ##            FDR
-## 1 0.000000e+00
-## 2 3.274582e-99
-## 3 1.382513e-60
-## 4 1.600710e-55
-## 5 4.072915e-49
-## 6 8.564126e-25
-## 7 3.454086e-09
-## 8 1.170276e-08</code></pre>
+## 1 1.999579e-15
+## 2 1.314329e-13
+## 3 3.642084e-07
+## 4 2.050340e-05
+## 5 5.903553e-04
+## 6 4.779417e-02</code></pre>
 <p><img src="batch_effect_csf_media_files/figure-html/pval%20lfc-8.svg" width="672" /></p>
-<pre><code>## Cluster: 7 Contrast: cryo-fresh Num genes: 4097 Num DE: 370 
-##                                    category NGenes Direction       PValue
-## 1         GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.194872e-39
-## 2                        GO_LAMININ_BINDING      6        Up 5.087772e-13
-## 3                GO_PEPTIDE_ANTIGEN_BINDING     16        Up 5.337778e-13
-## 4 GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 1.546361e-09
-## 5           GO_EXTRACELLULAR_MATRIX_BINDING      9        Up 3.061100e-08
-## 6   GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 3.510074e-08
-## 7     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 3.594827e-07
-## 8       GO_PHOSPHOLIPASE_INHIBITOR_ACTIVITY      6        Up 8.450128e-07
-##            FDR
-## 1 5.012487e-37
-## 2 8.956791e-11
-## 3 8.956791e-11
-## 4 2.162329e-07
-## 5 3.668947e-06
-## 6 3.681190e-06
-## 7 3.016060e-05
-## 8 5.908048e-05</code></pre>
+<pre><code>## Cluster: 7 Contrast: cryo-fresh Num genes: 4097 Num DE: 337 
+##                                                                                                       category
+## 1                                                                                   GO_CATION_CHANNEL_ACTIVITY
+## 2                                                                                   GO_PEPTIDE_ANTIGEN_BINDING
+## 3                                                              GO_METAL_ION_TRANSMEMBRANE_TRANSPORTER_ACTIVITY
+## 4                                                            GO_CALCIUM_ION_TRANSMEMBRANE_TRANSPORTER_ACTIVITY
+## 5                                              GO_DIVALENT_INORGANIC_CATION_TRANSMEMBRANE_TRANSPORTER_ACTIVITY
+## 6                                                                      GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING
+## 7 GO_ENDONUCLEASE_ACTIVITY_ACTIVE_WITH_EITHER_RIBO_OR_DEOXYRIBONUCLEIC_ACIDS_AND_PRODUCING_3_PHOSPHOMONOESTERS
+## 8                                                                                 GO_SERINE_HYDROLASE_ACTIVITY
+##   NGenes Direction       PValue          FDR
+## 1     14        Up 7.020615e-06 0.0008191906
+## 2     16        Up 7.616510e-06 0.0008191906
+## 3     32        Up 7.811115e-06 0.0008191906
+## 4     14        Up 4.590193e-05 0.0042790800
+## 5     17        Up 1.905384e-04 0.0106574453
+## 6     12        Up 2.256327e-04 0.0118316172
+## 7      6        Up 4.324428e-04 0.0201566384
+## 8     35        Up 6.216336e-04 0.0262346360</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 <span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>

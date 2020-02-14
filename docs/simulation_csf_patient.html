@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize simulated batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">13 February, 2020</h4>
+<h4 class="date">14 February, 2020</h4>
 
 </div>
 
@@ -449,7 +449,7 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 <span class="st">  </span><span class="kw">Tlab</span>(<span class="st">&quot;celltype&quot;</span>) +
 <span class="st">  </span><span class="kw">Rlab</span>(<span class="st">&quot;other&quot;</span>) +
 <span class="st">  </span><span class="kw">theme_bw</span>()</code></pre></div>
-<pre><code>## Warning: Removed 1261 rows containing non-finite values (StatDensityTern).</code></pre>
+<pre><code>## Warning: Removed 1157 rows containing non-finite values (StatDensityTern).</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/var%20expr-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1 &lt;-<span class="st"> </span><span class="kw">ggtern</span>(<span class="dt">data=</span><span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)),<span class="kw">aes</span>(vp_batch, vp_celltype, vp_residuals)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.1</span>) +
@@ -516,7 +516,7 @@ var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_c
 <h4>Celltypes cms smooth</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare by celltypes</span>
 <span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.0422</code></pre>
+<pre><code>## Picking joint bandwidth of 0.0542</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/cms%20celltypes-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype, <span class="dt">violin =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="simulation_csf_patient_files/figure-html/cms%20celltypes-2.svg" width="672" /></p>
@@ -589,7 +589,7 @@ mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span
 <span class="st">  </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
 <span class="st">  </span><span class="kw">scale_colour_manual</span>(<span class="dt">values =</span> cols[<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>,<span class="dv">7</span>)]) +
 <span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">limits =</span>  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>))</code></pre></div>
-<pre><code>## Warning: Removed 11 rows containing non-finite values (stat_density).</code></pre>
+<pre><code>## Warning: Removed 10 rows containing non-finite values (stat_density).</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/count%20distributions-1.svg" width="960" /></p>
 </div>
 <div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
@@ -702,21 +702,21 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
 
 pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)</code></pre></div>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-1.svg" width="672" /></p>
-<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4095 Num DE: 5</code></pre>
+<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4095 Num DE: 43</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-2.svg" width="672" /></p>
-<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4095 Num DE: 11</code></pre>
+<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4095 Num DE: 58</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-3.svg" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4095 Num DE: 319</code></pre>
+<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4095 Num DE: 884</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-4.svg" width="672" /></p>
-<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4095 Num DE: 289</code></pre>
+<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4095 Num DE: 760</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4095 Num DE: 414</code></pre>
+<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4095 Num DE: 702</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-6.svg" width="672" /></p>
-<pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4095 Num DE: 391</code></pre>
+<pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4095 Num DE: 640</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-7.svg" width="672" /></p>
-<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4095 Num DE: 562</code></pre>
+<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4095 Num DE: 992</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-8.svg" width="672" /></p>
-<pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4095 Num DE: 770</code></pre>
+<pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4095 Num DE: 1053</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 <span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
@@ -864,7 +864,7 @@ vis_type &lt;-<span class="st"> </span>function(dim_red){
 <span class="kw">visHist</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="simulation_csf_patient_files/figure-html/batchtype%20cms-1.svg" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visIntegration</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">metric_name =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.0436</code></pre>
+<pre><code>## Picking joint bandwidth of 0.0415</code></pre>
 <p><img src="simulation_csf_patient_files/figure-html/batchtype%20cms-2.svg" width="672" /></p>
 </div>
 </div>

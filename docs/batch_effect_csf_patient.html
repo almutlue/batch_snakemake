@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">13 February, 2020</h4>
+<h4 class="date">14 February, 2020</h4>
 
 </div>
 
@@ -696,8 +696,8 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
 
     <span class="co"># run &#39;camera&#39; for this comparison</span>
     inds &lt;-<span class="st"> </span><span class="kw">ids2indices</span>(cats, ct_de$gene)
-    <span class="co">#cm &lt;- cameraPR(ct_de$t, inds)</span>
-    cm &lt;-<span class="st"> </span><span class="kw">cameraPR</span>(ct_de$LR, inds)
+    <span class="co">#cm &lt;- cameraPR(ct_de$t, inds) #LR</span>
+    cm &lt;-<span class="st"> </span><span class="kw">cameraPR</span>(ct_de$F, inds)
     <span class="kw">print</span>(cm %&gt;%<span class="st"> </span><span class="kw">rownames_to_column</span>(<span class="st">&quot;category&quot;</span>) %&gt;%<span class="st"> </span>
 <span class="st">      </span><span class="kw">filter</span>(FDR &lt;<span class="st"> </span>.<span class="dv">05</span> &amp;<span class="st"> </span>NGenes &gt;=<span class="st"> </span><span class="dv">5</span>) %&gt;%<span class="st"> </span><span class="kw">head</span>(<span class="dv">8</span>))
   })
@@ -705,123 +705,101 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
 
 pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)</code></pre></div>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-1.svg" width="672" /></p>
-<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4097 Num DE: 29 
+<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4097 Num DE: 74 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 6.901739e-39
-## 2                       GO_RRNA_BINDING     38        Up 1.016484e-27
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 1.019008e-18
-## 4                       GO_MRNA_BINDING     78        Up 1.786568e-09
-## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 2.304284e-07
-## 6     GO_TRANSLATION_REGULATOR_ACTIVITY     12        Up 2.282801e-04
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 6.274674e-53
+## 2                       GO_RRNA_BINDING     38        Up 5.468404e-34
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 2.802761e-24
+## 4   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 6.804371e-11
+## 5                       GO_MRNA_BINDING     78        Up 9.513233e-10
+## 6     GO_TRANSLATION_REGULATOR_ACTIVITY     12        Up 1.451676e-05
 ##            FDR
-## 1 5.790559e-36
-## 2 4.264150e-25
-## 3 2.849827e-16
-## 4 3.747326e-07
-## 5 3.866588e-05
-## 6 3.192117e-02</code></pre>
+## 1 5.264451e-50
+## 2 2.293996e-31
+## 3 7.838389e-22
+## 4 1.427217e-08
+## 5 1.596321e-07
+## 6 2.029928e-03</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-2.svg" width="672" /></p>
-<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4097 Num DE: 42 
+<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4097 Num DE: 79 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 1.957498e-20
-## 2                       GO_RRNA_BINDING     38        Up 3.385101e-17
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 2.720215e-10
-## 4                       GO_MRNA_BINDING     78        Up 3.768172e-08
-## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 2.080308e-05
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 2.944653e-22
+## 2                       GO_RRNA_BINDING     38        Up 3.446944e-16
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 1.482425e-10
+## 4                       GO_MRNA_BINDING     78        Up 3.829001e-08
+## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 1.559943e-06
 ##            FDR
-## 1 1.642341e-17
-## 2 1.420050e-14
-## 3 7.607535e-08
-## 4 7.903740e-06
-## 5 3.490757e-03</code></pre>
+## 1 2.470564e-19
+## 2 1.445993e-13
+## 3 4.145847e-08
+## 4 8.031329e-06
+## 5 2.617584e-04</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-3.svg" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4097 Num DE: 313 
+<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4097 Num DE: 602 
 ##                                category NGenes Direction       PValue
-## 1     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 8.107715e-36
-## 2            GO_PEPTIDE_ANTIGEN_BINDING     16        Up 3.070090e-16
-## 3                       GO_RRNA_BINDING     38        Up 1.443283e-12
-## 4                    GO_ANTIGEN_BINDING     42        Up 1.495338e-07
-## 5 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 1.569039e-07
-## 6                      GO_AMIDE_BINDING     75        Up 8.272855e-05
-## 7       GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 3.984053e-04
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 2.164049e-23
+## 2                       GO_RRNA_BINDING     38        Up 1.937752e-21
+## 3     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 8.224868e-17
+## 4   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 5.606826e-13
+## 5       GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 1.692879e-11
+## 6                 GO_CHEMOKINE_ACTIVITY      8        Up 3.295061e-10
+## 7            GO_PEPTIDE_ANTIGEN_BINDING     16        Up 3.685838e-10
+## 8         GO_CHEMOKINE_RECEPTOR_BINDING     12        Up 1.489607e-06
 ##            FDR
-## 1 6.802373e-33
-## 2 1.287903e-13
-## 3 4.036383e-10
-## 4 2.632847e-05
-## 5 2.632847e-05
-## 6 9.915608e-03
-## 7 4.178275e-02</code></pre>
+## 1 1.815637e-20
+## 2 8.128869e-19
+## 3 2.300221e-14
+## 4 1.176032e-10
+## 5 2.840651e-09
+## 6 4.417741e-08
+## 7 4.417741e-08
+## 8 1.562226e-04</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-4.svg" width="672" /></p>
-<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4097 Num DE: 271 
-##                                    category NGenes Direction       PValue
-## 1                           GO_RRNA_BINDING     38        Up 8.333853e-12
-## 2         GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.082135e-09
-## 3     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 1.131708e-09
-## 4           GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 2.702353e-07
-## 5          GO_NITRIC_OXIDE_SYNTHASE_BINDING      8        Up 1.574629e-06
-## 6 GO_STRUCTURAL_CONSTITUENT_OF_CYTOSKELETON     26        Up 5.726857e-06
-## 7               GO_PHOSPHOLIPASE_C_ACTIVITY      6        Up 7.116633e-06
-## 8       GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 1.356077e-04
-##            FDR
-## 1 6.992102e-09
-## 2 3.165010e-07
-## 3 3.165010e-07
-## 4 3.778790e-05
-## 5 1.887305e-04
-## 6 6.006042e-04
-## 7 6.634283e-04
-## 8 1.034317e-02</code></pre>
-<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4097 Num DE: 295 
+<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4097 Num DE: 596 
 ##                                category NGenes Direction       PValue
-## 1     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.840030e-22
-## 2                       GO_RRNA_BINDING     38        Up 1.173649e-10
-## 3 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 4.868908e-05
-## 4      GO_POLY_PYRIMIDINE_TRACT_BINDING      8        Up 1.682952e-04
-## 5                   GO_COLLAGEN_BINDING     10        Up 2.864482e-04
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 1.639491e-27
+## 2                       GO_RRNA_BINDING     38        Up 1.863244e-16
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    238        Up 4.609571e-13
+## 4   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 1.450058e-04
 ##            FDR
-## 1 1.543785e-19
-## 2 4.923459e-08
-## 3 8.170028e-03
-## 4 2.353328e-02
-## 5 3.433286e-02</code></pre>
+## 1 1.375533e-24
+## 2 7.816310e-14
+## 3 1.289143e-10
+## 4 1.520748e-02</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
+<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4097 Num DE: 382 
+## [1] category  NGenes    Direction PValue    FDR      
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-6.svg" width="672" /></p>
-<pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4097 Num DE: 332 
-##                                   category NGenes Direction       PValue
-## 1                          GO_RRNA_BINDING     38        Up 1.815016e-07
-## 2              GO_PHOSPHOLIPASE_C_ACTIVITY      6        Up 2.201401e-07
-## 3    GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 2.498301e-06
-## 4      GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 3.480246e-06
-## 5                    GO_CHEMOKINE_ACTIVITY      8        Up 9.065585e-06
-## 6                          GO_MRNA_BINDING     78        Up 4.274359e-05
-## 7 GO_PHOSPHORIC_DIESTER_HYDROLASE_ACTIVITY     13        Up 1.359245e-04
-## 8        GO_CCR_CHEMOKINE_RECEPTOR_BINDING     10        Up 2.475244e-04
+<pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4097 Num DE: 443 
+##                                 category NGenes Direction       PValue
+## 1 GO_ALCOHOL_DEHYDROGENASE_NADP_ACTIVITY      7        Up 6.972976e-07
+## 2   GO_ALDO_KETO_REDUCTASE_NADP_ACTIVITY      9        Up 1.001693e-06
 ##            FDR
-## 1 9.234875e-05
-## 2 9.234875e-05
-## 3 6.986915e-04
-## 4 7.299817e-04
-## 5 1.521205e-03
-## 6 5.976979e-03
-## 7 1.425508e-02
-## 8 2.307478e-02</code></pre>
+## 1 0.0004202101
+## 2 0.0004202101</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-7.svg" width="672" /></p>
-<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4097 Num DE: 448 
-##                            category NGenes Direction       PValue          FDR
-## 1 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.236642e-99 1.037542e-96
-## 2        GO_PEPTIDE_ANTIGEN_BINDING     16        Up 2.260306e-20 9.481984e-18
-## 3                GO_ANTIGEN_BINDING     42        Up 4.656283e-10 9.766553e-08
-## 4                  GO_AMIDE_BINDING     75        Up 2.610213e-05 4.379938e-03
-## 5                   GO_RRNA_BINDING     38        Up 2.577708e-04 3.604495e-02</code></pre>
+<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4097 Num DE: 545 
+##                                  category NGenes Direction       PValue
+## 1       GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 6.946129e-78
+## 2              GO_PEPTIDE_ANTIGEN_BINDING     16        Up 2.842303e-15
+## 3                         GO_RRNA_BINDING     38        Up 1.669774e-06
+## 4 GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 4.484325e-06
+## 5   GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    151        Up 5.451833e-06
+## 6                      GO_ANTIGEN_BINDING     42        Up 1.232108e-05
+## 7          GO_MHC_PROTEIN_COMPLEX_BINDING     14        Up 6.663181e-05
+##            FDR
+## 1 5.827802e-75
+## 2 1.192346e-12
+## 3 4.669800e-04
+## 4 9.148176e-04
+## 5 9.148176e-04
+## 6 1.476770e-03
+## 7 6.988011e-03</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-8.svg" width="672" /></p>
-<pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4097 Num DE: 325 
+<pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4097 Num DE: 408 
 ##                            category NGenes Direction       PValue          FDR
-## 1 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 8.862118e-54 7.435317e-51
-## 2        GO_PEPTIDE_ANTIGEN_BINDING     16        Up 4.515992e-17 1.894459e-14
-## 3  GO_NITRIC_OXIDE_SYNTHASE_BINDING      8        Up 8.660849e-10 2.422151e-07
-## 4                GO_ANTIGEN_BINDING     42        Up 7.985896e-08 1.675042e-05
-## 5                  GO_AMIDE_BINDING     75        Up 5.969304e-05 1.001649e-02</code></pre>
+## 1 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.224285e-13 1.027175e-10</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 <span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>

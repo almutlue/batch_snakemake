@@ -387,8 +387,8 @@ plotDE <- function(cont_var){
 
     # run 'camera' for this comparison
     inds <- ids2indices(cats, ct_de$gene)
-    #cm <- cameraPR(ct_de$t, inds)
-    cm <- cameraPR(ct_de$LR, inds)
+    #cm <- cameraPR(ct_de$t, inds) #LR
+    cm <- cameraPR(ct_de$F, inds)
     print(cm %>% rownames_to_column("category") %>% 
       filter(FDR < .05 & NGenes >= 5) %>% head(8))
   })
