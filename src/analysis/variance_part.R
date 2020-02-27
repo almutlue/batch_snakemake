@@ -42,7 +42,7 @@ form <- as.formula(paste0("~ (1|", celltype, ") + (1|", batch, ")"))
 #meta_sub <- as.data.frame(colData(sce)[, c(batch)])
 #colnames(meta_sub) <- batch
 #form <- as.formula(paste0("~ (1|", batch, ")"))
-varPart <- fitExtractVarPartModel(expr, form, meta_sub)
+varPart <- fitExtractVarPartModel(expr, form, meta_sub, BPPARAM=MulticoreParam(4))
 # Add to sce
 rowData(sce)$vp_celltype <- varPart[[celltype]]
 rowData(sce)$vp_batch <- varPart[[batch]]
