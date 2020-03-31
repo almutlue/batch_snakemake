@@ -23,8 +23,19 @@ suppressPackageStartupMessages({
 })
 
 # Read in data
-sim_sce <- readRDS(file = sim_sce)
 params <- readRDS(file = params)
+
+name <- params[["dataset_name"]]
+flag <- ifelse(sim_sce %in% c(paste0('out/sim/', name, '/sim_', name, '_5__2_1_sce.rds'),
+                              paste0('out/sim/', name, '/sim_', name, '_5__1_0_sce.rds'),
+                              paste0('out/sim/', name, '/sim_', name, '_5__1_sce.rds')),
+               TRUE, FALSE)
+
+if( name %in% "pancreas"){
+  flag <- TRUE
+}
+
+sim_sce <- readRDS(file = sim_sce)
 k <- params[["k"]]
 k
 
@@ -36,18 +47,33 @@ dir.create(out_path, showWarnings = FALSE)
 sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
 
 ### ------------ Standardize normalized counts-----------###
+#remove empty genes and cells
+sim_sce <- sim_sce[,!colSums(assays(sim_sce)[["counts"]]) <= 100]
+sim_sce <- sim_sce[!rowSums(assays(sim_sce)[["counts"]]) <= 50,]
 clusters <- quickCluster(sim_sce, use.ranks=FALSE)
 table(clusters)
-sim_sce <- computeSumFactors(sim_sce, min.mean=0.1, cluster=clusters)
+
+if( !flag ){
+   sim_sce <- computeSumFactors(sim_sce, min.mean=0.1, cluster=clusters)
+}
+
 sim_sce <-  logNormCounts(sim_sce)
 
 ### --------------Reduced dim representation------------###
 sim_sce <- runPCA(sim_sce, ntop = 1000, ncomponents = 10, exprs_values = "counts")
 sim_sce <- runTSNE(sim_sce, ntop = 1000, exprs_values = "counts")
-sim_sce <- runUMAP(sim_sce, ntop = 1000, exprs_values = "counts")
+sim_sce <- runUMAP(sim_sce, ntop = 1000, exprs_values = "logcounts")
+
+
 
 ### --------------Run cms-----------------------------###
-sim_sce <- cms(sim_sce, group = "batch_id", k = k, k_min = 50, n_dim = 5)
+if( !flag ){
+    sim_sce <- cms(sim_sce, group = "batch_id", k = k, k_min = 50, n_dim = 10)
+}else{
+    sim_sce$cms <- rep(NA, ncol(sim_sce))
+    sim_sce$cms_smooth <- rep(NA, ncol(sim_sce))
+}
+
 
 #Save outputfile
 saveRDS(sim_sce, outputfile)

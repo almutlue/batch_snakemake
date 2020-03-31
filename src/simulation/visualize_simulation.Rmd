@@ -63,6 +63,7 @@ suppressPackageStartupMessages({
 sce <- readRDS(params$data)
 sce_real <- readRDS(params$real)
 sim_list = list(strsplit(params$sim, ","))
+
 print(sim_list[[1]][[1]])
 
 param <- readRDS(params$param)
@@ -79,13 +80,18 @@ sample_real <- param_real[["sample"]]
 table(colData(sce_real)[,sample_real])
 #colors for plotting
 tsne_cols <- c(
-  "#DC050C", "#1965B0", "#FB8072", 
-    "#7BAFDE", "#B17BA6",  "#FDB462")
+  "#DC050C", "#1965B0", "#FB8072","#7BAFDE", "#B17BA6",  
+  "#FDB462", "#882E72", "#FF7F00", "#E78AC3", "#B2DF8A",
+  "#33A02C", "#55A1B1", "#B2DF8A", "#8DD3C7", "#A6761D",
+  "#7570B3", "#E6AB02", "#BEAED4", "#666666", "#999999")
 
 mds_cols <- c(
-    "#DC050C", "#1965B0", "#7BAFDE", "#882E72",
-    "#B17BA6", "#FF7F00", "#FDB462") 
+    "#DC050C", "#FB8072", "#1965B0", "#7BAFDE", "#882E72",
+    "#B17BA6", "#FF7F00", "#FDB462", "#E7298A", "#E78AC3",
+    "#33A02C", "#B2DF8A", "#55A1B1", "#8DD3C7", "#A6761D",
+    "#E6AB02", "#7570B3", "#BEAED4", "#666666", "#999999") 
 ```
+
 
 ### Visualize simulations
 ```{r vis sim, warning=FALSE}
@@ -230,42 +236,95 @@ visMDS <-function(simulation, title, ids){
 
 ```
 
-#### TSNE
-```{r tsne, warning=FALSE}
-lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
-    filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-    sim_sce <- readRDS(file = filename)
-    sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
-    visTSNE(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
-})
+### TSNE {.tabset}
+```{r tsne, warning=FALSE, echo = FALSE}
+# lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
+#     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
+#     sim_sce <- readRDS(file = filename)
+#     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
+#     visTSNE(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
+# })
+#"sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)",
+
+template_tsne <- c(
+    "#### {{nm}}\n",
+    "```{r tsne{{nm}}, echo = FALSE}\n",
+    "filename <- paste0('out/sim_char/', '{{name}}', '/sim_', '{{name}}', '_', '{{nm}}', '_sce.rds')",
+    "sim_sce <- readRDS(file = filename)",
+    "visTSNE(sim_sce, title = paste0('Simulate: ', '{{name}}', ' - ', '{{nm}}'), ids = batch)\n",
+    "```\n",
+    "\n"
+  )
+
+plots_tsne <- lapply(sim_list[[1]][[1]], 
+  function(nm, name = dataset_name) knitr::knit_expand(text = template_tsne)
+)
 ```
 
-#### UMAP
+`r knitr::knit(text = unlist(plots_tsne))`
+
+
+### UMAP {.tabset}
 ```{r umap, warning=FALSE}
-lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
-    filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-    sim_sce <- readRDS(file = filename)
-    sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
-    visUMAP(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
-})
+# lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
+#     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
+#     sim_sce <- readRDS(file = filename)
+#     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
+#     visUMAP(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
+# })
+# "sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)",
+
+template_umap <- c(
+    "#### {{nm}}\n",
+    "```{r umap{{nm}}, echo = FALSE}\n",
+    "filename <- paste0('out/sim_char/', '{{name}}', '/sim_', '{{name}}', '_', '{{nm}}', '_sce.rds')",
+    "sim_sce <- readRDS(file = filename)",
+    "visUMAP(sim_sce, title = paste0('Simulate: ', '{{name}}', ' - ', '{{nm}}'), ids = batch)\n",
+    "```\n",
+    "\n"
+  )
+
+plots_umap <- lapply(sim_list[[1]][[1]], 
+  function(nm, name = dataset_name) knitr::knit_expand(text = template_umap)
+)
 ```
 
-#### MDS plot
+`r knitr::knit(text = unlist(plots_umap))`
+
+
+### MDS plot {.tabset}
 ```{r mds, warning=FALSE}
-lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
-    filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-    sim_sce <- readRDS(file = filename)
-    sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
-    visMDS(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
-})
+# lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
+#     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
+#     sim_sce <- readRDS(file = filename)
+#     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
+#     visMDS(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
+# })
+# "sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)",
+
+template_mds <- c(
+    "#### {{nm}}\n",
+    "```{r mds{{nm}}, echo = FALSE}\n",
+    "filename <- paste0('out/sim_char/', '{{name}}', '/sim_', '{{name}}', '_', '{{nm}}', '_sce.rds')",
+    "sim_sce <- readRDS(file = filename)",
+    "visMDS(sim_sce, title = paste0('Simulate: ', '{{name}}', ' - ', '{{nm}}'), ids = batch)\n",
+    "```\n",
+    "\n"
+  )
+
+plots_mds <- lapply(sim_list[[1]][[1]], 
+  function(nm, name = dataset_name) knitr::knit_expand(text = template_mds)
+)
 ```
+
+`r knitr::knit(text = unlist(plots_mds))`
 
 ### Real data
 ```{r real}
 # to make aggregate functions work
-sce_real$batch_id <- colData(sce_real)[, batch_real]
-sce_real$sample_id <- colData(sce_real)[, sample_real]
-sce_real$cluster_id <- colData(sce_real)[, cluster_real]
+sce_real$batch_id <- as.factor(colData(sce_real)[, batch_real])
+sce_real$sample_id <- as.factor(colData(sce_real)[, sample_real])
+sce_real$cluster_id <- as.factor(colData(sce_real)[, cluster_real])
 sce_real$group_id <- as.factor(rep("A", ncol(sce_real)))
 metadata(sce_real)$experiment_info <- colData(sce_real)[, c("batch_id", "cluster_id", "group_id", "sample_id")]
 
@@ -274,29 +333,35 @@ visUMAP(sce_real, title = "Real dataset", ids = "batch_id")
 visMDS(sce_real, title = "Real dataset", ids = "batch_id")
 ```
 
-### Cellspecific Mixing score simulations {.tabset .tabset-fade}  
 
-```{r sim cms}
+### Cellspecific Mixing score simulations {.tabset}  
+
+```{r sim cms, echo = FALSE}
 #get all cms scores
 cms_all <- names(colData(sce))[grep("cms_sim", names(colData(sce)))]
-
+cms_all <- cms_all[!cms_all %in% c("cms_sim_5__1", "cms_sim_5__1_0", "cms_sim_5__2_1")]
 # plot list
-cms_list <- lapply(cms_all, function(sim){
-    dim_nam <- gsub("cms_sim_","X", sim)
-    p <- visMetric(sce, metric = sim, dim_red = dim_nam)
-    #p2 <- visGroup(sce, group = "batch_id", dim_red = dim_nam)
-    #p3 <- plot_grid(p, p2, nrow = 2)
-})
+# cms_list <- lapply(cms_all, function(sim){
+#     dim_nam <- gsub("cms_sim_","X", sim)
+#     p <- visMetric(sce, metric = sim, dim_red = dim_nam)
+#     #p2 <- visGroup(sce, group = "batch_id", dim_red = dim_nam)
+#     #p3 <- plot_grid(p, p2, nrow = 2)
+# })
+
+template_cms <- c(
+    "#### {{nm}}\n",
+    "```{r cms{{nm}}, echo = FALSE}\n",
+    "dim_nam <- gsub('cms_sim_','X', '{{nm}}')",
+    "visMetric(sce, metric = '{{nm}}', dim_red = dim_nam)\n",
+    "```\n",
+    "\n"
+  )
+
+plots_cms <- lapply(cms_all, 
+  function(nm) knitr::knit_expand(text = template_cms)
+)
 
 ```
 
+`r knitr::knit(text = unlist(plots_cms))`
 
-```{r, results='asis', echo = FALSE}
-for (i in 1:length(cms_all)) {
-    cat("#### ", cms_all[i], " \n")
-    print(cms_list[[i]])
-    plot.new()
-    dev.off()
-    cat(' \n \n')
-}
-```

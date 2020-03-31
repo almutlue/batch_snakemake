@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize simulated batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">15 February, 2020</h4>
+<h4 class="date">31 March, 2020</h4>
 
 </div>
 
@@ -342,9 +342,9 @@ div.tocify {
   <span class="kw">library</span>(here)
   <span class="kw">library</span>(tidyr)
   <span class="kw">library</span>(dplyr)
+  <span class="kw">library</span>(gridExtra)
   <span class="kw">library</span>(stringr)
   <span class="kw">library</span>(ComplexHeatmap)
-  <span class="kw">library</span>(ggtern)
   <span class="kw">library</span>(scran)
   <span class="kw">library</span>(cowplot)
   <span class="kw">library</span>(CAMERA)
@@ -366,16 +366,16 @@ dataset_name</code></pre></div>
 
 <span class="kw">table</span>(<span class="kw">colData</span>(sce)[,celltype])</code></pre></div>
 <pre><code>## 
-##    0    1    2    3    4    5    6    7 
-## 1395  769  123   79   62   39   44   39</code></pre>
+##    0    1    2    3    4 
+## 1498  585  143  108   36</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(<span class="kw">colData</span>(sce)[,batch])</code></pre></div>
 <pre><code>## 
 ## pat2 pat3 
-## 1378 1172</code></pre>
+## 1292 1078</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(<span class="kw">colData</span>(sce)[,sample])</code></pre></div>
 <pre><code>## 
 ## E2528 E2547 
-##  1378  1172</code></pre>
+##  1292  1078</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_de &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$de)
 abund &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$abund)
 outputfile &lt;-<span class="st"> </span>params$out_file
@@ -393,13 +393,13 @@ feature_list &lt;-<span class="st"> </span>feature_list[<span class="kw">which</
   <span class="kw">visGroup</span>(sce, feature_name, <span class="dt">dim_red=</span> <span class="st">&quot;UMAP&quot;</span>)
 })</code></pre></div>
 <pre><code>## [[1]]</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/vis-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/vis-1.png" width="672" /></p>
 <pre><code>## 
 ## [[2]]</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/vis-2.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/vis-2.png" width="672" /></p>
 <pre><code>## 
 ## [[3]]</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/vis-3.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/vis-3.png" width="672" /></p>
 </div>
 </div>
 <div id="batch-strengthsize" class="section level2">
@@ -414,9 +414,9 @@ vp_sub &lt;-<span class="st"> </span>vp[<span class="dv">1</span>:<span class="d
 <pre><code>## Warning: Setting row names on a tibble is deprecated.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot</span>
 <span class="kw">plotPercentBars</span>( vp_sub[<span class="dv">1</span>:<span class="dv">10</span>,] )</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/variance%20part-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/variance%20part-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotVarPart</span>( vp_sub )</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/variance%20part-2.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/variance%20part-2.png" width="672" /></p>
 </div>
 <div id="variance-and-gene-expression" class="section level3 tabset tabset-pills">
 <h3>Variance and gene expression</h3>
@@ -440,24 +440,23 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 }
 
 <span class="co">#Ternary plots</span>
-<span class="kw">ggtern</span>(<span class="dt">data=</span><span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)),<span class="kw">aes</span>(vp_batch, vp_celltype, vp_residuals)) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">stat_density_tern</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>..level.., <span class="dt">alpha=</span>..level..),<span class="dt">geom=</span><span class="st">&#39;polygon&#39;</span>) +
-<span class="st">  </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">high =</span> <span class="st">&quot;red&quot;</span>) +
-<span class="st">  </span><span class="kw">guides</span>(<span class="dt">color =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">alpha =</span> <span class="st">&quot;none&quot;</span>) +
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size=</span> <span class="fl">0.1</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>)  +<span class="st"> </span>
-<span class="st">  </span><span class="kw">Llab</span>(<span class="st">&quot;batch&quot;</span>) +
-<span class="st">  </span><span class="kw">Tlab</span>(<span class="st">&quot;celltype&quot;</span>) +
-<span class="st">  </span><span class="kw">Rlab</span>(<span class="st">&quot;other&quot;</span>) +
-<span class="st">  </span><span class="kw">theme_bw</span>()</code></pre></div>
-<pre><code>## Warning: Removed 1294 rows containing non-finite values (StatDensityTern).</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/var%20expr-1.svg" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1 &lt;-<span class="st"> </span><span class="kw">ggtern</span>(<span class="dt">data=</span><span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)),<span class="kw">aes</span>(vp_batch, vp_celltype, vp_residuals)) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="fl">0.1</span>) +
-<span class="st">  </span><span class="kw">geom_density_tern</span>() +<span class="st"> </span>
-<span class="st">  </span><span class="kw">Llab</span>(<span class="st">&quot;batch&quot;</span>) +
-<span class="st">  </span><span class="kw">Tlab</span>(<span class="st">&quot;celltype&quot;</span>) +
-<span class="st">  </span><span class="kw">Rlab</span>(<span class="st">&quot;other&quot;</span>) +
-<span class="st">  </span><span class="kw">theme_bw</span>()
+<span class="co"># ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + </span>
+<span class="co">#   stat_density_tern(aes(fill=..level.., alpha=..level..),geom=&#39;polygon&#39;) +</span>
+<span class="co">#   scale_fill_gradient2(high = &quot;red&quot;) +</span>
+<span class="co">#   guides(color = &quot;none&quot;, fill = &quot;none&quot;, alpha = &quot;none&quot;) +</span>
+<span class="co">#   geom_point(size= 0.1, alpha = 0.5)  + </span>
+<span class="co">#   Llab(&quot;batch&quot;) +</span>
+<span class="co">#   Tlab(&quot;celltype&quot;) +</span>
+<span class="co">#   Rlab(&quot;other&quot;) +</span>
+<span class="co">#   theme_bw()</span>
+<span class="co"># </span>
+<span class="co"># t1 &lt;- ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + </span>
+<span class="co">#   geom_point(size = 0.1) +</span>
+<span class="co">#   geom_density_tern() + </span>
+<span class="co">#   Llab(&quot;batch&quot;) +</span>
+<span class="co">#   Tlab(&quot;celltype&quot;) +</span>
+<span class="co">#   Rlab(&quot;other&quot;) +</span>
+<span class="co">#   theme_bw()</span>
 
 ## Summarize variance partitioning
 <span class="co"># How many genes have a variance component affected by batch with &gt; 1%</span>
@@ -477,22 +476,22 @@ m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="
 <div id="scatterplot-batch" class="section level4">
 <h4>Scatterplot batch</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_batch&quot;</span>, <span class="st">&quot;vp_batch&quot;</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/var_plot_batch-1.svg" width="672" /></p>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/var_plot_batch-1.png" width="672" /></p>
 </div>
 <div id="scatterplot-celltype" class="section level4">
 <h4>Scatterplot celltype</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_celltype&quot;</span>, <span class="st">&quot;vp_celltype&quot;</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/var_plot_celltype-1.svg" width="672" /></p>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/var_plot_celltype-1.png" width="672" /></p>
 </div>
 <div id="ternary-plot-all-genes" class="section level4">
 <h4>Ternary plot all genes</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/tern%20plots-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#t1</span></code></pre></div>
 </div>
 <div id="ternary-plot-gene-expression-classes" class="section level4">
 <h4>Ternary plot gene expression classes</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t1 +<span class="st"> </span><span class="kw">facet_grid</span>(~expr_class)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/tern%20plots%20gene%20class-1.svg" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#t1 + facet_grid(~expr_class)</span></code></pre></div>
 </div>
 </div>
 <div id="cellspecific-mixing-score" class="section level3 tabset tabset-pills">
@@ -501,11 +500,11 @@ m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="
 <h4>Overall</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#visualize overall cms score</span>
 <span class="kw">visHist</span>(sce, <span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/cms-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/cms-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visMetric</span>(sce, <span class="dt">metric =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">dim_red =</span> <span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/cms-2.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/cms-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visGroup</span>(sce, celltype, <span class="dt">dim_red =</span> <span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/cms-3.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/cms-3.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summarize</span>
 mean_cms &lt;-<span class="st"> </span><span class="kw">mean</span>(sce$cms)
 n_cms_0<span class="fl">.01</span> &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">which</span>(sce$cms &lt;<span class="st"> </span><span class="fl">0.01</span>))
@@ -516,10 +515,10 @@ var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_c
 <h4>Celltypes cms smooth</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare by celltypes</span>
 <span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.044</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/cms%20celltypes-1.svg" width="672" /></p>
+<pre><code>## Picking joint bandwidth of 0.0163</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/cms%20celltypes-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype, <span class="dt">violin =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/cms%20celltypes-2.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/cms%20celltypes-2.png" width="672" /></p>
 </div>
 <div id="celltypes-histogram" class="section level4">
 <h4>Celltypes histogram</h4>
@@ -537,7 +536,7 @@ p +<span class="st"> </span><span class="kw">geom_vline</span>(<span class="kw">
                cluster_mean_cms, <span class="dt">linetype=</span><span class="dv">2</span>) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> cols) </code></pre></div>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/cms%20histogram-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/cms%20histogram-1.png" width="672" /></p>
 </div>
 </div>
 </div>
@@ -555,7 +554,7 @@ plot_abundance &lt;-<span class="st"> </span>function(cluster_var, tib, x_var){
 }
 
 <span class="kw">plot_abundance</span>(<span class="dt">cluster_var =</span> celltype, <span class="dt">tib =</span> meta_tib, <span class="dt">x_var =</span> batch)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/celltype%20abundance-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/celltype%20abundance-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summarize diff abundance</span>
 mean_rel_abund_diff &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(abund))
 min_rel_abund_diff &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(abund))
@@ -580,17 +579,20 @@ mean_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(bids, fun
   mean_c &lt;-<span class="st"> </span>mean_cluster %&gt;%<span class="st"> </span><span class="kw">map</span>(rowMeans) %&gt;%<span class="st"> </span>bind_rows %&gt;%
 <span class="st">    </span>dplyr::<span class="kw">mutate</span>(<span class="dt">gene=</span><span class="kw">rownames</span>(sce)) %&gt;%<span class="st"> </span>
 <span class="st">    </span><span class="kw">gather</span>(cluster, logcounts, cids)
-})
-
-mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id=</span> <span class="st">&quot;batch&quot;</span>)
+})</code></pre></div>
+<pre><code>## Note: Using an external vector in selections is ambiguous.
+## ℹ Use `all_of(cids)` instead of `cids` to silence this message.
+## ℹ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.
+## This message is displayed once per session.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id=</span> <span class="st">&quot;batch&quot;</span>)
 
 <span class="kw">ggplot</span>(mean_expr, <span class="kw">aes</span>(<span class="dt">x=</span>logcounts, <span class="dt">colour=</span>batch)) +<span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha=</span>.<span class="dv">3</span>) +
 <span class="st">  </span><span class="kw">theme_classic</span>() +
 <span class="st">  </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
-<span class="st">  </span><span class="kw">scale_colour_manual</span>(<span class="dt">values =</span> cols[<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>,<span class="dv">7</span>)]) +
+<span class="st">  </span><span class="kw">scale_colour_manual</span>(<span class="dt">values =</span> cols[<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">3</span>,<span class="dv">7</span>,<span class="dv">4</span>:<span class="dv">6</span>,<span class="dv">8</span>:<span class="kw">length</span>(cols))]) +
 <span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">limits =</span>  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>))</code></pre></div>
 <pre><code>## Warning: Removed 10 rows containing non-finite values (stat_density).</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/count%20distributions-1.svg" width="960" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/count%20distributions-1.png" width="960" /></p>
 </div>
 <div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
 <h3>Batch to batch comparisons of expression distributions</h3>
@@ -613,12 +615,12 @@ batch_all &lt;-<span class="st"> </span><span class="kw">levels</span>(<span cla
 })</code></pre></div>
 <pre><code>## [[1]]
 ## [[1]][[1]]</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/mean%20expression-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/mean%20expression-1.png" width="672" /></p>
 <pre><code>## 
 ## 
 ## [[2]]
 ## [[2]][[1]]</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/mean%20expression-2.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/mean%20expression-2.png" width="672" /></p>
 </div>
 </div>
 <div id="differentially-expressed-genes" class="section level2">
@@ -654,7 +656,7 @@ for(jj in <span class="dv">1</span>:<span class="kw">length</span>(cs)){
 
 <span class="kw">lapply</span>(m2, function(x) <span class="kw">UpSet</span>(x))</code></pre></div>
 <pre><code>## $`pat2-pat3`</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/de%20res-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/de%20res-1.png" width="672" /></p>
 </div>
 <div id="logfold_change" class="section level3">
 <h3>Logfold_change</h3>
@@ -700,23 +702,19 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
   })
 }
 
-pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-1.svg" width="672" /></p>
-<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 4095 Num DE: 5</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-2.svg" width="672" /></p>
-<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 4095 Num DE: 11</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-3.svg" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 4095 Num DE: 339</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-4.svg" width="672" /></p>
-<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 4095 Num DE: 321</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-5.svg" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 4095 Num DE: 405</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-6.svg" width="672" /></p>
-<pre><code>## Cluster: 5 Contrast: pat2-pat3 Num genes: 4095 Num DE: 400</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-7.svg" width="672" /></p>
-<pre><code>## Cluster: 6 Contrast: pat2-pat3 Num genes: 4095 Num DE: 611</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-8.svg" width="672" /></p>
-<pre><code>## Cluster: 7 Contrast: pat2-pat3 Num genes: 4095 Num DE: 786</code></pre>
+if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<span class="st"> </span><span class="dv">3</span> ){
+    pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)
+}</code></pre></div>
+<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-1.png" width="672" /></p>
+<pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 3611 Num DE: 7</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-2.png" width="672" /></p>
+<pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 3611 Num DE: 11</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-3.png" width="672" /></p>
+<pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 3611 Num DE: 180</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-4.png" width="672" /></p>
+<pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 3611 Num DE: 140</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/pval%20lfc-5.png" width="672" /></p>
+<pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 3611 Num DE: 445</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 <span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
@@ -828,9 +826,68 @@ panel.hist &lt;-<span class="st"> </span>function(x, ...){
                                            <span class="dt">lower.panel =</span> panel.smooth, 
                                            <span class="dt">upper.panel =</span> panel.cor, 
                                            <span class="dt">diag.panel =</span> panel.hist, <span class="dt">main =</span> x))</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/ct%20de%20dist%20-1.svg" width="1920" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/ct%20de%20dist%20-1.png" width="1920" /></p>
 <pre><code>## [[1]]
 ## NULL</code></pre>
+<p>Compare estimated logFC between real data and simulated data. This can give as a feeling for how much we underestimate the batch effect. In extremer case the batch tuning parameters can be used to get a batch effect closer to the real batch effect.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">comp_lfcs &lt;-<span class="st"> </span>function(cont_var){
+    <span class="kw">print</span>(cont_var)
+    <span class="kw">lapply</span>(cids, function(cell_t){
+        <span class="kw">print</span>(cell_t)
+        c1 &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-.*&quot;</span>, <span class="st">&quot;&quot;</span>, cont_var)
+        c2 &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.*-&quot;</span>, <span class="st">&quot;&quot;</span>, cont_var)
+        cont_fc &lt;-<span class="st"> </span><span class="kw">colnames</span>(sce@metadata[[<span class="st">&quot;gene_info&quot;</span>]]) %&gt;%<span class="st"> </span>
+<span class="st">            </span><span class="kw">grep</span>(<span class="kw">paste0</span>(<span class="st">&quot;lfc_be_&quot;</span>, c2), ., <span class="dt">value =</span> <span class="ot">TRUE</span>)
+        sim_est &lt;-<span class="st"> </span>all_folds[[cont_var]][, <span class="kw">c</span>(<span class="st">&quot;gene&quot;</span>, <span class="kw">paste0</span>(<span class="st">&quot;logFC_&quot;</span>, cell_t))]
+        real_est &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(sce@metadata[[<span class="st">&quot;gene_info&quot;</span>]]) %&gt;%<span class="st"> </span>
+<span class="st">            </span><span class="kw">filter</span>(cluster_id %in%<span class="st"> </span>cell_t) %&gt;%<span class="st"> </span><span class="kw">select</span>(<span class="kw">c</span>(<span class="st">&quot;gene&quot;</span>, <span class="kw">all_of</span>(cont_fc)))
+        if( <span class="kw">ncol</span>(real_est) &lt;<span class="st"> </span><span class="dv">2</span> ){
+            p &lt;-<span class="st"> </span><span class="ot">NULL</span>
+        }else{
+            lfc_com &lt;-<span class="st"> </span><span class="kw">full_join</span>(real_est, sim_est) %&gt;%<span class="st"> </span><span class="kw">set_colnames</span>(<span class="kw">c</span>(<span class="st">&quot;gene&quot;</span>, <span class="st">&quot;real&quot;</span>, <span class="st">&quot;simulated&quot;</span>))
+        p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lfc_com, <span class="kw">aes</span>(<span class="dt">y=</span>real, <span class="dt">x=</span>simulated)) +<span class="st"> </span>
+<span class="st">            </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> <span class="fl">0.3</span>, <span class="dt">color=</span><span class="st">&#39;darkblue&#39;</span>) +
+<span class="st">            </span><span class="kw">geom_abline</span>(<span class="dt">intercept =</span> <span class="dv">0</span>, <span class="dt">slope =</span> <span class="dv">1</span>) +
+<span class="st">            </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="kw">paste0</span>(<span class="st">&quot;Compare logFC estimates: &quot;</span>, cont_var, <span class="st">&quot;, cluster: &quot;</span>, cell_t), 
+                 <span class="dt">x =</span> <span class="st">&quot;logFC simulated&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;logFC real&quot;</span>) +<span class="st"> </span>
+<span class="st">            </span><span class="kw">theme_classic</span>() +<span class="st"> </span><span class="kw">coord_fixed</span>()
+        p
+        }
+    })
+}
+
+<span class="kw">lapply</span>(cs, comp_lfcs)</code></pre></div>
+<pre><code>## [1] &quot;pat2-pat3&quot;
+## [1] &quot;0&quot;</code></pre>
+<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
+<pre><code>## [1] &quot;1&quot;</code></pre>
+<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
+<pre><code>## [1] &quot;2&quot;</code></pre>
+<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
+<pre><code>## [1] &quot;3&quot;</code></pre>
+<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
+<pre><code>## [1] &quot;4&quot;</code></pre>
+<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
+<pre><code>## $`pat2-pat3`
+## $`pat2-pat3`$`0`</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/compare%20lfcs-1.png" width="672" /></p>
+<pre><code>## 
+## $`pat2-pat3`$`1`</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/compare%20lfcs-2.png" width="672" /></p>
+<pre><code>## 
+## $`pat2-pat3`$`2`</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/compare%20lfcs-3.png" width="672" /></p>
+<pre><code>## 
+## $`pat2-pat3`$`3`</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/compare%20lfcs-4.png" width="672" /></p>
+<pre><code>## 
+## $`pat2-pat3`$`4`</code></pre>
+<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/compare%20lfcs-5.png" width="672" /></p>
 </div>
 </div>
 <div id="batch-categorization" class="section level2 tabset tabset-pills">
@@ -851,21 +908,21 @@ vis_type &lt;-<span class="st"> </span>function(dim_red){
 <div id="pca" class="section level3">
 <h3>PCA</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_type</span>(<span class="st">&quot;PCA&quot;</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/batchtype%20pca-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/batchtype%20pca-1.png" width="672" /></p>
 </div>
 <div id="umap" class="section level3">
 <h3>UMAP</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_type</span>(<span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/batchtype%20umap-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/batchtype%20umap-1.png" width="672" /></p>
 </div>
 <div id="cellspecific-mixing-score-1" class="section level3">
 <h3>Cellspecific Mixing Score</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># #Cellspecific Mixing score (Batch effect strength after &quot;removal&quot;)</span>
 <span class="kw">visHist</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<p><img src="simulation_csf_patient_files/figure-html/batchtype%20cms-1.svg" width="672" /></p>
+<p><img src="simulation_csf_patient_files/figure-html/batchtype%20cms-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visIntegration</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">metric_name =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>## Picking joint bandwidth of 0.0428</code></pre>
-<p><img src="simulation_csf_patient_files/figure-html/batchtype%20cms-2.svg" width="672" /></p>
+<pre><code>## Picking joint bandwidth of 0.039</code></pre>
+<p><img src="simulation_csf_patient_files/figure-html/batchtype%20cms-2.png" width="672" /></p>
 </div>
 </div>
 <div id="simulation-parameter" class="section level2">
@@ -998,85 +1055,86 @@ summary &lt;-<span class="st"> </span><span class="kw">cbind</span>(size, cellty
 ## LAPACK: /home/aluetg/R/lib/R/lib/libRlapack.so
 ## 
 ## locale:
-##  [1] LC_CTYPE=C.UTF-8        LC_NUMERIC=C            LC_TIME=C              
-##  [4] LC_COLLATE=en_CA.UTF-8  LC_MONETARY=C           LC_MESSAGES=en_CA.UTF-8
-##  [7] LC_PAPER=C              LC_NAME=C               LC_ADDRESS=C           
-## [10] LC_TELEPHONE=C          LC_MEASUREMENT=C        LC_IDENTIFICATION=C    
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
 ##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
 ##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] readr_1.3.1                 ggrepel_0.8.1              
-##  [3] CAMERA_1.42.0               xcms_3.8.1                 
+##  [1] readr_1.3.1                 ggrepel_0.8.2              
+##  [3] CAMERA_1.42.0               xcms_3.8.2                 
 ##  [5] MSnbase_2.12.0              ProtGenerics_1.18.0        
 ##  [7] mzR_2.20.0                  Rcpp_1.0.3                 
-##  [9] cowplot_1.0.0               scran_1.14.5               
-## [11] ggtern_3.1.0                ComplexHeatmap_2.2.0       
-## [13] stringr_1.4.0               dplyr_0.8.3                
-## [15] tidyr_1.0.0                 here_0.1                   
+##  [9] cowplot_1.0.0               scran_1.14.6               
+## [11] ComplexHeatmap_2.2.0        stringr_1.4.0              
+## [13] gridExtra_2.3               dplyr_0.8.5                
+## [15] tidyr_1.0.2                 here_0.1                   
 ## [17] jcolors_0.0.4               purrr_0.3.3                
-## [19] variancePartition_1.16.0    scales_1.1.0               
-## [21] foreach_1.4.7               limma_3.42.0               
-## [23] CellMixS_1.2.1              kSamples_1.2-9             
-## [25] SuppDists_1.1-9.4           scater_1.14.4              
-## [27] ggplot2_3.2.1               CellBench_1.2.0            
+## [19] variancePartition_1.16.1    scales_1.1.0               
+## [21] foreach_1.4.8               limma_3.42.2               
+## [23] CellMixS_1.2.4              kSamples_1.2-9             
+## [25] SuppDists_1.1-9.5           scater_1.14.6              
+## [27] ggplot2_3.3.0               CellBench_1.2.0            
 ## [29] tibble_2.1.3                magrittr_1.5               
-## [31] SingleCellExperiment_1.8.0  SummarizedExperiment_1.16.0
-## [33] DelayedArray_0.12.0         BiocParallel_1.20.0        
+## [31] SingleCellExperiment_1.8.0  SummarizedExperiment_1.16.1
+## [33] DelayedArray_0.12.2         BiocParallel_1.20.1        
 ## [35] matrixStats_0.55.0          Biobase_2.46.0             
 ## [37] GenomicRanges_1.38.0        GenomeInfoDb_1.22.0        
-## [39] IRanges_2.20.1              S4Vectors_0.24.0           
+## [39] IRanges_2.20.2              S4Vectors_0.24.3           
 ## [41] BiocGenerics_0.32.0        
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] proto_1.0.0              tidyselect_0.2.5         lme4_1.1-21             
-##   [4] htmlwidgets_1.5.1        RSQLite_2.1.2            munsell_0.5.0           
-##   [7] codetools_0.2-16         preprocessCore_1.48.0    statmod_1.4.32          
-##  [10] withr_2.1.2              colorspace_1.4-1         knitr_1.26              
-##  [13] rstudioapi_0.10          robustbase_0.93-5        bayesm_3.1-4            
-##  [16] mzID_1.24.0              labeling_0.3             GenomeInfoDbData_1.2.2  
-##  [19] farver_2.0.1             bit64_0.9-7              rprojroot_1.3-2         
-##  [22] vctrs_0.2.0              xfun_0.11                BiocFileCache_1.10.2    
-##  [25] R6_2.4.1                 doParallel_1.0.15        ggbeeswarm_0.6.0        
-##  [28] clue_0.3-57              rsvd_1.0.2               locfit_1.5-9.1          
-##  [31] bitops_1.0-6             assertthat_0.2.1         nnet_7.3-12             
-##  [34] beeswarm_0.2.3           gtable_0.3.0             affy_1.64.0             
-##  [37] rlang_0.4.2              zeallot_0.1.0            GlobalOptions_0.1.1     
-##  [40] splines_3.6.1            lazyeval_0.2.2           acepack_1.4.1           
-##  [43] impute_1.60.0            checkmate_1.9.4          BiocManager_1.30.10     
-##  [46] yaml_2.2.0               reshape2_1.4.3           backports_1.1.5         
-##  [49] Hmisc_4.3-0              MassSpecWavelet_1.52.0   RBGL_1.62.1             
-##  [52] tensorA_0.36.1           tools_3.6.1              ellipsis_0.3.0          
-##  [55] affyio_1.56.0            gplots_3.0.1.1           RColorBrewer_1.1-2      
-##  [58] ggridges_0.5.1           latex2exp_0.4.0          plyr_1.8.4              
-##  [61] base64enc_0.1-3          progress_1.2.2           zlibbioc_1.32.0         
-##  [64] RCurl_1.95-4.12          prettyunits_1.0.2        rpart_4.1-15            
-##  [67] GetoptLong_0.1.7         viridis_0.5.1            cluster_2.1.0           
-##  [70] colorRamps_2.3           data.table_1.12.6        circlize_0.4.8          
-##  [73] RANN_2.6.1               pcaMethods_1.78.0        packrat_0.5.0           
-##  [76] hms_0.5.2                evaluate_0.14            pbkrtest_0.4-7          
-##  [79] XML_3.98-1.20            gridExtra_2.3            shape_1.4.4             
-##  [82] compiler_3.6.1           KernSmooth_2.23-15       ncdf4_1.17              
-##  [85] crayon_1.3.4             minqa_1.2.4              htmltools_0.4.0         
-##  [88] Formula_1.2-3            lubridate_1.7.4          DBI_1.0.0               
-##  [91] dbplyr_1.4.2             MASS_7.3-51.4            rappdirs_0.3.1          
-##  [94] boot_1.3-23              compositions_1.40-3      Matrix_1.2-17           
-##  [97] vsn_3.54.0               gdata_2.18.0             igraph_1.2.4.2          
-## [100] pkgconfig_2.0.3          foreign_0.8-72           MALDIquant_1.19.3       
-## [103] vipor_0.4.5              dqrng_0.2.1              multtest_2.42.0         
-## [106] XVector_0.26.0           digest_0.6.23            graph_1.64.0            
-## [109] rmarkdown_1.18           htmlTable_1.13.2         edgeR_3.28.0            
-## [112] DelayedMatrixStats_1.8.0 listarrays_0.2.0         curl_4.2                
-## [115] gtools_3.8.1             rjson_0.2.20             nloptr_1.2.1            
-## [118] lifecycle_0.1.0          nlme_3.1-141             BiocNeighbors_1.4.1     
-## [121] viridisLite_0.3.0        pillar_1.4.2             lattice_0.20-38         
-## [124] httr_1.4.1               DEoptimR_1.0-8           survival_2.44-1.1       
-## [127] glue_1.3.1               png_0.1-7                iterators_1.0.12        
-## [130] bit_1.1-14               stringi_1.4.3            blob_1.2.0              
-## [133] BiocSingular_1.2.0       latticeExtra_0.6-28      caTools_1.17.1.3        
-## [136] memoise_1.1.0            irlba_2.3.3</code></pre>
+##   [1] tidyselect_1.0.0         lme4_1.1-21              RSQLite_2.2.0           
+##   [4] htmlwidgets_1.5.1        munsell_0.5.0            codetools_0.2-16        
+##   [7] preprocessCore_1.48.0    statmod_1.4.34           withr_2.1.2             
+##  [10] colorspace_1.4-1         knitr_1.28               rstudioapi_0.11         
+##  [13] robustbase_0.93-5        mzID_1.24.0              labeling_0.3            
+##  [16] GenomeInfoDbData_1.2.2   farver_2.0.3             bit64_0.9-7             
+##  [19] rprojroot_1.3-2          vctrs_0.2.4              xfun_0.12               
+##  [22] BiocFileCache_1.10.2     R6_2.4.1                 doParallel_1.0.15       
+##  [25] ggbeeswarm_0.6.0         clue_0.3-57              rsvd_1.0.3              
+##  [28] locfit_1.5-9.1           bitops_1.0-6             assertthat_0.2.1        
+##  [31] nnet_7.3-13              beeswarm_0.2.3           gtable_0.3.0            
+##  [34] affy_1.64.0              rlang_0.4.5              GlobalOptions_0.1.1     
+##  [37] splines_3.6.1            acepack_1.4.1            impute_1.60.0           
+##  [40] checkmate_2.0.0          BiocManager_1.30.10      yaml_2.2.1              
+##  [43] reshape2_1.4.3           backports_1.1.5          Hmisc_4.3-1             
+##  [46] MassSpecWavelet_1.52.0   RBGL_1.62.1              tools_3.6.1             
+##  [49] ellipsis_0.3.0           affyio_1.56.0            gplots_3.0.3            
+##  [52] RColorBrewer_1.1-2       ggridges_0.5.2           plyr_1.8.6              
+##  [55] base64enc_0.1-3          progress_1.2.2           zlibbioc_1.32.0         
+##  [58] RCurl_1.98-1.1           prettyunits_1.1.1        rpart_4.1-15            
+##  [61] GetoptLong_0.1.8         viridis_0.5.1            cluster_2.1.0           
+##  [64] colorRamps_2.3           data.table_1.12.8        circlize_0.4.8          
+##  [67] RANN_2.6.1               pcaMethods_1.78.0        packrat_0.5.0           
+##  [70] hms_0.5.3                evaluate_0.14            pbkrtest_0.4-8.6        
+##  [73] XML_3.99-0.3             jpeg_0.1-8.1             shape_1.4.4             
+##  [76] compiler_3.6.1           KernSmooth_2.23-16       ncdf4_1.17              
+##  [79] crayon_1.3.4             minqa_1.2.4              htmltools_0.4.0         
+##  [82] mgcv_1.8-31              Formula_1.2-3            lubridate_1.7.4         
+##  [85] DBI_1.1.0                dbplyr_1.4.2             MASS_7.3-51.5           
+##  [88] rappdirs_0.3.1           boot_1.3-24              Matrix_1.2-18           
+##  [91] cli_2.0.2                vsn_3.54.0               gdata_2.18.0            
+##  [94] igraph_1.2.4.2           pkgconfig_2.0.3          foreign_0.8-76          
+##  [97] MALDIquant_1.19.3        vipor_0.4.5              dqrng_0.2.1             
+## [100] multtest_2.42.0          XVector_0.26.0           digest_0.6.25           
+## [103] graph_1.64.0             rmarkdown_2.1            htmlTable_1.13.3        
+## [106] edgeR_3.28.1             DelayedMatrixStats_1.8.0 listarrays_0.3.1        
+## [109] curl_4.3                 gtools_3.8.1             rjson_0.2.20            
+## [112] nloptr_1.2.2.1           lifecycle_0.2.0          nlme_3.1-145            
+## [115] BiocNeighbors_1.4.2      fansi_0.4.1              viridisLite_0.3.0       
+## [118] pillar_1.4.3             lattice_0.20-40          httr_1.4.1              
+## [121] DEoptimR_1.0-8           survival_3.1-11          glue_1.3.1              
+## [124] png_0.1-7                iterators_1.0.12         bit_1.1-15.2            
+## [127] stringi_1.4.6            blob_1.2.1               BiocSingular_1.2.2      
+## [130] latticeExtra_0.6-29      caTools_1.18.0           memoise_1.1.0           
+## [133] irlba_2.3.3</code></pre>
 </div>
 
 

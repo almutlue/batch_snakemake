@@ -48,13 +48,16 @@ suppressPackageStartupMessages({
   library(dplyr)
   library(stringr)
   library(ComplexHeatmap)
-  library(ggtern)
+  #library(ggtern)
+  library(gridExtra)
   library(scran)
   library(cowplot)
   library(CAMERA)
   library(ggrepel)
   library(readr)
 })
+
+options(bitmapType='cairo')
 ```
 
 
@@ -138,23 +141,23 @@ plot_dev <- function(var, var_col){
 }
 
 #Ternary plots
-ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + 
-  stat_density_tern(aes(fill=..level.., alpha=..level..),geom='polygon') +
-  scale_fill_gradient2(high = "red") +
-  guides(color = "none", fill = "none", alpha = "none") +
-  geom_point(size= 0.1, alpha = 0.5)  + 
-  Llab("batch") +
-  Tlab("celltype") +
-  Rlab("other") +
-  theme_bw()
-
-t1 <- ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + 
-  geom_point(size = 0.1) +
-  geom_density_tern() + 
-  Llab("batch") +
-  Tlab("celltype") +
-  Rlab("other") +
-  theme_bw()
+# ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + 
+#   stat_density_tern(aes(fill=..level.., alpha=..level..),geom='polygon') +
+#   scale_fill_gradient2(high = "red") +
+#   guides(color = "none", fill = "none", alpha = "none") +
+#   geom_point(size= 0.1, alpha = 0.5)  + 
+#   Llab("batch") +
+#   Tlab("celltype") +
+#   Rlab("other") +
+#   theme_bw()
+# 
+# t1 <- ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + 
+#   geom_point(size = 0.1) +
+#   geom_density_tern() + 
+#   Llab("batch") +
+#   Tlab("celltype") +
+#   Rlab("other") +
+#   theme_bw()
 
 ## Summarize variance partitioning
 # How many genes have a variance component affected by batch with > 1%
@@ -172,24 +175,24 @@ m_rel <- m_batch/m_celltype
 
 #### Scatterplot batch
 ```{r var_plot_batch, warning=FALSE}
-plot_dev("vp_batch", "vp_batch")
+#plot_dev("vp_batch", "vp_batch")
 ```
 
 #### Scatterplot celltype
 ```{r var_plot_celltype, warning=FALSE}
-plot_dev("vp_celltype", "vp_celltype")
+#plot_dev("vp_celltype", "vp_celltype")
 ```
 
 
 #### Ternary plot all genes
 ```{r tern plots, warning=FALSE}
-t1
+#t1
 
 ```
 
 #### Ternary plot gene expression classes
 ```{r tern plots gene class, fig.asp=0.5, warning=FALSE}
-t1 + facet_grid(~expr_class)
+#t1 + facet_grid(~expr_class)
 ```
 
 
@@ -284,7 +287,7 @@ mean_expr <- mean_list %>% bind_rows(.id= "batch")
 ggplot(mean_expr, aes(x=logcounts, colour=batch)) + geom_density(alpha=.3) +
   theme_classic() +
   facet_wrap( ~ cluster, ncol = 3) +
-  scale_colour_manual(values = cols[c(1:3,7)]) +
+  scale_colour_manual(values = cols) +
   scale_x_continuous(limits =  c(0, 7))
 
 ```
@@ -295,6 +298,13 @@ ggplot(mean_expr, aes(x=logcounts, colour=batch)) + geom_density(alpha=.3) +
 #mean expression
 mean_expr <- mean_list %>% bind_rows(.id = "batch" ) %>% spread(batch, logcounts)
 batch_all <- levels(as.factor(colData(sce)[,batch]))
+batch_all <- gsub("-", "_", batch_all)
+batch_all <- gsub("\\(", "_", batch_all)
+batch_all <- gsub("\\)", "", batch_all)
+colnames(mean_expr) <- gsub("-", "_", colnames(mean_expr))
+colnames(mean_expr) <- gsub("\\(", "_", colnames(mean_expr))
+colnames(mean_expr) <- gsub("\\)", "", colnames(mean_expr))
+
 
 lapply(batch_all, function(batch_var){
   batch_var_2 <- batch_all[-which(batch_all %in% batch_var)]
@@ -394,7 +404,10 @@ plotDE <- function(cont_var){
   })
 }
 
-pathways <- lapply(names(res), plotDE)
+if( length(names(res)) <= 3 ){
+    pathways <- lapply(names(res), plotDE)
+}
+
 
 ```
 
@@ -530,9 +543,9 @@ vis_type <- function(dim_red){
     ggtitle("unadjusted")
   g1 <- visGroup(sce, batch, dim_red = paste0(dim_red, "_Xadj1")) + 
     ggtitle("constant batch effect")
-  g2 <- visGroup(sce, batch, dim_red = paste0(dim_red, "_Xadj1")) + 
+  g2 <- visGroup(sce, batch, dim_red = paste0(dim_red, "_Xadj2")) + 
     ggtitle("constant batch effect, different ct composition")
-  g3 <- visGroup(sce, batch, dim_red = paste0(dim_red, "_Xadj1")) + 
+  g3 <- visGroup(sce, batch, dim_red = paste0(dim_red, "_Xadj3")) + 
     ggtitle("celltype and batch effect interact")
   do.call("grid.arrange", c(list(g, g1, g2, g3), ncol = 2))
 }

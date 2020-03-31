@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Almut Lütge" />
+
+
+<title>Characterize batch effects</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code > span.dt { color: #204a87; } /* DataType */
+code > span.dv { color: #0000cf; } /* DecVal */
+code > span.bn { color: #0000cf; } /* BaseN */
+code > span.fl { color: #0000cf; } /* Float */
+code > span.ch { color: #4e9a06; } /* Char */
+code > span.st { color: #4e9a06; } /* String */
+code > span.co { color: #8f5902; font-style: italic; } /* Comment */
+code > span.ot { color: #8f5902; } /* Other */
+code > span.al { color: #ef2929; } /* Alert */
+code > span.fu { color: #000000; } /* Function */
+code > span.er { color: #a40000; font-weight: bold; } /* Error */
+code > span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #000000; } /* Constant */
+code > span.sc { color: #000000; } /* SpecialChar */
+code > span.vs { color: #4e9a06; } /* VerbatimString */
+code > span.ss { color: #4e9a06; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #000000; } /* Variable */
+code > span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code > span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code > span.ex { } /* Extension */
+code > span.at { color: #c4a000; } /* Attribute */
+code > span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code > span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Characterize batch effects</h1>
+<h4 class="author">Almut Lütge</h4>
+<h4 class="date">22 March, 2020</h4>
+
+</div>
+
+
+<div id="hca" class="section level2">
+<h2>hca</h2>
+<p><a href="index.html">Back to home</a></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">suppressPackageStartupMessages</span>({
+  <span class="kw">library</span>(CellBench)
+  <span class="kw">library</span>(scater)
+  <span class="kw">library</span>(CellMixS)
+  <span class="kw">library</span>(variancePartition)
+  <span class="kw">library</span>(purrr)
+  <span class="kw">library</span>(jcolors)
+  <span class="kw">library</span>(here)
+  <span class="kw">library</span>(tidyr)
+  <span class="kw">library</span>(dplyr)
+  <span class="kw">library</span>(stringr)
+  <span class="kw">library</span>(ComplexHeatmap)
+  <span class="co">#library(ggtern)</span>
+  <span class="kw">library</span>(gridExtra)
+  <span class="kw">library</span>(scran)
+  <span class="kw">library</span>(cowplot)
+  <span class="kw">library</span>(CAMERA)
+  <span class="kw">library</span>(ggrepel)
+  <span class="kw">library</span>(readr)
+})
+
+<span class="kw">options</span>(<span class="dt">bitmapType=</span><span class="st">&#39;cairo&#39;</span>)</code></pre></div>
+<div id="dataset-and-parameter" class="section level3">
+<h3>Dataset and parameter</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sce &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$data)
+
+param &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$param)
+celltype &lt;-<span class="st"> </span>param[[<span class="st">&quot;celltype&quot;</span>]]
+batch &lt;-<span class="st"> </span>param[[<span class="st">&quot;batch&quot;</span>]]
+sample &lt;-<span class="st"> </span>param[[<span class="st">&quot;sample&quot;</span>]]
+dataset_name &lt;-<span class="st"> </span>param[[<span class="st">&quot;dataset_name&quot;</span>]]
+dataset_name</code></pre></div>
+<pre><code>## [1] &quot;hca&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n_genes &lt;-<span class="st"> </span><span class="kw">nrow</span>(sce)
+
+<span class="kw">table</span>(<span class="kw">colData</span>(sce)[,celltype])</code></pre></div>
+<pre><code>## 
+##           B cells   CD14+ Monocytes       CD4 T cells       CD8 T cells 
+##              1657              2782              5693              2522 
+##   Dendritic cells FCGR3A+ Monocytes         HEK cells          NK cells 
+##               274               897              4942              1425</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(<span class="kw">colData</span>(sce)[,batch])</code></pre></div>
+<pre><code>## 
+##  C1HT-medium   C1HT-small     CEL-Seq2     Chromium Chromium(sn)        ddSEQ 
+##         2210         1603         1082         1604         1512         2104 
+##     Drop-Seq       ICELL8       inDrop     MARS-Seq   mcSCRB-Seq  Quartz-Seq2 
+##         2260         1912          685         1476         1680         1332 
+##   Smart-Seq2 
+##          732</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res_de &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$de)
+abund &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$abund)
+outputfile &lt;-<span class="st"> </span>params$out_file
+
+cols &lt;-<span class="kw">c</span>(<span class="kw">c</span>(<span class="kw">jcolors</span>(<span class="st">&#39;pal6&#39;</span>),<span class="kw">jcolors</span>(<span class="st">&#39;pal8&#39;</span>))[<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">8</span>,<span class="dv">14</span>,<span class="dv">5</span>,<span class="dv">2</span>:<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">9</span>:<span class="dv">13</span>,<span class="dv">15</span>:<span class="dv">20</span>)],<span class="kw">jcolors</span>(<span class="st">&#39;pal4&#39;</span>))
+<span class="kw">names</span>(cols) &lt;-<span class="st"> </span><span class="kw">c</span>()</code></pre></div>
+</div>
+<div id="visualize-data" class="section level3">
+<h3>Visualize data</h3>
+<p>How are sample, celltypes and batches distributed within normalized, but not batch corrected data?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">feature_list &lt;-<span class="st"> </span><span class="kw">c</span>(batch, celltype, sample)
+feature_list &lt;-<span class="st"> </span>feature_list[<span class="kw">which</span>(!<span class="kw">is.na</span>(feature_list))]
+
+<span class="kw">lapply</span>(feature_list, function(feature_name){
+  <span class="kw">visGroup</span>(sce, feature_name, <span class="dt">dim_red=</span> <span class="st">&quot;UMAP&quot;</span>)
+})</code></pre></div>
+<pre><code>## [[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/vis-1.png" width="672" /></p>
+<pre><code>## 
+## [[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/vis-2.png" width="672" /></p>
+<pre><code>## 
+## [[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/vis-3.png" width="672" /></p>
+</div>
+</div>
+<div id="batch-strengthsize" class="section level2">
+<h2>Batch strength/size</h2>
+<p>To compare or describe the severity of a batch effect there are different meassures. In general they can either give an estimate of the relative strength compared to the signal of interest e.g. the celltype signal or an absolut estimate e.g. the number of batch affected genes.</p>
+<div id="variance-partitioning" class="section level3">
+<h3>Variance partitioning</h3>
+<p>How much of the variance within the datasets can we attributed to the batch effect and how much could be explained by the celltype? Which genes are mostly affected?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vp_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;vp_batch&quot;</span>, <span class="st">&quot;vp_celltype&quot;</span>, <span class="st">&quot;vp_residuals&quot;</span>)
+vp &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">rowData</span>(sce)[, vp_vars])  %&gt;%<span class="st"> </span>dplyr::<span class="kw">mutate</span>(<span class="dt">gene=</span> <span class="kw">rownames</span>(sce)) %&gt;%<span class="st"> </span>dplyr::<span class="kw">arrange</span>(-vp_batch)
+vp_sub &lt;-<span class="st"> </span>vp[<span class="dv">1</span>:<span class="dv">3</span>] %&gt;%<span class="st"> </span><span class="kw">set_rownames</span>(vp$gene)</code></pre></div>
+<pre><code>## Warning: Setting row names on a tibble is deprecated.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot</span>
+<span class="kw">plotPercentBars</span>( vp_sub[<span class="dv">1</span>:<span class="dv">10</span>,] )</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/variance%20part-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plotVarPart</span>( vp_sub )</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/variance%20part-2.png" width="672" /></p>
+</div>
+<div id="variance-and-gene-expression" class="section level3 tabset tabset-pills">
+<h3>Variance and gene expression</h3>
+<p>Are general expression and batch effect related? Does the batch effect or the celltype effect preferable manifest within highly, medium or low expressed genes?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#define expression classes by mean expression quantiles </span>
+th &lt;-<span class="st"> </span><span class="kw">quantile</span>(<span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts), <span class="kw">c</span>(.<span class="dv">33</span>, .<span class="dv">66</span>))
+high_th &lt;-<span class="st"> </span>th[<span class="dv">2</span>]
+mid_th &lt;-<span class="st"> </span>th[<span class="dv">1</span>]
+
+<span class="kw">rowData</span>(sce)$expr_class &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts) &gt;<span class="st"> </span>high_th, <span class="st">&quot;high&quot;</span>,
+                                  <span class="kw">ifelse</span>(<span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts) &lt;=<span class="st"> </span>high_th &amp;
+<span class="st">                                           </span><span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts) &gt;<span class="st"> </span>mid_th, 
+                                         <span class="st">&quot;medium&quot;</span>, <span class="st">&quot;low&quot;</span>))
+<span class="kw">rowData</span>(sce)$mean_expr &lt;-<span class="st"> </span><span class="kw">rowMeans</span>(<span class="kw">assays</span>(sce)$logcounts)
+
+<span class="co">#plot </span>
+plot_dev &lt;-<span class="st"> </span>function(var, var_col){
+  <span class="kw">ggplot</span>(<span class="kw">as.data.frame</span>(<span class="kw">rowData</span>(sce)), <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;mean_expr&quot;</span>, <span class="dt">y =</span> var, <span class="dt">colour =</span> var_col)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+}
+
+<span class="co">#Ternary plots</span>
+<span class="co"># ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + </span>
+<span class="co">#   stat_density_tern(aes(fill=..level.., alpha=..level..),geom=&#39;polygon&#39;) +</span>
+<span class="co">#   scale_fill_gradient2(high = &quot;red&quot;) +</span>
+<span class="co">#   guides(color = &quot;none&quot;, fill = &quot;none&quot;, alpha = &quot;none&quot;) +</span>
+<span class="co">#   geom_point(size= 0.1, alpha = 0.5)  + </span>
+<span class="co">#   Llab(&quot;batch&quot;) +</span>
+<span class="co">#   Tlab(&quot;celltype&quot;) +</span>
+<span class="co">#   Rlab(&quot;other&quot;) +</span>
+<span class="co">#   theme_bw()</span>
+<span class="co"># </span>
+<span class="co"># t1 &lt;- ggtern(data=as.data.frame(rowData(sce)),aes(vp_batch, vp_celltype, vp_residuals)) + </span>
+<span class="co">#   geom_point(size = 0.1) +</span>
+<span class="co">#   geom_density_tern() + </span>
+<span class="co">#   Llab(&quot;batch&quot;) +</span>
+<span class="co">#   Tlab(&quot;celltype&quot;) +</span>
+<span class="co">#   Rlab(&quot;other&quot;) +</span>
+<span class="co">#   theme_bw()</span>
+
+## Summarize variance partitioning
+<span class="co"># How many genes have a variance component affected by batch with &gt; 1%</span>
+n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_celltype&quot;</span>&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_rel &lt;-<span class="st"> </span>n_batch_gene/n_celltype_gene
+
+<span class="co"># Mean variance that is explained by the batch effect/celltype</span>
+m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_batch&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_batch&quot;]), na.rm = TRUE): argument is
+## not numeric or logical: returning NA</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_celltype&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_celltype&quot;]), na.rm = TRUE): argument
+## is not numeric or logical: returning NA</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
+<div id="scatterplot-batch" class="section level4">
+<h4>Scatterplot batch</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_dev(&quot;vp_batch&quot;, &quot;vp_batch&quot;)</span></code></pre></div>
+</div>
+<div id="scatterplot-celltype" class="section level4">
+<h4>Scatterplot celltype</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_dev(&quot;vp_celltype&quot;, &quot;vp_celltype&quot;)</span></code></pre></div>
+</div>
+<div id="ternary-plot-all-genes" class="section level4">
+<h4>Ternary plot all genes</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#t1</span></code></pre></div>
+</div>
+<div id="ternary-plot-gene-expression-classes" class="section level4">
+<h4>Ternary plot gene expression classes</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#t1 + facet_grid(~expr_class)</span></code></pre></div>
+</div>
+</div>
+<div id="cellspecific-mixing-score" class="section level3 tabset tabset-pills">
+<h3>Cellspecific Mixing score</h3>
+<div id="overall" class="section level4">
+<h4>Overall</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#visualize overall cms score</span>
+<span class="kw">visHist</span>(sce, <span class="dt">n_col =</span> <span class="dv">2</span>, <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/cms-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visMetric</span>(sce, <span class="dt">metric =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">dim_red =</span> <span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/cms-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visGroup</span>(sce, celltype, <span class="dt">dim_red =</span> <span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/cms-3.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summarize</span>
+mean_cms &lt;-<span class="st"> </span><span class="kw">mean</span>(sce$cms)
+n_cms_0<span class="fl">.01</span> &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">which</span>(sce$cms &lt;<span class="st"> </span><span class="fl">0.01</span>))
+cluster_mean_cms &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">colData</span>(sce)) %&gt;%<span class="st"> </span><span class="kw">group_by_at</span>(celltype) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">cms_mean =</span> <span class="kw">mean</span>(cms))
+var_cms &lt;-<span class="st"> </span><span class="kw">var</span>(cluster_mean_cms$cms_mean)</code></pre></div>
+</div>
+<div id="celltypes-cms-smooth" class="section level4">
+<h4>Celltypes cms smooth</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare by celltypes</span>
+<span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype)</code></pre></div>
+<pre><code>## Picking joint bandwidth of 0.0151</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/cms%20celltypes-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visCluster</span>(sce, <span class="dt">metric_var =</span> <span class="st">&quot;cms_smooth&quot;</span>, <span class="dt">cluster_var =</span> celltype, <span class="dt">violin =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/cms%20celltypes-2.png" width="672" /></p>
+</div>
+<div id="celltypes-histogram" class="section level4">
+<h4>Celltypes histogram</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#compare histogram by celltype</span>
+
+p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="kw">as.data.frame</span>(<span class="kw">colData</span>(sce)), 
+            <span class="kw">aes_string</span>(<span class="dt">x =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">fill =</span> celltype)) +<span class="st"> </span>
+<span class="st">                </span><span class="kw">geom_histogram</span>() +<span class="st"> </span>
+<span class="st">                </span><span class="kw">facet_wrap</span>(celltype, <span class="dt">scales =</span> <span class="st">&quot;free_y&quot;</span>, <span class="dt">ncol =</span> <span class="dv">3</span>) +
+<span class="st">                </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> cols) +
+<span class="st">                </span><span class="kw">theme_classic</span>()
+
+p +<span class="st"> </span><span class="kw">geom_vline</span>(<span class="kw">aes_string</span>(<span class="dt">xintercept =</span> <span class="st">&quot;cms_mean&quot;</span>, 
+                   <span class="dt">colour =</span> celltype), 
+               cluster_mean_cms, <span class="dt">linetype=</span><span class="dv">2</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> cols) </code></pre></div>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/cms%20histogram-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="celltype-specificity" class="section level2">
+<h2>Celltype specificity</h2>
+<div id="celltype-abundance" class="section level3">
+<h3>Celltype abundance</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">meta_tib &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">colData</span>(sce)) %&gt;%<span class="st"> </span><span class="kw">group_by_at</span>(<span class="kw">c</span>(batch, celltype)) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">n =</span> <span class="kw">n</span>()) %&gt;%<span class="st"> </span>dplyr::<span class="kw">mutate</span>(<span class="dt">cell_freq =</span> n /<span class="st"> </span><span class="kw">sum</span>(n))
+
+plot_abundance &lt;-<span class="st"> </span>function(cluster_var, tib, x_var){
+  meta_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">eval</span>(tib))
+  p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data=</span>meta_df, <span class="kw">aes_string</span>(<span class="dt">x=</span>x_var, <span class="dt">y=</span><span class="st">&quot;cell_freq&quot;</span>, <span class="dt">fill =</span> cluster_var)) +
+<span class="st">    </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>) +<span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span>cols, <span class="dt">name =</span> <span class="st">&quot;celltype&quot;</span>)
+  p +<span class="st"> </span><span class="kw">coord_flip</span>() +<span class="st"> </span><span class="kw">theme_minimal</span>() 
+}
+
+<span class="kw">plot_abundance</span>(<span class="dt">cluster_var =</span> celltype, <span class="dt">tib =</span> meta_tib, <span class="dt">x_var =</span> batch)</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/celltype%20abundance-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summarize diff abundance</span>
+mean_rel_abund_diff &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(abund))
+min_rel_abund_diff &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(abund))
+max_rel_abund_diff &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">unlist</span>(abund))</code></pre></div>
+</div>
+<div id="batch-and-celltype-specific-count-distributions" class="section level3">
+<h3>Batch and celltype specific count distributions</h3>
+<p>Do the overall count distribution vary between batches? Are count distributions celltype depended</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#batch level</span>
+bids &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[, batch]))
+<span class="kw">names</span>(bids) &lt;-<span class="st"> </span>bids
+cids &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[, celltype]))
+<span class="kw">names</span>(cids) &lt;-<span class="st"> </span>cids
+
+<span class="co">#mean gene expression by batch and cluster</span>
+mean_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(bids, function(batch_var){
+  mean_cluster &lt;-<span class="st"> </span><span class="kw">lapply</span>(cids, function(cluster_var){
+    counts_sc &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">logcounts</span>(
+      sce[, <span class="kw">colData</span>(sce)[, batch] %in%<span class="st"> </span>batch_var &amp;<span class="st"> </span>
+<span class="st">            </span><span class="kw">colData</span>(sce)[, celltype] %in%<span class="st"> </span>cluster_var]))
+  })
+  mean_c &lt;-<span class="st"> </span>mean_cluster %&gt;%<span class="st"> </span><span class="kw">map</span>(rowMeans) %&gt;%<span class="st"> </span>bind_rows %&gt;%
+<span class="st">    </span>dplyr::<span class="kw">mutate</span>(<span class="dt">gene=</span><span class="kw">rownames</span>(sce)) %&gt;%<span class="st"> </span>
+<span class="st">    </span><span class="kw">gather</span>(cluster, logcounts, cids)
+})</code></pre></div>
+<pre><code>## Note: Using an external vector in selections is ambiguous.
+## ℹ Use `all_of(cids)` instead of `cids` to silence this message.
+## ℹ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.
+## This message is displayed once per session.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id=</span> <span class="st">&quot;batch&quot;</span>)
+
+<span class="kw">ggplot</span>(mean_expr, <span class="kw">aes</span>(<span class="dt">x=</span>logcounts, <span class="dt">colour=</span>batch)) +<span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha=</span>.<span class="dv">3</span>) +
+<span class="st">  </span><span class="kw">theme_classic</span>() +
+<span class="st">  </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
+<span class="st">  </span><span class="kw">scale_colour_manual</span>(<span class="dt">values =</span> cols) +
+<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">limits =</span>  <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>))</code></pre></div>
+<pre><code>## Warning: Removed 3872 rows containing non-finite values (stat_density).</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/count%20distributions-1.png" width="960" /></p>
+</div>
+<div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
+<h3>Batch to batch comparisons of expression distributions</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#mean expression</span>
+mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;batch&quot;</span> ) %&gt;%<span class="st"> </span><span class="kw">spread</span>(batch, logcounts)
+batch_all &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[,batch]))
+batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;_&quot;</span>, batch_all)
+batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;_&quot;</span>, batch_all)
+batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;&quot;</span>, batch_all)
+<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="kw">colnames</span>(mean_expr))
+<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="kw">colnames</span>(mean_expr))
+<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">colnames</span>(mean_expr))
+
+
+<span class="kw">lapply</span>(batch_all, function(batch_var){
+  batch_var_2 &lt;-<span class="st"> </span>batch_all[-<span class="kw">which</span>(batch_all %in%<span class="st"> </span>batch_var)]
+  <span class="kw">lapply</span>(batch_var_2, function(batch_var_3){
+    <span class="kw">ggplot</span>(mean_expr, <span class="kw">aes_string</span>(<span class="dt">x=</span>batch_var, <span class="dt">y =</span> batch_var_3)) +
+<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> .<span class="dv">3</span>, <span class="kw">aes</span>(<span class="dt">color=</span>cluster)) +
+<span class="st">      </span><span class="kw">ggtitle</span>(batch_var) +<span class="st"> </span>
+<span class="st">      </span><span class="kw">geom_abline</span>(<span class="dt">slope =</span> <span class="dv">1</span>) +<span class="st"> </span>
+<span class="st">      </span><span class="kw">coord_fixed</span>() +
+<span class="st">      </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
+<span class="st">      </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span>cols) +
+<span class="st">      </span><span class="kw">theme_classic</span>()
+  })
+})</code></pre></div>
+<pre><code>## [[1]]
+## [[1]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-1.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-2.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-3.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-4.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-5.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-6.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-7.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-8.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-9.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-10.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-11.png" width="672" /></p>
+<pre><code>## 
+## [[1]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-12.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[2]]
+## [[2]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-13.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-14.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-15.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-16.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-17.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-18.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-19.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-20.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-21.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-22.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-23.png" width="672" /></p>
+<pre><code>## 
+## [[2]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-24.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[3]]
+## [[3]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-25.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-26.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-27.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-28.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-29.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-30.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-31.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-32.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-33.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-34.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-35.png" width="672" /></p>
+<pre><code>## 
+## [[3]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-36.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[4]]
+## [[4]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-37.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-38.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-39.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-40.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-41.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-42.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-43.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-44.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-45.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-46.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-47.png" width="672" /></p>
+<pre><code>## 
+## [[4]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-48.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[5]]
+## [[5]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-49.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-50.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-51.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-52.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-53.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-54.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-55.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-56.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-57.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-58.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-59.png" width="672" /></p>
+<pre><code>## 
+## [[5]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-60.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[6]]
+## [[6]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-61.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-62.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-63.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-64.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-65.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-66.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-67.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-68.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-69.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-70.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-71.png" width="672" /></p>
+<pre><code>## 
+## [[6]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-72.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[7]]
+## [[7]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-73.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-74.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-75.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-76.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-77.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-78.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-79.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-80.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-81.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-82.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-83.png" width="672" /></p>
+<pre><code>## 
+## [[7]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-84.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[8]]
+## [[8]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-85.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-86.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-87.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-88.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-89.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-90.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-91.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-92.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-93.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-94.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-95.png" width="672" /></p>
+<pre><code>## 
+## [[8]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-96.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[9]]
+## [[9]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-97.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-98.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-99.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-100.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-101.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-102.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-103.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-104.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-105.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-106.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-107.png" width="672" /></p>
+<pre><code>## 
+## [[9]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-108.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[10]]
+## [[10]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-109.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-110.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-111.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-112.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-113.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-114.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-115.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-116.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-117.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-118.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-119.png" width="672" /></p>
+<pre><code>## 
+## [[10]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-120.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[11]]
+## [[11]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-121.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-122.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-123.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-124.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-125.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-126.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-127.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-128.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-129.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-130.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-131.png" width="672" /></p>
+<pre><code>## 
+## [[11]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-132.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[12]]
+## [[12]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-133.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-134.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-135.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-136.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-137.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-138.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-139.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-140.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-141.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-142.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-143.png" width="672" /></p>
+<pre><code>## 
+## [[12]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-144.png" width="672" /></p>
+<pre><code>## 
+## 
+## [[13]]
+## [[13]][[1]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-145.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[2]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-146.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[3]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-147.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[4]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-148.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[5]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-149.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[6]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-150.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[7]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-151.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[8]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-152.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[9]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-153.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[10]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-154.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[11]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-155.png" width="672" /></p>
+<pre><code>## 
+## [[13]][[12]]</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/mean%20expression-156.png" width="672" /></p>
+</div>
+</div>
+<div id="differentially-expressed-genes" class="section level2">
+<h2>Differentially expressed genes</h2>
+<div id="upset-plot" class="section level3">
+<h3>Upset plot</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Upset plot\
+cont &lt;-<span class="st"> </span>param[[<span class="st">&quot;cont&quot;</span>]]
+cs &lt;-<span class="st"> </span><span class="kw">names</span>(cont)
+<span class="kw">names</span>(cs) &lt;-<span class="st"> </span>cs
+
+<span class="co"># Filter DEG by pvalue</span>
+FilterDEGs &lt;-<span class="st"> </span>function (<span class="dt">degDF =</span> df, <span class="dt">filter =</span> <span class="kw">c</span>(<span class="dt">FDR =</span> <span class="dv">5</span>)){
+  <span class="kw">rownames</span>(degDF) &lt;-<span class="st"> </span>degDF$gene
+  <span class="co">#pval &lt;- degDF[, grep(&quot;adj.P.Val$&quot;, colnames(degDF)), drop = FALSE]</span>
+  pval &lt;-<span class="st"> </span>degDF[, <span class="kw">grep</span>(<span class="st">&quot;PValue$&quot;</span>, <span class="kw">colnames</span>(degDF)), drop =<span class="st"> </span><span class="ot">FALSE</span>]
+  pf &lt;-<span class="st"> </span>pval &lt;=<span class="st"> </span>filter[<span class="st">&quot;FDR&quot;</span>]/<span class="dv">100</span>
+  pf[<span class="kw">is.na</span>(pf)] &lt;-<span class="st"> </span><span class="ot">FALSE</span>
+  DEGlistUPorDOWN &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="kw">colnames</span>(pf), function(x) <span class="kw">rownames</span>(pf[pf[, x, <span class="dt">drop =</span> <span class="ot">FALSE</span>], , <span class="dt">drop =</span> <span class="ot">FALSE</span>]), <span class="dt">simplify =</span> <span class="ot">FALSE</span>)
+}
+
+result &lt;-<span class="st"> </span><span class="kw">list</span>()
+m2 &lt;-<span class="st"> </span><span class="kw">list</span>()
+
+for(jj in <span class="dv">1</span>:<span class="kw">length</span>(cs)){
+  result[[jj]] &lt;-<span class="st"> </span><span class="kw">sapply</span>(res_de[[<span class="dv">1</span>]][[<span class="kw">names</span>(cs)[jj]]], function(x) <span class="kw">FilterDEGs</span>(x))
+  <span class="kw">names</span>(result[[jj]]) &lt;-<span class="st"> </span>cids
+  m2[[jj]] =<span class="st"> </span><span class="kw">make_comb_mat</span>(result[[jj]], <span class="dt">mode =</span> <span class="st">&quot;intersect&quot;</span>)
+}
+
+<span class="kw">names</span>(result) &lt;-<span class="st"> </span><span class="kw">names</span>(cs)
+<span class="kw">names</span>(m2) &lt;-<span class="st"> </span><span class="kw">names</span>(cs)
+
+<span class="kw">lapply</span>(m2, function(x) <span class="kw">UpSet</span>(x))</code></pre></div>
+<pre><code>## $`Chromium-CELseq2`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-1.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-Dropseq`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-2.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-SMARTseq2`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-3.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-C1HT-medium`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-4.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-C1HT-small`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-5.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-Chromium(sn)`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-6.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-ddSEQ`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-7.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-ICELL8`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-8.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-inDrop`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-9.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-MARS-Seq`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-10.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-mcSCRB-Seq`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-11.png" width="672" /></p>
+<pre><code>## 
+## $`Chromium-Quartz-Seq2`</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/de%20res-12.png" width="672" /></p>
+</div>
+<div id="logfold_change-and-gsea" class="section level3">
+<h3>Logfold_change and GSEA</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
+res &lt;-<span class="st"> </span>res_de[[<span class="st">&quot;table&quot;</span>]]
+<span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
+n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$adj.PValue &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(<span class="kw">abs</span>(x$logFC) &gt;<span class="st"> </span><span class="dv">1</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+mean_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
+
+<span class="co"># plot DE for all comparison and check gene sets</span>
+<span class="co">#get geneset</span>
+gs &lt;-<span class="st"> </span><span class="kw">read_delim</span>(params$gs, <span class="dt">delim =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">col_names =</span> <span class="st">&quot;cat&quot;</span>)</code></pre></div>
+<pre><code>## Parsed with column specification:
+## cols(
+##   cat = col_character()
+## )</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cats &lt;-<span class="st"> </span><span class="kw">sapply</span>(gs$cat, function(u) <span class="kw">strsplit</span>(u, <span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>)[[<span class="dv">1</span>]][-<span class="dv">2</span>], 
+               <span class="dt">USE.NAMES =</span> <span class="ot">FALSE</span>)
+<span class="kw">names</span>(cats) &lt;-<span class="st"> </span><span class="kw">sapply</span>(cats, .subset, <span class="dv">1</span>)
+cats &lt;-<span class="st"> </span><span class="kw">lapply</span>(cats, function(u) u[-<span class="dv">1</span>])
+
+plotDE &lt;-<span class="st"> </span>function(cont_var){
+  <span class="co">#res_s &lt;- res[[cont_var]] %&gt;% map(filter, adj.P.Val &lt; .05) %&gt;% map(filter, abs(logFC) &gt; 1)</span>
+  res_s &lt;-<span class="st"> </span>res[[cont_var]] %&gt;%<span class="st"> </span><span class="kw">map</span>(dplyr::filter, PValue &lt;<span class="st"> </span>.<span class="dv">05</span>) %&gt;%<span class="st"> </span><span class="kw">map</span>(dplyr::filter, <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>)
+  
+  <span class="co">#plot</span>
+  <span class="kw">lapply</span>(<span class="kw">names</span>(res[[cont_var]]), function(ct){
+    ct_de &lt;-<span class="st"> </span>res[[cont_var]][[ct]]
+    ct_de$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, ct_de$gene)
+    res_s[[ct]]$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, res_s[[ct]]$gene)
+    
+    <span class="co">#p &lt;- ggplot(ct_de, aes(x = AveExpr, y = logFC, colour = abs(logFC) &gt; 1, label = gene)) + </span>
+    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> logCPM, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
+<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> .<span class="dv">5</span>) +
+<span class="st">      </span><span class="kw">geom_label_repel</span>(<span class="dt">data =</span> res_s[[ct]]) +
+<span class="st">      </span><span class="kw">ggtitle</span>(<span class="kw">paste0</span>(ct,<span class="st">&quot;: &quot;</span>, cont_var)) +
+<span class="st">      </span><span class="kw">theme_classic</span>()
+    <span class="kw">print</span>(p)
+    
+    <span class="kw">cat</span>(<span class="st">&quot;Cluster:&quot;</span>, ct, <span class="st">&quot;Contrast:&quot;</span>, cont_var, 
+        <span class="st">&quot;Num genes:&quot;</span>, <span class="kw">nrow</span>(ct_de), <span class="st">&quot;Num DE:&quot;</span>, <span class="kw">nrow</span>(res_s[[ct]]), <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span> )
+
+    <span class="co"># run &#39;camera&#39; for this comparison</span>
+    inds &lt;-<span class="st"> </span><span class="kw">ids2indices</span>(cats, ct_de$gene)
+    <span class="co">#cm &lt;- cameraPR(ct_de$t, inds) #LR</span>
+    cm &lt;-<span class="st"> </span><span class="kw">cameraPR</span>(ct_de$F, inds)
+    <span class="kw">print</span>(cm %&gt;%<span class="st"> </span><span class="kw">rownames_to_column</span>(<span class="st">&quot;category&quot;</span>) %&gt;%<span class="st"> </span>
+<span class="st">      </span><span class="kw">filter</span>(FDR &lt;<span class="st"> </span>.<span class="dv">05</span> &amp;<span class="st"> </span>NGenes &gt;=<span class="st"> </span><span class="dv">5</span>) %&gt;%<span class="st"> </span><span class="kw">head</span>(<span class="dv">8</span>))
+  })
+}
+
+if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<span class="st"> </span><span class="dv">3</span> ){
+    pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)
+}</code></pre></div>
+<p>Summarize differential expression analysis</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
+<span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
+n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(x$PValue &lt;<span class="st"> </span><span class="fl">0.05</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+n_de_cl &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">nrow</span>(x), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+mean_n_de &lt;-<span class="st"> </span><span class="kw">lapply</span>(n_de, function(x) <span class="kw">mean</span>(x))
+mean_mean_n_de &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(mean_n_de))/n_genes
+min_mean_n_de &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(mean_n_de))/n_genes
+max_mean_n_de &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">unlist</span>(mean_n_de))/n_genes
+
+<span class="co"># Genes with lfc &gt; 1</span>
+n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x) <span class="kw">sum</span>(<span class="kw">abs</span>(x$logFC) &gt;<span class="st"> </span><span class="dv">1</span>), <span class="kw">numeric</span>(<span class="dv">1</span>)))
+mean_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
+min_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
+max_n_genes_lfc1 &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">unlist</span>(n_genes_lfc1))/n_genes
+
+<span class="co"># DE genes overlap between celltypes (celltype specific de genes)</span>
+<span class="co"># Genes are &quot;overlapping&quot; if they are present in all clusters with at least 10% of all cells</span>
+de_overlap &lt;-<span class="st"> </span><span class="kw">lapply</span>(result, function(x){
+  result2 &lt;-<span class="st"> </span>x[<span class="kw">table</span>(<span class="kw">colData</span>(sce)[, celltype]) &gt;<span class="st"> </span><span class="kw">ncol</span>(sce) *<span class="st"> </span><span class="fl">0.1</span>]
+  de_overlap &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">Reduce</span>(intersect, result2))
+  de_overlap
+})
+
+mean_de_overlap &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(de_overlap))/n_genes
+min_de_overlap &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">unlist</span>(de_overlap))/n_genes
+max_de_overlap &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">unlist</span>(de_overlap))/n_genes
+
+<span class="co">#Genes unique to single celltypes</span>
+unique_genes_matrix &lt;-<span class="st"> </span><span class="ot">NULL</span>
+unique_genes &lt;-<span class="st"> </span><span class="ot">NULL</span>
+cb &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">names</span>(result[[<span class="dv">1</span>]]))
+unique_genes &lt;-<span class="st"> </span><span class="kw">lapply</span>(result,function(x){
+  for( i in <span class="dv">1</span>:cb ){
+    unique_genes[i] &lt;-<span class="kw">as.numeric</span>(<span class="kw">length</span>(<span class="kw">setdiff</span>(<span class="kw">unlist</span>(x[i]),<span class="kw">unlist</span>(x[-i]))))
+  }
+  unique_genes_matrix &lt;-<span class="st"> </span><span class="kw">cbind</span>(unique_genes_matrix, unique_genes)
+  unique_genes_matrix
+})
+
+unique_genes &lt;-<span class="st"> </span><span class="kw">Reduce</span>(<span class="st">&#39;cbind&#39;</span>, unique_genes)
+<span class="kw">colnames</span>(unique_genes) &lt;-<span class="st"> </span><span class="kw">names</span>(result)
+<span class="kw">rownames</span>(unique_genes) &lt;-<span class="st"> </span><span class="kw">names</span>(result[[<span class="dv">1</span>]])
+
+<span class="co"># Relative cluster specificity (unique/overlapping)</span>
+rel_spec1 &lt;-<span class="st"> </span><span class="ot">NULL</span>
+for( i in <span class="dv">1</span>:<span class="kw">dim</span>(unique_genes)[<span class="dv">2</span>] ){
+  rel_spec &lt;-<span class="st"> </span>unique_genes[,i]/de_overlap[[i]]
+  rel_spec1 &lt;-<span class="st"> </span><span class="kw">cbind</span>(rel_spec1,rel_spec)
+}
+
+mean_rel_spec &lt;-<span class="st"> </span><span class="kw">mean</span>(rel_spec1)
+min_rel_spec &lt;-<span class="st"> </span><span class="kw">min</span>(rel_spec1)
+max_rel_spec &lt;-<span class="st"> </span><span class="kw">max</span>(rel_spec1)</code></pre></div>
+</div>
+<div id="celltype-specific-de-distributions" class="section level3">
+<h3>Celltype specific DE distributions</h3>
+<p>How similar is the batch effect between celltypes. Do we have similar logFC distributions or different?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">combine_folds &lt;-<span class="st"> </span>function(cont_var){
+  <span class="co">#extract the contrast of interest and change log2fold colums names to be unique</span>
+  B &lt;-<span class="st"> </span>res[[cont_var]] 
+  new_name &lt;-<span class="st"> </span>function(p){
+    <span class="kw">colnames</span>(B[[p]])[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;logFC_&quot;</span>, p)
+    <span class="kw">return</span>(B[[p]][,<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)])
+    }
+  B_new_names &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(B),new_name)
+  <span class="kw">names</span>(B_new_names) &lt;-<span class="st"> </span><span class="kw">names</span>(B)
+  <span class="co">#combine log2fold colums</span>
+  Folds &lt;-<span class="st"> </span><span class="kw">Reduce</span>(function(...){<span class="kw">inner_join</span>(..., <span class="dt">by=</span><span class="st">&quot;gene&quot;</span>)}, B_new_names)
+}
+
+all_folds &lt;-<span class="st"> </span><span class="kw">lapply</span>(cs, combine_folds)
+
+<span class="co">#define pannels for pairs() function</span>
+panel.cor &lt;-<span class="st"> </span>function(x, y, <span class="dt">digits =</span> <span class="dv">2</span>, cex.cor){
+  usr &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="st">&quot;usr&quot;</span>); <span class="kw">on.exit</span>(<span class="kw">par</span>(usr))
+  <span class="kw">par</span>(<span class="dt">usr =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>))
+  r &lt;-<span class="st"> </span><span class="kw">abs</span>(<span class="kw">cor</span>(x, y))
+  txt &lt;-<span class="st"> </span><span class="kw">format</span>(<span class="kw">c</span>(r, <span class="fl">0.123456789</span>), <span class="dt">digits=</span>digits)[<span class="dv">1</span>]
+  test &lt;-<span class="st"> </span><span class="kw">cor.test</span>(x,y)
+  Signif &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">round</span>(test$p.value, <span class="dv">3</span>) &lt;<span class="st"> </span><span class="fl">0.001</span>,
+                   <span class="st">&quot;p&lt;0.001&quot;</span>,
+                   <span class="kw">paste</span>(<span class="st">&quot;p=&quot;</span>,<span class="kw">round</span>(test$p.value,<span class="dv">3</span>)))  
+  <span class="kw">text</span>(<span class="fl">0.5</span>, <span class="fl">0.25</span>, <span class="kw">paste</span>(<span class="st">&quot;r=&quot;</span>,txt), <span class="dt">cex =</span> <span class="dv">3</span>)
+  <span class="kw">text</span>(.<span class="dv">5</span>, .<span class="dv">75</span>, Signif, <span class="dt">cex =</span> <span class="dv">3</span>)
+}
+
+panel.smooth &lt;-<span class="st"> </span>function (x, y, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">bg =</span> <span class="ot">NA</span>, <span class="dt">pch =</span> <span class="dv">18</span>, <span class="dt">cex =</span> <span class="fl">1.5</span>, 
+                          <span class="dt">col.smooth =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">span =</span> <span class="dv">2</span>/<span class="dv">3</span>, <span class="dt">iter =</span> <span class="dv">3</span>, ...){
+  <span class="kw">points</span>(x, y, <span class="dt">pch =</span> pch, <span class="dt">col =</span> col, <span class="dt">bg =</span> bg, <span class="dt">cex =</span> cex)
+  ok &lt;-<span class="st"> </span><span class="kw">is.finite</span>(x) &amp;<span class="st"> </span><span class="kw">is.finite</span>(y)
+  if( <span class="kw">any</span>(ok) ) 
+    <span class="kw">lines</span>(stats::<span class="kw">lowess</span>(x[ok], y[ok], <span class="dt">f =</span> span, <span class="dt">iter =</span> iter), 
+          <span class="dt">col =</span> col.smooth, ...)
+}
+
+panel.hist &lt;-<span class="st"> </span>function(x, ...){
+  usr &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="st">&quot;usr&quot;</span>); <span class="kw">on.exit</span>(<span class="kw">par</span>(usr))
+  <span class="kw">par</span>(<span class="dt">usr =</span> <span class="kw">c</span>(usr[<span class="dv">1</span>:<span class="dv">2</span>], <span class="dv">0</span>, <span class="fl">1.5</span>) )
+  h &lt;-<span class="st"> </span><span class="kw">hist</span>(x, <span class="dt">plot =</span> <span class="ot">FALSE</span>)
+  breaks &lt;-<span class="st"> </span>h$breaks
+  nB &lt;-<span class="st"> </span><span class="kw">length</span>(breaks)
+  y &lt;-<span class="st"> </span>h$counts
+  y &lt;-<span class="st"> </span>y/<span class="kw">max</span>(y)
+  <span class="kw">rect</span>(breaks[-nB], <span class="dv">0</span>, breaks[-<span class="dv">1</span>], y, <span class="dt">col=</span><span class="st">&quot;cyan&quot;</span>, ...)
+}
+<span class="co">#plot correlations</span>
+<span class="kw">lapply</span>(<span class="kw">names</span>(all_folds), function(x) <span class="kw">pairs</span>(all_folds[[x]][,-<span class="dv">1</span>],
+                                           <span class="dt">lower.panel =</span> panel.smooth, 
+                                           <span class="dt">upper.panel =</span> panel.cor, 
+                                           <span class="dt">diag.panel =</span> panel.hist, <span class="dt">main =</span> x))</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-1.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-2.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-3.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-4.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-5.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-6.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-7.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-8.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-9.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-10.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-11.png" width="1920" /><img src="batch_effect_hca_files/figure-html/ct%20de%20dist%20-12.png" width="1920" /></p>
+<pre><code>## [[1]]
+## NULL
+## 
+## [[2]]
+## NULL
+## 
+## [[3]]
+## NULL
+## 
+## [[4]]
+## NULL
+## 
+## [[5]]
+## NULL
+## 
+## [[6]]
+## NULL
+## 
+## [[7]]
+## NULL
+## 
+## [[8]]
+## NULL
+## 
+## [[9]]
+## NULL
+## 
+## [[10]]
+## NULL
+## 
+## [[11]]
+## NULL
+## 
+## [[12]]
+## NULL</code></pre>
+</div>
+</div>
+<div id="batch-categorization" class="section level2 tabset tabset-pills">
+<h2>Batch categorization</h2>
+<p>How does the batch effect manifest? Can we describe it by “simple” mean shifts of expression levels for some genes for all the cells in a given celltype and batch? Can we “remove” the batch effcet using a linear model with batch, batch and celltype or batch and celltype interacting?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Visualize different models</span>
+vis_type &lt;-<span class="st"> </span>function(dim_red){
+  g &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> dim_red) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;unadjusted&quot;</span>)
+  g1 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj1&quot;</span>)) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;constant batch effect&quot;</span>)
+  g2 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj2&quot;</span>)) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;constant batch effect, different ct composition&quot;</span>)
+  g3 &lt;-<span class="st"> </span><span class="kw">visGroup</span>(sce, batch, <span class="dt">dim_red =</span> <span class="kw">paste0</span>(dim_red, <span class="st">&quot;_Xadj3&quot;</span>)) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;celltype and batch effect interact&quot;</span>)
+  <span class="kw">do.call</span>(<span class="st">&quot;grid.arrange&quot;</span>, <span class="kw">c</span>(<span class="kw">list</span>(g, g1, g2, g3), <span class="dt">ncol =</span> <span class="dv">2</span>))
+}</code></pre></div>
+<div id="pca" class="section level3">
+<h3>PCA</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_type</span>(<span class="st">&quot;PCA&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/batchtype%20pca-1.png" width="672" /></p>
+</div>
+<div id="umap" class="section level3">
+<h3>UMAP</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vis_type</span>(<span class="st">&quot;UMAP&quot;</span>)</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/batchtype%20umap-1.png" width="672" /></p>
+</div>
+<div id="cellspecific-mixing-score-1" class="section level3">
+<h3>Cellspecific Mixing Score</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># #Cellspecific Mixing score (Batch effect strength after &quot;removal&quot;)</span>
+<span class="kw">visHist</span>(sce, <span class="dt">metric =</span> <span class="kw">c</span>(<span class="st">&quot;cms&quot;</span>, <span class="st">&quot;cms.Xadj1&quot;</span>, <span class="st">&quot;cms.Xadj2&quot;</span>, <span class="st">&quot;cms.Xadj3&quot;</span>), <span class="dt">prefix =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="batch_effect_hca_files/figure-html/batchtype%20cms-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">visIntegration</span>(sce, <span class="dt">metric =</span> <span class="st">&quot;cms&quot;</span>, <span class="dt">metric_name =</span> <span class="st">&quot;cms&quot;</span>)</code></pre></div>
+<pre><code>## Picking joint bandwidth of 0.00319</code></pre>
+<p><img src="batch_effect_hca_files/figure-html/batchtype%20cms-2.png" width="672" /></p>
+</div>
+</div>
+<div id="simulation-parameter" class="section level2">
+<h2>Simulation parameter</h2>
+<p>Extract parameter to use as input into simualation</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#percentage of batch affected genes</span>
+cond &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-.*&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">names</span>(n_de))
+cond &lt;-<span class="st"> </span><span class="kw">c</span>(cond, <span class="kw">unique</span>(<span class="kw">gsub</span>(<span class="st">&quot;.*-&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">names</span>(n_de))))
+cond &lt;-<span class="st"> </span><span class="kw">unique</span>(cond)
+de_be_tab &lt;-<span class="st"> </span>n_de %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
+de_cl_tab &lt;-<span class="st"> </span>n_de_cl %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
+
+de_be &lt;-<span class="st"> </span>cond %&gt;%<span class="st"> </span><span class="kw">map</span>(function(x){
+  de_tab &lt;-<span class="st"> </span>de_be_tab[, <span class="kw">grep</span>(x, <span class="kw">colnames</span>(de_be_tab))]
+  de_be &lt;-<span class="st"> </span><span class="kw">rowMeans</span>(de_tab)
+}) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>() %&gt;%<span class="st"> </span><span class="kw">set_colnames</span>(cond)
+
+n_cl &lt;-<span class="st"> </span>cond %&gt;%<span class="st"> </span><span class="kw">map</span>(function(x){
+  cl_tab &lt;-<span class="st"> </span>de_cl_tab[, <span class="kw">grep</span>(x, <span class="kw">colnames</span>(de_cl_tab))]
+  de_cl &lt;-<span class="st"> </span><span class="kw">rowMeans</span>(cl_tab)
+}) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>() %&gt;%<span class="st"> </span><span class="kw">set_colnames</span>(cond)
+
+
+p_be &lt;-<span class="st"> </span>de_be/n_cl
+mean_p_be &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">colMeans</span>(p_be))
+min_p_be &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">colMins</span>(<span class="kw">as.matrix</span>(p_be)))
+max_p_be &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">colMaxs</span>(<span class="kw">as.matrix</span>(p_be)))
+sd_p_be &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">colSds</span>(<span class="kw">as.matrix</span>(p_be)))
+if(<span class="kw">is.na</span>(sd_p_be)){ sd_p_be &lt;-<span class="st"> </span><span class="dv">0</span> }
+
+
+#### Percentage of celltype specific genes &quot;p_ct&quot;
+n_de_unique &lt;-<span class="st"> </span><span class="kw">lapply</span>(result,function(x){
+  de_genes &lt;-<span class="st"> </span><span class="kw">unlist</span>(x) %&gt;%<span class="st"> </span><span class="kw">unique</span>() %&gt;%<span class="st"> </span><span class="kw">length</span>()
+  de_genes &lt;-<span class="st"> </span>de_genes/<span class="kw">length</span>(x)
+}) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
+
+
+rel_spec2 &lt;-<span class="st"> </span><span class="ot">NULL</span>
+for(i in <span class="dv">1</span>:<span class="kw">length</span>(de_overlap)){
+  rel_spec &lt;-<span class="st"> </span>de_overlap[[i]]/<span class="kw">mean</span>(n_de[[i]][<span class="kw">table</span>(<span class="kw">colData</span>(sce)[, celltype]) &gt;<span class="st"> </span><span class="kw">dim</span>(expr)[<span class="dv">2</span>] *<span class="st"> </span><span class="fl">0.1</span>])
+  rel_spec2 &lt;-<span class="st"> </span><span class="kw">cbind</span>(rel_spec2, rel_spec)
+}
+
+mean_p_ct &lt;-<span class="st"> </span><span class="dv">1</span> -<span class="st"> </span><span class="kw">mean</span>(rel_spec2)
+max_p_ct &lt;-<span class="st"> </span><span class="dv">1</span> -<span class="st"> </span><span class="kw">min</span>(rel_spec2)
+min_p_ct &lt;-<span class="st"> </span><span class="dv">1</span> -<span class="st"> </span><span class="kw">max</span>(rel_spec2)
+sd_p_ct &lt;-<span class="st"> </span><span class="kw">sd</span>(rel_spec2)
+if(<span class="kw">is.na</span>(sd_p_ct)){ sd_p_ct &lt;-<span class="st"> </span><span class="dv">0</span> }
+
+<span class="co"># Logfold change</span>
+<span class="co">#logFoldchange batch effect distribution</span>
+mean_lfc_cl &lt;-<span class="st"> </span><span class="kw">lapply</span>(res, function(y) <span class="kw">vapply</span>(y, function(x){
+  <span class="co">#de_genes &lt;- which(x$adj.P.Val &lt; 0.05)</span>
+  de_genes &lt;-<span class="st"> </span><span class="kw">which</span>(x$adj.PValue &lt;<span class="st"> </span><span class="fl">0.05</span>)
+  mean_de &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">abs</span>(x[, <span class="st">&quot;logFC&quot;</span>]))}
+  , <span class="kw">numeric</span>(<span class="dv">1</span>))) %&gt;%<span class="st"> </span><span class="kw">bind_cols</span>()
+
+mean_lfc_be &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">colMeans</span>(mean_lfc_cl, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+min_lfc_be &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">colMins</span>(<span class="kw">as.matrix</span>(mean_lfc_cl), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+max_lfc_be &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">colMaxs</span>(<span class="kw">as.matrix</span>(mean_lfc_cl), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</code></pre></div>
+</div>
+<div id="summarize-batch-effect" class="section level2">
+<h2>Summarize batch effect</h2>
+<ul>
+<li>Batch size</li>
+<li>Celltype specificity</li>
+<li>“Batch genes”</li>
+<li>batch type</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Size? How much of the variance can be attributed to the batch effect?</span>
+size &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;batch_genes_1per&quot;</span> =<span class="st"> </span>n_batch_gene,       <span class="co"># 1.variance partition</span>
+                   <span class="st">&quot;batch_genes_10per&quot;</span> =<span class="st"> </span>n_batch_gene10,
+                   <span class="st">&quot;celltype_gene_1per&quot;</span> =<span class="st"> </span>n_celltype_gene,
+                   <span class="st">&quot;relative_batch_celltype&quot;</span> =<span class="st"> </span>n_rel,
+                   <span class="st">&quot;mean_var_batch&quot;</span> =<span class="st"> </span>m_batch,
+                   <span class="st">&quot;mean_var_celltype&quot;</span> =<span class="st"> </span>m_celltype,
+                   <span class="st">&quot;rel_mean_ct_batch&quot;</span> =<span class="st"> </span>m_rel,
+                   <span class="st">&quot;mean_cms&quot;</span> =<span class="st"> </span>mean_cms,                    <span class="co">#2.cms</span>
+                   <span class="st">&quot;n_cells_cms_0.01&quot;</span> =<span class="st"> </span>n_cms_0<span class="fl">.01</span>,
+                   <span class="st">&quot;mean_mean_n_de_genes&quot;</span> =<span class="st"> </span>mean_mean_n_de,  <span class="co">#3.de genes</span>
+                   <span class="st">&quot;max_mean_n_de_genes&quot;</span> =<span class="st"> </span>max_mean_n_de,
+                   <span class="st">&quot;min_mean_n_de_genes&quot;</span> =<span class="st"> </span>min_mean_n_de,
+                   <span class="st">&quot;mean_n_genes_lfc1&quot;</span> =<span class="st"> </span>mean_n_genes_lfc1,
+                   <span class="st">&quot;min_n_genes_lfc1&quot;</span> =<span class="st"> </span>min_n_genes_lfc1,
+                   <span class="st">&quot;max_n_genes_lfc1&quot;</span> =<span class="st"> </span>max_n_genes_lfc1,
+                   <span class="st">&quot;n_cells_total&quot;</span> =<span class="st"> </span><span class="kw">ncol</span>(sce),              <span class="co">#4.general</span>
+                   <span class="st">&quot;n_genes_total&quot;</span> =<span class="st"> </span><span class="kw">nrow</span>(sce))
+
+
+<span class="co">#Celltype-specificity? How celltype/cluster specific are batch effects? </span>
+<span class="co"># Differences in size, distribution or abundance? Do we find correlations between lfcs,</span>
+<span class="co"># overlap in de genes, pathways? Interaction between ct and be?</span>
+celltype &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&#39;mean_rel_abund_diff&#39;</span> =<span class="st"> </span>mean_rel_abund_diff, <span class="co">#1.abundance</span>
+                       <span class="st">&#39;min_rel_abund_diff&#39;</span> =<span class="st"> </span>min_rel_abund_diff,
+                       <span class="st">&#39;max_rel_abund_diff&#39;</span> =<span class="st"> </span>max_rel_abund_diff,
+                       <span class="st">&quot;celltype_var_cms&quot;</span> =<span class="st"> </span>var_cms,                 <span class="co">#2.size/strength</span>
+                       <span class="st">&quot;mean_de_overlap&quot;</span> =<span class="st"> </span>mean_de_overlap,
+                       <span class="st">&quot;min_de_overlap&quot;</span> =<span class="st"> </span>min_de_overlap,
+                       <span class="st">&quot;max_de_overlap&quot;</span> =<span class="st"> </span>max_de_overlap,
+                       <span class="st">&quot;mean_rel_cluster_spec&quot;</span>=<span class="st"> </span>mean_rel_spec,
+                       <span class="st">&quot;min_rel_cluster_spec&quot;</span>=<span class="st"> </span>min_rel_spec,
+                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec)
+
+
+sim &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;mean_p_be&quot;</span> =<span class="st"> </span>mean_p_be,
+                  <span class="st">&quot;max_p_be&quot;</span> =<span class="st"> </span>max_p_be,
+                  <span class="st">&quot;min_p_be&quot;</span> =<span class="st"> </span>min_p_be,
+                  <span class="st">&quot;sd_p_be&quot;</span> =<span class="st"> </span>sd_p_be,
+                  <span class="st">&quot;mean_lfc_be&quot;</span> =<span class="st"> </span>mean_lfc_be,
+                  <span class="st">&quot;min_lfc_be&quot;</span> =<span class="st"> </span>min_lfc_be,
+                  <span class="st">&quot;max_lfc_be&quot;</span> =<span class="st"> </span>max_lfc_be,
+                  <span class="st">&quot;mean_p_ct&quot;</span>=<span class="st"> </span>mean_p_ct,
+                  <span class="st">&quot;min_p_ct&quot;</span>=<span class="st"> </span>min_p_ct,
+                  <span class="st">&quot;max_p_ct&quot;</span>=<span class="st"> </span>max_p_ct,
+                  <span class="st">&quot;sd_p_ct&quot;</span> =<span class="st"> </span>sd_p_ct)
+
+
+summary &lt;-<span class="st"> </span><span class="kw">cbind</span>(size, celltype, sim) %&gt;%<span class="st"> </span><span class="kw">set_rownames</span>(dataset_name)
+
+### -------------- save summary object ----------------------###
+<span class="kw">saveRDS</span>(summary, <span class="dt">file =</span> outputfile)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()</code></pre></div>
+<pre><code>## R version 3.6.1 (2019-07-05)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 16.04.6 LTS
+## 
+## Matrix products: default
+## BLAS:   /home/aluetg/R/lib/R/lib/libRblas.so
+## LAPACK: /home/aluetg/R/lib/R/lib/libRlapack.so
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
+##  [8] datasets  methods   base     
+## 
+## other attached packages:
+##  [1] readr_1.3.1                 ggrepel_0.8.2              
+##  [3] CAMERA_1.42.0               xcms_3.8.2                 
+##  [5] MSnbase_2.12.0              ProtGenerics_1.18.0        
+##  [7] mzR_2.20.0                  Rcpp_1.0.3                 
+##  [9] cowplot_1.0.0               scran_1.14.6               
+## [11] gridExtra_2.3               ComplexHeatmap_2.2.0       
+## [13] stringr_1.4.0               dplyr_0.8.5                
+## [15] tidyr_1.0.2                 here_0.1                   
+## [17] jcolors_0.0.4               purrr_0.3.3                
+## [19] variancePartition_1.16.1    scales_1.1.0               
+## [21] foreach_1.4.8               limma_3.42.2               
+## [23] CellMixS_1.2.4              kSamples_1.2-9             
+## [25] SuppDists_1.1-9.5           scater_1.14.6              
+## [27] ggplot2_3.3.0               CellBench_1.2.0            
+## [29] tibble_2.1.3                magrittr_1.5               
+## [31] SingleCellExperiment_1.8.0  SummarizedExperiment_1.16.1
+## [33] DelayedArray_0.12.2         BiocParallel_1.20.1        
+## [35] matrixStats_0.55.0          Biobase_2.46.0             
+## [37] GenomicRanges_1.38.0        GenomeInfoDb_1.22.0        
+## [39] IRanges_2.20.2              S4Vectors_0.24.3           
+## [41] BiocGenerics_0.32.0        
+## 
+## loaded via a namespace (and not attached):
+##   [1] tidyselect_1.0.0         lme4_1.1-21              RSQLite_2.2.0           
+##   [4] htmlwidgets_1.5.1        munsell_0.5.0            codetools_0.2-16        
+##   [7] preprocessCore_1.48.0    statmod_1.4.34           withr_2.1.2             
+##  [10] colorspace_1.4-1         knitr_1.28               rstudioapi_0.11         
+##  [13] robustbase_0.93-5        mzID_1.24.0              labeling_0.3            
+##  [16] GenomeInfoDbData_1.2.2   farver_2.0.3             bit64_0.9-7             
+##  [19] rprojroot_1.3-2          vctrs_0.2.4              xfun_0.12               
+##  [22] BiocFileCache_1.10.2     R6_2.4.1                 doParallel_1.0.15       
+##  [25] ggbeeswarm_0.6.0         clue_0.3-57              rsvd_1.0.3              
+##  [28] locfit_1.5-9.1           bitops_1.0-6             assertthat_0.2.1        
+##  [31] nnet_7.3-13              beeswarm_0.2.3           gtable_0.3.0            
+##  [34] affy_1.64.0              rlang_0.4.5              GlobalOptions_0.1.1     
+##  [37] splines_3.6.1            acepack_1.4.1            impute_1.60.0           
+##  [40] checkmate_2.0.0          BiocManager_1.30.10      yaml_2.2.1              
+##  [43] reshape2_1.4.3           backports_1.1.5          Hmisc_4.3-1             
+##  [46] MassSpecWavelet_1.52.0   RBGL_1.62.1              tools_3.6.1             
+##  [49] ellipsis_0.3.0           affyio_1.56.0            gplots_3.0.3            
+##  [52] RColorBrewer_1.1-2       ggridges_0.5.2           plyr_1.8.6              
+##  [55] base64enc_0.1-3          progress_1.2.2           zlibbioc_1.32.0         
+##  [58] RCurl_1.98-1.1           prettyunits_1.1.1        rpart_4.1-15            
+##  [61] GetoptLong_0.1.8         viridis_0.5.1            cluster_2.1.0           
+##  [64] colorRamps_2.3           data.table_1.12.8        circlize_0.4.8          
+##  [67] RANN_2.6.1               pcaMethods_1.78.0        packrat_0.5.0           
+##  [70] hms_0.5.3                evaluate_0.14            pbkrtest_0.4-8.6        
+##  [73] XML_3.99-0.3             jpeg_0.1-8.1             shape_1.4.4             
+##  [76] compiler_3.6.1           KernSmooth_2.23-16       ncdf4_1.17              
+##  [79] crayon_1.3.4             minqa_1.2.4              htmltools_0.4.0         
+##  [82] Formula_1.2-3            lubridate_1.7.4          DBI_1.1.0               
+##  [85] dbplyr_1.4.2             MASS_7.3-51.5            rappdirs_0.3.1          
+##  [88] boot_1.3-24              Matrix_1.2-18            cli_2.0.2               
+##  [91] vsn_3.54.0               gdata_2.18.0             igraph_1.2.4.2          
+##  [94] pkgconfig_2.0.3          foreign_0.8-76           MALDIquant_1.19.3       
+##  [97] vipor_0.4.5              dqrng_0.2.1              multtest_2.42.0         
+## [100] XVector_0.26.0           digest_0.6.25            graph_1.64.0            
+## [103] rmarkdown_2.1            htmlTable_1.13.3         edgeR_3.28.1            
+## [106] DelayedMatrixStats_1.8.0 listarrays_0.3.1         curl_4.3                
+## [109] gtools_3.8.1             rjson_0.2.20             nloptr_1.2.2.1          
+## [112] lifecycle_0.2.0          nlme_3.1-145             BiocNeighbors_1.4.2     
+## [115] fansi_0.4.1              viridisLite_0.3.0        pillar_1.4.3            
+## [118] lattice_0.20-40          httr_1.4.1               DEoptimR_1.0-8          
+## [121] survival_3.1-11          glue_1.3.1               png_0.1-7               
+## [124] iterators_1.0.12         bit_1.1-15.2             stringi_1.4.6           
+## [127] blob_1.2.1               BiocSingular_1.2.2       latticeExtra_0.6-29     
+## [130] caTools_1.18.0           memoise_1.1.0            irlba_2.3.3</code></pre>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

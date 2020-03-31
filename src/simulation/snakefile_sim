@@ -77,15 +77,15 @@ rule char_sim:
 
 rule countSimQC:
     input: 
-        sce_sim = config["out_sim_char"] + "{sample}/sim_{sample}_1__1_sce.rds",
-        sce_real = config["src_data"] + "{sample}.rds",
+        sce_sim = config["out_sim_char"] + "{sample_sim}/sim_{sample_sim}_1__1_sce.rds",
+        sce_real = config["src_data"] + "{sample_sim}.rds",
         script = config["src_sim"] + "run_countSimQC.R"
     params:
         out = config["docs"]
     output:
-        out = config["docs"] + "countSimQC_{sample}.html"
+        out = config["docs"] + "countSimQC_{sample_sim}.html"
     log:
-        config["log_sim_QC"] + "countSimQC_{sample}.Rout"
+        config["log_sim_QC"] + "countSimQC_{sample_sim}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args sce_sim='{input.sce_sim}' sce_real='{input.sce_real}' outputfile='{params.out}'" {input.script} {log}'''
 
@@ -96,12 +96,12 @@ rule countSimQC:
 
 rule change_params:
     input: 
-        param = config["out_set"] + "settings_{sample}.rds",
+        param = config["out_set"] + "settings_{sample_sim}.rds",
         script = config["src_data_mgt"] + "adjust_params_simdata.R"
     output:
-        out = config["out_adjust_params"] + "adjust_params_{sample}.rds"
+        out = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds"
     log:
-        config["log_adjust_params"] + "adjust_params_{sample}.Rout"
+        config["log_adjust_params"] + "adjust_params_{sample_sim}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
         
@@ -112,13 +112,13 @@ rule change_params:
 
 rule variance_part:
     input: 
-        data = config["out_sim_char"] + "{sample}/sim_{sample}_1__1_sce.rds",
-        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        data = config["out_sim_char"] + "{sample_sim}/sim_{sample_sim}_1__1_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds",
         script = config["src_analysis"] + "variance_part.R"
     output:
-        out = config["out_sim_vp"] + "vp_sim_{sample}_sce.rds"
+        out = config["out_sim_vp"] + "vp_sim_{sample_sim}_sce.rds"
     log:
-        config["log_sim_vp"] + "vp_sim_{sample}.Rout"
+        config["log_sim_vp"] + "vp_sim_{sample_sim}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
         
@@ -130,13 +130,13 @@ rule variance_part:
 
 rule abundance:
     input: 
-        data = config["out_sim_vp"] + "vp_sim_{sample}_sce.rds",
-        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        data = config["out_sim_vp"] + "vp_sim_{sample_sim}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds",
         script = config["src_analysis"] + "abundance.R"
     output:
-        out = config["out_sim_abund"] + "abundance_sim_{sample}.rds"
+        out = config["out_sim_abund"] + "abundance_sim_{sample_sim}.rds"
     log:
-        config["log_sim_abund"] + "abundance_sim_{sample}.Rout"
+        config["log_sim_abund"] + "abundance_sim_{sample_sim}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
 
@@ -148,14 +148,14 @@ rule abundance:
 
 rule de:
     input: 
-        data = config["out_sim_vp"] + "vp_sim_{sample}_sce.rds",
-        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        data = config["out_sim_vp"] + "vp_sim_{sample_sim}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds",
         script = config["src_analysis"] + "de.R"
     output:
-        out = config["out_sim_de"] + "de_sim_{sample}.rds",
-        out_sce = config["out_sim_de"] + "de_sim_{sample}_sce.rds"
+        out = config["out_sim_de"] + "de_sim_{sample_sim}.rds",
+        out_sce = config["out_sim_de"] + "de_sim_{sample_sim}_sce.rds"
     log:
-        config["log_sim_de"] + "de_sim_{sample}.Rout"
+        config["log_sim_de"] + "de_sim_{sample_sim}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}' outputsce='{output.out_sce}'" {input.script} {log}'''
         
@@ -167,13 +167,13 @@ rule de:
 
 rule batch_type:
     input: 
-        data = config["out_sim_de"] + "de_sim_{sample}_sce.rds",
-        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
+        data = config["out_sim_de"] + "de_sim_{sample_sim}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds",
         script = config["src_analysis"] + "batch_type.R"
     output:
-        out = config["out_sim_type"] + "type_sim_{sample}_sce.rds"
+        out = config["out_sim_type"] + "type_sim_{sample_sim}_sce.rds"
     log:
-        config["log_sim_type"] + "type_sim_{sample}.Rout"
+        config["log_sim_type"] + "type_sim_{sample_sim}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
     
@@ -185,15 +185,15 @@ rule batch_type:
 
 rule summarize_cms:
     input: 
-        data = config["out_sim_type"] + "type_sim_{sample}_sce.rds",
+        data = config["out_sim_type"] + "type_sim_{sample_sim}_sce.rds",
         script = config["src_sim"] + "summarise_cms.R",
-        sim = expand(config["out_sim_char"] + "{sample}/sim_{sample}_{sim_name}_sce.rds", sample = sample, sim_name = sim_name)
+        sim = expand(config["out_sim_char"] + "{sample_sim}/sim_{sample_sim}_{sim_name}_sce.rds", sample_sim = sample_sim, sim_name = sim_name)
     params:
         param = ",".join(sim_name),
     output:
-        out = config["out_sim_sumcms"] + "summarize_cms_sim_{sample}_sce.rds"
+        out = config["out_sim_sumcms"] + "summarize_cms_sim_{sample_sim}_sce.rds"
     log:
-        config["log_sim_sumcms"] + "summarize_cms_sim_{sample}.Rout"
+        config["log_sim_sumcms"] + "summarize_cms_sim_{sample_sim}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{params.param}' outputfile='{output.out}'" {input.script} {log}'''
         
@@ -224,17 +224,17 @@ rule vis_sim:
 
 rule summary_sim:
     input: 
-        data = config["out_sim_sumcms"] + "summarize_cms_sim_{sample}_sce.rds",
-        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
-        de = config["out_sim_de"] + "de_sim_{sample}.rds",
+        data = config["out_sim_sumcms"] + "summarize_cms_sim_{sample_sim}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds",
+        de = config["out_sim_de"] + "de_sim_{sample_sim}.rds",
         gs = config["src_data"] + "c5.mf.v6.2.symbols.gmt",
-        abund = config["out_sim_abund"] + "abundance_sim_{sample}.rds",
+        abund = config["out_sim_abund"] + "abundance_sim_{sample_sim}.rds",
         script = config["src_sim"] + "summary_simulation.Rmd"
     params:
         outdir = config["docs"]
     output:
-        out = config["docs"] + "simulation_{sample}.html",
-        out_file = config["out_sim_summary"] + "summary_sim_{sample}.rds"
+        out = config["docs"] + "simulation_{sample_sim}.html",
+        out_file = config["out_sim_summary"] + "summary_sim_{sample_sim}.rds"
     shell:
         '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', de ='{input.de}', gs = '{input.gs}', abund = '{input.abund}', out_file = '{output.out_file}'))"'''
         

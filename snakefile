@@ -18,6 +18,11 @@ logger.info("=====")
 logger.info(sim_name)
 logger.info("=====")
 
+sample_sim = sample.copy()
+sample_sim.remove("pancreas")
+logger.info("=====")
+logger.info(sample_sim)
+logger.info("=====")
 
 # --- Subworkflows --- #
 
@@ -66,17 +71,17 @@ rule all:
 	  simulation(expand(config["out_edger"] + "edgeR_{sample}.rds", sample = sample)),
 	  simulation(expand(config["out_sim"] + "{sample}/sim_{sample}_{sim_name}_sce.rds", sample = sample, sim_name = sim_name)),
 	  simulation(expand(config["out_sim_char"] + "{sample}/sim_{sample}_{sim_name}_sce.rds", sample = sample, sim_name = sim_name)),
-	  simulation(expand(config["docs"] + "countSimQC_{sample}.html", sample = sample)),
-	  simulation(expand(config["out_adjust_params"] + "adjust_params_{sample}.rds", sample = sample)),
-	  simulation(expand(config["out_sim_vp"] + "vp_sim_{sample}_sce.rds", sample = sample)),
-	  simulation(expand(config["out_sim_abund"] + "abundance_sim_{sample}.rds", sample = sample)),
-	  simulation(expand(config["out_sim_de"] + "de_sim_{sample}_sce.rds", sample = sample)),
-	  simulation(expand(config["out_sim_de"] + "de_sim_{sample}.rds", sample = sample)),
-	  simulation(expand(config["out_sim_type"] + "type_sim_{sample}_sce.rds", sample = sample)),
-	  simulation(expand(config["out_sim_sumcms"] + "summarize_cms_sim_{sample}_sce.rds", sample = sample)),
-	  simulation(expand(config["out_sim_summary"] + "summary_sim_{sample}.rds", sample = sample)),
-	  simulation(expand(config["docs"] + "simulation_{sample}.html", sample = sample)),
-	  simulation(expand(config["docs"] + "vis_sim_{sample}.html", sample = sample)),
+	  simulation(expand(config["docs"] + "countSimQC_{sample_sim}.html", sample_sim = sample_sim)),
+	  simulation(expand(config["out_adjust_params"] + "adjust_params_{sample_sim}.rds", sample_sim = sample_sim)),
+	  simulation(expand(config["out_sim_vp"] + "vp_sim_{sample_sim}_sce.rds", sample_sim = sample_sim)),
+	  simulation(expand(config["out_sim_abund"] + "abundance_sim_{sample_sim}.rds", sample_sim = sample_sim)),
+	  simulation(expand(config["out_sim_de"] + "de_sim_{sample_sim}_sce.rds", sample_sim = sample_sim)),
+	  simulation(expand(config["out_sim_de"] + "de_sim_{sample_sim}.rds", sample_sim = sample_sim)),
+	  simulation(expand(config["out_sim_type"] + "type_sim_{sample_sim}_sce.rds", sample_sim = sample_sim)),
+	  simulation(expand(config["out_sim_sumcms"] + "summarize_cms_sim_{sample_sim}_sce.rds", sample_sim = sample_sim)),
+	  simulation(expand(config["out_sim_summary"] + "summary_sim_{sample_sim}.rds", sample_sim = sample_sim)),
+	  simulation(expand(config["docs"] + "simulation_{sample_sim}.html", sample_sim = sample_sim)),
+	  simulation(expand(config["docs"] + "vis_sim_{sample_sim}.html", sample_sim = sample_sim)),
 	  characterization(config["docs"] + "index.md")
 	  
 
