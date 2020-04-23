@@ -4,3 +4,25 @@ plugins:
 relative_links:
   enabled: true
   collections: true
+navbar:
+  title: "Batch effects in scRNAseq data"
+  type: inverse
+  left:
+  right:
+    - text: "Characterization"
+      icon: fa-area-chart
+      href: research.html
+    - text: "Simulation"
+      icon: fa-file-text-o
+      href: publications.html
+    - text: "Simulation Characteristics"
+      icon: fa-code
+      href: tools.html
+    - text: "CountSimQC"
+      icon: fa-user
+      href: people.html
+    - text: "Overview"
+      icon: fa-graduation-cap
+      href: teaching.html
+
+
