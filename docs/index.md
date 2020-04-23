@@ -21,7 +21,7 @@ output:
 
 A systematic analysis of different kinds of unwanted varaition in single cell RNAseq datasets.
 
-# Analysis {.tabset}
+# Analysis
 
 ## Batch effects
 + [cellbench](batch_effect_cellbench.html)
@@ -77,7 +77,7 @@ A systematic analysis of different kinds of unwanted varaition in single cell RN
 
 
 
-# Summarized batch characteristics {.tabset}
+# Summarized batch characteristics
 
 ## Real data
 [Summary real data](overall_batch_characteristics.html)
