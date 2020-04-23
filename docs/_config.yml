@@ -8,21 +8,15 @@ navbar:
   title: "Batch effects in scRNAseq data"
   type: inverse
   left:
-  right:
     - text: "Characterization"
-      icon: fa-area-chart
-      href: research.html
+      href: simulation_hca.html
     - text: "Simulation"
-      icon: fa-file-text-o
-      href: publications.html
+      href: simulation_hca.html
     - text: "Simulation Characteristics"
-      icon: fa-code
-      href: tools.html
+      href: simulation_hca.html
     - text: "CountSimQC"
-      icon: fa-user
-      href: people.html
+      href: simulation_hca.html
     - text: "Overview"
-      icon: fa-graduation-cap
-      href: teaching.html
+      href: simulation_hca.html
 
 
