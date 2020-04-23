@@ -4,19 +4,6 @@ plugins:
 relative_links:
   enabled: true
   collections: true
-navbar:
-  title: "Batch effects in scRNAseq data"
-  type: inverse
-  left:
-    - text: "Characterization"
-      href: simulation_hca.html
-    - text: "Simulation"
-      href: simulation_hca.html
-    - text: "Simulation Characteristics"
-      href: simulation_hca.html
-    - text: "CountSimQC"
-      href: simulation_hca.html
-    - text: "Overview"
-      href: simulation_hca.html
+
 
 
