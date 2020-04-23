@@ -1,0 +1,29 @@
+---
+title: "CountSimQC"
+params:
+  data_names:
+output: 
+  html_document
+---
+
+To test the count characteristics of the simulated batch datasets [CountSimQC](https://www.bioconductor.org/packages/release/bioc/html/countsimQC.html) was used.
+CountSimQC provides comprehensive reports on comparing a broad range of characteristics across a collection of count matrices. Here we compared the simulated count matrices with the counts from the real datasets. 
+  
+Reports can be checked here: 
+
+```{r dataset name, include=FALSE}
+sce_list = unlist(c(list(strsplit(params$data_names, ","))))
+create_link <- c(
+    "`r paste0('+ [', '{{sce_nam}}', '](countSimQC_', '{{sce_nam}}', '.html)')`"
+  )
+
+sim_links <- lapply(sce_list, 
+  function(sce_nam) knitr::knit_expand(text = create_link)
+)
+```
+
+
+`r knitr::knit(text = unlist(sim_links))`
+
+![](../../docs/external/countsimQC.png)
+

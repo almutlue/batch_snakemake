@@ -180,14 +180,28 @@ rule overview:
 ## Update index file
 ## -------------------------------------------------------------------------- ##
 
-rule index:
-    input:
-        script = config["src_summary"] + "write_index.sh",
-        ind_template = config["src_summary"] + "index_template.md"
+rule dataset_index:
+    input: 
+        script = config["src_summary"] + "dataset_index.Rmd"
+    params:
+        outdir = config["docs"]
     output:
-        out = config["docs"] + "index.md"
+        out = config["docs"] + "dataset_index.html"
     shell:
-        "./{input.script} {input.ind_template} {output.out} {sample}"
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd())"'''
+        
+        
+rule char_index:
+    input: 
+        check = expand(config["docs"] + "batch_effect_{sample}.html", sample = sample),
+        script = config["src_summary"] + "batch_index.Rmd"
+    params:
+        outdir = config["docs"],
+        data_names = ",".join(sample)
+    output:
+        out = config["docs"] + "batch_index.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data_names='{params.data_names}'))"'''
 
 
    

@@ -1,0 +1,28 @@
+---
+title: "Characteristics of simulated batch effects"
+params:
+  data_names:
+output: 
+  html_document
+---
+
+To test simulated batch effects there batch characteristics were analyzed and compared to the real datasets that were used to estimate the simulations parameter. 
+  
+Batch characteristics of the simulated datasets are shown here: 
+
+```{r dataset name, include=FALSE}
+sce_list = unlist(c(list(strsplit(params$data_names, ","))))
+create_link <- c(
+    "`r paste0('+ [', '{{sce_nam}}', '](simulation_', '{{sce_nam}}', '.html)')`"
+  )
+
+sim_links <- lapply(sce_list, 
+  function(sce_nam) knitr::knit_expand(text = create_link)
+)
+```
+
+
+`r knitr::knit(text = unlist(sim_links))`
+
+![](../../docs/simulation_csf_patient_files/figure-html/compare lfcs-4.png)
+

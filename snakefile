@@ -69,6 +69,8 @@ rule all:
 	  characterization(expand(config["out_summary"] + "summary_{sample}.rds", sample = sample)),
 	  characterization(expand(config["docs"] + "batch_effect_{sample}.html", sample = sample)),
 	  characterization(config["docs"] + "overall_batch_characteristics.html"),
+	  characterization(config["docs"] + "batch_index.html"),
+	  characterization(config["docs"] + "dataset_index.html"),
 	  simulation(expand(config["out_edger"] + "edgeR_{sample}.rds", sample = sample)),
 	  simulation(expand(config["out_sim"] + "{sample}/sim_{sample}_{sim_name}_sce.rds", sample = sample, sim_name = sim_name)),
 	  simulation(expand(config["out_sim_char"] + "{sample}/sim_{sample}_{sim_name}_sce.rds", sample = sample, sim_name = sim_name)),
@@ -84,7 +86,10 @@ rule all:
 	  simulation(expand(config["docs"] + "simulation_{sample_sim}.html", sample_sim = sample_sim)),
 	  simulation(expand(config["docs"] + "vis_sim_{sample_sim}.html", sample_sim = sample_sim)),
 	  simulation(config["docs"] + "overall_sim_batch_characteristics.html"),
-	  characterization(config["docs"] + "index.md")
+	  simulation(config["docs"] + "simulation_index.html"),
+	  simulation(config["docs"] + "sim_char_index.html"),
+	  simulation(config["docs"] + "countSimQC_index.html"),
+	  simulation(config["docs"] + "overview_index.html")
 	  
 
 

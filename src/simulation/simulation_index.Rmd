@@ -1,0 +1,35 @@
+---
+title: "Simulation"
+params:
+  data_names:
+output: 
+  html_document
+---
+
+To simulate datasets with **tuneable batch effects** we simulated scRNAseq counts similar 
+as described in [muscat](https://www.biorxiv.org/content/10.1101/713412v2). 
+In addition we estimated batch chracteristics from real datasets.
+  
+The celltype-specific genewise logFC of the batch effect were used to simulate counts with 
+respective mean expression among cells from each batch. 
+To mimic a realistic relationship between celltypes and batch effects estimates 
+from the real datasets celltypes were used to display celltype variance.  
+  
+Simulated datasets are shown here: 
+
+```{r dataset name, include=FALSE}
+sce_list = unlist(c(list(strsplit(params$data_names, ","))))
+create_link <- c(
+    "`r paste0('+ [', '{{sce_nam}}', '](vis_sim_', '{{sce_nam}}', '.html)')`"
+  )
+
+sim_links <- lapply(sce_list, 
+  function(sce_nam) knitr::knit_expand(text = create_link)
+)
+```
+
+
+`r knitr::knit(text = unlist(sim_links))`
+
+![](../../docs/vis_sim_csf_media_files/figure-html/tsne1__1-1.png)
+

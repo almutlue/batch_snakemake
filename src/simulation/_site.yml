@@ -4,12 +4,14 @@ navbar:
   type: inverse
   left:
     - text: "Characterization"
-      href: simulation_hca.html
+      href: batch_index.html
     - text: "Simulation"
-      href: simulation_hca.html
+      href: simulation_index.html
     - text: "Simulation Characteristics"
-      href: simulation_hca.html
+      href: sim_char_index.html
     - text: "CountSimQC"
-      href: simulation_hca.html
+      href: countSimQC_index.html
     - text: "Overview"
-      href: simulation_hca.html
+      href: overview_index.html
+    - text: "Datasets"
+      href: dataset_index.html

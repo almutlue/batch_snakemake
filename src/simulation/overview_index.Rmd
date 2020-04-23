@@ -1,0 +1,15 @@
+---
+title: "Overview on batch characteristics"
+output: 
+  html_document
+---
+
+Besides the analysis of batch characteristics for a range of datasets we summarized major characteristics in more readable overview.
+  
+Overviews of batch characteristics of the simulated and real datasets are shown here: 
+
++ [overview_real_batches](overall_batch_characteristics.html)
++ [overview_simulated_batches](overall_sim_batch_characteristics.html)
+
+![](../../docs/overall_sim_batch_characteristics_files/figure-html/plot batch size-1.png)
+

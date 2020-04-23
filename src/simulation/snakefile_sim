@@ -262,6 +262,60 @@ rule overview_sim:
 
 
 
+## -------------------------------------------------------------------------- ##
+## Update index files
+## -------------------------------------------------------------------------- ##
 
+rule sim index:
+    input: 
+        check = expand(config["docs"] + "vis_sim_{sample}.html", sample = sample),
+        script = config["src_sim"] + "simulation_index.Rmd"
+    params:
+        outdir = config["docs"],
+        data_names = ",".join(sample)
+    output:
+        out = config["docs"] + "simulation_index.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data_names='{params.data_names}'))"'''
+
+
+rule sim_char_index:
+    input: 
+        check = expand(config["docs"] + "simulation_{sample_sim}.html", sample_sim = sample_sim),
+        script = config["src_sim"] + "sim_char_index.Rmd"
+    params:
+        outdir = config["docs"],
+        data_names = ",".join(sample_sim)
+    output:
+        out = config["docs"] + "sim_char_index.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data_names='{params.data_names}'))"'''
+        
+
+rule countSimQC_index:
+    input: 
+        check = expand(config["docs"] + "countSimQC_{sample_sim}.html", sample_sim = sample_sim),
+        script = config["src_sim"] + "countSimQC_index.Rmd"
+    params:
+        outdir = config["docs"],
+        data_names = ",".join(sample_sim)
+    output:
+        out = config["docs"] + "countSimQC_index.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data_names='{params.data_names}'))"'''
+        
+
+rule overview_index:
+    input: 
+        check = config["docs"] + "overall_sim_batch_characteristics.html",
+        script = config["src_sim"] + "overview_index.Rmd"
+    params:
+        outdir = config["docs"]
+    output:
+        out = config["docs"] + "overview_index.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd())"'''        
+        
+        
 
 

@@ -1,0 +1,17 @@
+name: "Batch snakemake"
+navbar:
+  title: "Batch effects in scRNAseq data"
+  type: inverse
+  left:
+    - text: "Characterization"
+      href: batch_index.html
+    - text: "Simulation"
+      href: simulation_index.html
+    - text: "Simulation Characteristics"
+      href: sim_char_index.html
+    - text: "CountSimQC"
+      href: countSimQC_index.html
+    - text: "Overview"
+      href: overview_index.html
+    - text: "Datasets"
+      href: dataset_index.html
