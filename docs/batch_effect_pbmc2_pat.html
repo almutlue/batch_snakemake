@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">13 March, 2020</h4>
+<h4 class="date">19 April, 2020</h4>
 
 </div>
 
@@ -459,26 +459,26 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 
 ## Summarize variance partitioning
 <span class="co"># How many genes have a variance component affected by batch with &gt; 1%</span>
-n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
-n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
-n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_celltype&quot;</span>&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_batch &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_batch &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_celltype&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
 n_rel &lt;-<span class="st"> </span>n_batch_gene/n_celltype_gene
 
 <span class="co"># Mean variance that is explained by the batch effect/celltype</span>
-m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_batch&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_batch&quot;]), na.rm = TRUE): argument is
-## not numeric or logical: returning NA</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_celltype&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_celltype&quot;]), na.rm = TRUE): argument
-## is not numeric or logical: returning NA</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
+m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(vp_sub$vp_batch, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(vp_sub$vp_celltype, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
 <div id="scatterplot-batch" class="section level4">
 <h4>Scatterplot batch</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_dev(&quot;vp_batch&quot;, &quot;vp_batch&quot;)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_batch&quot;</span>, <span class="st">&quot;vp_batch&quot;</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="batch_effect_pbmc2_pat_files/figure-html/var_plot_batch-1.png" width="672" /></p>
 </div>
 <div id="scatterplot-celltype" class="section level4">
 <h4>Scatterplot celltype</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_dev(&quot;vp_celltype&quot;, &quot;vp_celltype&quot;)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_celltype&quot;</span>, <span class="st">&quot;vp_celltype&quot;</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="batch_effect_pbmc2_pat_files/figure-html/var_plot_celltype-1.png" width="672" /></p>
 </div>
 <div id="ternary-plot-all-genes" class="section level4">
 <h4>Ternary plot all genes</h4>
@@ -591,38 +591,6 @@ mean_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(bids, fun
 </div>
 <div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
 <h3>Batch to batch comparisons of expression distributions</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#mean expression</span>
-mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;batch&quot;</span> ) %&gt;%<span class="st"> </span><span class="kw">spread</span>(batch, logcounts)
-batch_all &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[,batch]))
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;_&quot;</span>, batch_all)
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;_&quot;</span>, batch_all)
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;&quot;</span>, batch_all)
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-
-
-<span class="kw">lapply</span>(batch_all, function(batch_var){
-  batch_var_2 &lt;-<span class="st"> </span>batch_all[-<span class="kw">which</span>(batch_all %in%<span class="st"> </span>batch_var)]
-  <span class="kw">lapply</span>(batch_var_2, function(batch_var_3){
-    <span class="kw">ggplot</span>(mean_expr, <span class="kw">aes_string</span>(<span class="dt">x=</span>batch_var, <span class="dt">y =</span> batch_var_3)) +
-<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> .<span class="dv">3</span>, <span class="kw">aes</span>(<span class="dt">color=</span>cluster)) +
-<span class="st">      </span><span class="kw">ggtitle</span>(batch_var) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">geom_abline</span>(<span class="dt">slope =</span> <span class="dv">1</span>) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">coord_fixed</span>() +
-<span class="st">      </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
-<span class="st">      </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span>cols) +
-<span class="st">      </span><span class="kw">theme_classic</span>()
-  })
-})</code></pre></div>
-<pre><code>## [[1]]
-## [[1]][[1]]</code></pre>
-<p><img src="batch_effect_pbmc2_pat_files/figure-html/mean%20expression-1.png" width="672" /></p>
-<pre><code>## 
-## 
-## [[2]]
-## [[2]][[1]]</code></pre>
-<p><img src="batch_effect_pbmc2_pat_files/figure-html/mean%20expression-2.png" width="672" /></p>
 </div>
 </div>
 <div id="differentially-expressed-genes" class="section level2">
@@ -692,7 +660,7 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
     res_s[[ct]]$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, res_s[[ct]]$gene)
     
     <span class="co">#p &lt;- ggplot(ct_de, aes(x = AveExpr, y = logFC, colour = abs(logFC) &gt; 1, label = gene)) + </span>
-    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> logCPM, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
+    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> logCPM, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">2</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
 <span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> .<span class="dv">5</span>) +
 <span class="st">      </span><span class="kw">geom_label_repel</span>(<span class="dt">data =</span> res_s[[ct]]) +
 <span class="st">      </span><span class="kw">ggtitle</span>(<span class="kw">paste0</span>(ct,<span class="st">&quot;: &quot;</span>, cont_var)) +
@@ -717,23 +685,23 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-1.png" width="672" /></p>
 <pre><code>## Cluster: 0 Contrast: pat1-pat2 Num genes: 8331 Num DE: 12 
 ##                                category NGenes Direction       PValue
-## 1                       GO_MRNA_BINDING    106        Up 4.127980e-09
-## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 4.337018e-07
-## 3                     GO_OXYGEN_BINDING      6        Up 1.511618e-04
+## 1                       GO_MRNA_BINDING    106        Up 4.403918e-09
+## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 4.639148e-07
+## 3                     GO_OXYGEN_BINDING      6        Up 1.459243e-04
 ##            FDR
-## 1 3.645006e-06
-## 2 1.914793e-04
-## 3 4.449196e-02</code></pre>
+## 1 3.888660e-06
+## 2 2.048184e-04
+## 3 4.295038e-02</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-2.png" width="672" /></p>
 <pre><code>## Cluster: 1 Contrast: pat1-pat2 Num genes: 8331 Num DE: 17 
 ##                                category NGenes Direction       PValue
-## 1                       GO_MRNA_BINDING    106        Up 1.142677e-08
-## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 7.404660e-07
-## 3                     GO_OXYGEN_BINDING      6        Up 3.310847e-06
+## 1                       GO_MRNA_BINDING    106        Up 1.116800e-08
+## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 7.298287e-07
+## 3                     GO_OXYGEN_BINDING      6        Up 3.712983e-06
 ##            FDR
-## 1 1.008983e-05
-## 2 3.269157e-04
-## 3 9.744925e-04</code></pre>
+## 1 9.861340e-06
+## 2 3.222194e-04
+## 3 1.092855e-03</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-3.png" width="672" /></p>
 <pre><code>## Cluster: 2 Contrast: pat1-pat2 Num genes: 8331 Num DE: 16 
 ##                                                    category NGenes Direction
@@ -744,49 +712,49 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 5                     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up
 ## 6                                       GO_IRON_ION_BINDING     45        Up
 ##         PValue          FDR
-## 1 1.889510e-30 1.668437e-27
-## 2 1.196986e-07 5.284695e-05
-## 3 1.766594e-06 5.199675e-04
-## 4 2.522697e-06 5.568854e-04
-## 5 1.459670e-05 2.577776e-03
-## 6 2.461428e-04 3.622401e-02</code></pre>
+## 1 5.261183e-30 4.645625e-27
+## 2 1.142776e-07 5.045354e-05
+## 3 2.097426e-06 6.173423e-04
+## 4 2.998122e-06 6.618355e-04
+## 5 1.393105e-05 2.460223e-03
+## 6 2.726393e-04 4.012342e-02</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-4.png" width="672" /></p>
 <pre><code>## Cluster: 3 Contrast: pat1-pat2 Num genes: 8331 Num DE: 67 
 ##                            category NGenes Direction       PValue          FDR
-## 1        GO_PEPTIDE_ANTIGEN_BINDING     18        Up 2.330440e-30 2.057778e-27
-## 2 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      8        Up 2.501406e-19 1.104371e-16
-## 3                 GO_OXYGEN_BINDING      6        Up 2.691493e-10 7.921960e-08
-## 4          GO_RAGE_RECEPTOR_BINDING      9        Up 1.317576e-09 2.908550e-07
-## 5                GO_ANTIGEN_BINDING     66        Up 1.063693e-08 1.878482e-06
-## 6 GO_INTERLEUKIN_1_RECEPTOR_BINDING      7        Up 1.676246e-07 2.466876e-05
-## 7             GO_CHEMOKINE_ACTIVITY     17        Up 3.778889e-06 4.766798e-04
-## 8 GO_CCR_CHEMOKINE_RECEPTOR_BINDING     14        Up 4.679001e-06 5.164448e-04</code></pre>
+## 1        GO_PEPTIDE_ANTIGEN_BINDING     18        Up 1.325083e-30 1.170048e-27
+## 2 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      8        Up 4.669461e-19 2.061567e-16
+## 3                 GO_OXYGEN_BINDING      6        Up 4.026392e-10 1.185101e-07
+## 4          GO_RAGE_RECEPTOR_BINDING      9        Up 1.565964e-09 3.456866e-07
+## 5                GO_ANTIGEN_BINDING     66        Up 8.875491e-09 1.567412e-06
+## 6 GO_INTERLEUKIN_1_RECEPTOR_BINDING      7        Up 1.895078e-07 2.788923e-05
+## 7             GO_CHEMOKINE_ACTIVITY     17        Up 4.530189e-06 5.714510e-04
+## 8 GO_CCR_CHEMOKINE_RECEPTOR_BINDING     14        Up 5.541021e-06 6.115902e-04</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-5.png" width="672" /></p>
 <pre><code>## Cluster: 4 Contrast: pat1-pat2 Num genes: 8331 Num DE: 18 
 ##                                category NGenes Direction       PValue
-## 1            GO_PEPTIDE_ANTIGEN_BINDING     18        Up 9.230250e-26
-## 2     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      8        Up 5.332486e-09
-## 3 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 4.425207e-08
-## 4                    GO_ANTIGEN_BINDING     66        Up 1.709172e-07
-## 5                       GO_MRNA_BINDING    106        Up 2.527525e-07
-## 6                     GO_OXYGEN_BINDING      6        Up 2.687654e-05
+## 1            GO_PEPTIDE_ANTIGEN_BINDING     18        Up 1.271667e-25
+## 2     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      8        Up 6.691937e-09
+## 3 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 6.036858e-08
+## 4                    GO_ANTIGEN_BINDING     66        Up 1.417205e-07
+## 5                       GO_MRNA_BINDING    106        Up 3.125631e-07
+## 6                     GO_OXYGEN_BINDING      6        Up 2.387772e-05
 ##            FDR
-## 1 8.150310e-23
-## 2 2.354293e-06
-## 3 1.302486e-05
-## 4 3.772998e-05
-## 5 4.463609e-05
-## 6 3.955331e-03</code></pre>
+## 1 1.122882e-22
+## 2 2.954490e-06
+## 3 1.776849e-05
+## 4 3.128479e-05
+## 5 5.519865e-05
+## 6 3.514004e-03</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-6.png" width="672" /></p>
 <pre><code>## Cluster: 5 Contrast: pat1-pat2 Num genes: 8331 Num DE: 27 
 ##                                category NGenes Direction       PValue
-## 1                  GO_CYTOKINE_ACTIVITY     65        Up 6.753566e-07
-## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 4.615864e-06
-## 3                       GO_MRNA_BINDING    106        Up 2.734657e-05
-##           FDR
-## 1 0.000298170
-## 2 0.001358603
-## 3 0.006036754</code></pre>
+## 1                  GO_CYTOKINE_ACTIVITY     65        Up 5.464452e-07
+## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 5.654608e-06
+## 3                       GO_MRNA_BINDING    106        Up 3.315812e-05
+##            FDR
+## 1 0.0002412556
+## 2 0.0016643396
+## 3 0.0073196541</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-7.png" width="672" /></p>
 <pre><code>## Cluster: 6 Contrast: pat1-pat2 Num genes: 8331 Num DE: 59 
 ##                                                    category NGenes Direction
@@ -799,35 +767,34 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 7                                   GO_TETRAPYRROLE_BINDING     35        Up
 ## 8                                      GO_CYTOKINE_ACTIVITY     65        Up
 ##         PValue          FDR
-## 1 5.305811e-57 4.685031e-54
-## 2 6.620278e-25 2.922853e-22
-## 3 3.172036e-22 9.336360e-20
-## 4 1.239089e-14 2.735288e-12
-## 5 6.678657e-13 1.179451e-10
-## 6 8.433748e-13 1.241167e-10
-## 7 1.387164e-10 1.749809e-08
-## 8 3.088664e-10 3.409113e-08</code></pre>
+## 1 3.278506e-56 2.894920e-53
+## 2 1.228908e-24 5.425629e-22
+## 3 5.736571e-22 1.688464e-19
+## 4 1.808964e-14 3.993287e-12
+## 5 8.130126e-13 1.435780e-10
+## 6 1.116556e-12 1.643198e-10
+## 7 1.847759e-10 2.330815e-08
+## 8 3.766603e-10 4.157388e-08</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-8.png" width="672" /></p>
 <pre><code>## Cluster: 7 Contrast: pat1-pat2 Num genes: 8331 Num DE: 37 
 ##                                category NGenes Direction       PValue
-## 1                     GO_OXYGEN_BINDING      6        Up 3.863841e-10
-## 2                       GO_MRNA_BINDING    106        Up 5.856020e-09
-## 3 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 1.586479e-07
-## 4              GO_RAGE_RECEPTOR_BINDING      9        Up 4.267285e-05
+## 1                     GO_OXYGEN_BINDING      6        Up 9.409125e-10
+## 2                       GO_MRNA_BINDING    106        Up 4.745165e-09
+## 3 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 1.284023e-07
+## 4              GO_RAGE_RECEPTOR_BINDING      9        Up 4.849188e-05
 ##            FDR
-## 1 3.411771e-07
-## 2 2.585433e-06
-## 3 4.669537e-05
-## 4 9.420031e-03</code></pre>
+## 1 8.308257e-07
+## 2 2.094990e-06
+## 3 3.779309e-05
+## 4 1.070458e-02</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-9.png" width="672" /></p>
 <pre><code>## Cluster: 8 Contrast: pat1-pat2 Num genes: 8331 Num DE: 45 
 ##                            category NGenes Direction       PValue          FDR
-## 1                 GO_OXYGEN_BINDING      6        Up 5.279537e-28 4.661832e-25
-## 2          GO_RAGE_RECEPTOR_BINDING      9        Up 1.120365e-05 3.297609e-03
-## 3 GO_CCR_CHEMOKINE_RECEPTOR_BINDING     14        Up 1.465971e-04 3.204378e-02
-## 4             GO_CHEMOKINE_ACTIVITY     17        Up 2.123283e-04 3.204378e-02
-## 5     GO_CHEMOKINE_RECEPTOR_BINDING     24        Up 2.177380e-04 3.204378e-02
-## 6        GO_VIRUS_RECEPTOR_ACTIVITY     29        Up 4.310304e-04 4.757498e-02</code></pre>
+## 1                 GO_OXYGEN_BINDING      6        Up 4.530794e-27 4.000691e-24
+## 2          GO_RAGE_RECEPTOR_BINDING      9        Up 2.540862e-05 7.478605e-03
+## 3             GO_CHEMOKINE_ACTIVITY     17        Up 2.317261e-04 3.894747e-02
+## 4 GO_CCR_CHEMOKINE_RECEPTOR_BINDING     14        Up 2.467579e-04 3.894747e-02
+## 5     GO_CHEMOKINE_RECEPTOR_BINDING     24        Up 2.646487e-04 3.894747e-02</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-10.png" width="672" /></p>
 <pre><code>## Cluster: 9 Contrast: pat1-pat2 Num genes: 8331 Num DE: 16 
 ##                                                    category NGenes Direction
@@ -838,62 +805,64 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 5                                     GO_CHEMOKINE_ACTIVITY     17        Up
 ## 6                         GO_CCR_CHEMOKINE_RECEPTOR_BINDING     14        Up
 ##          PValue           FDR
-## 1 4.721714e-180 4.169274e-177
-## 2  5.412296e-42  2.389528e-39
-## 3  1.299594e-23  3.825140e-21
-## 4  1.393609e-16  3.076392e-14
-## 5  6.625025e-06  1.169979e-03
-## 6  6.053382e-05  8.908561e-03</code></pre>
+## 1 1.027150e-188 9.069736e-186
+## 2  2.865380e-44  1.265065e-41
+## 3  9.115073e-25  2.682870e-22
+## 4  2.285274e-17  5.044742e-15
+## 5  6.480798e-06  1.144509e-03
+## 6  7.041093e-05  1.036214e-02</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-11.png" width="672" /></p>
 <pre><code>## Cluster: 10 Contrast: pat1-pat2 Num genes: 8331 Num DE: 157 
 ##                                         category NGenes Direction       PValue
-## 1                              GO_OXYGEN_BINDING      6        Up 7.694151e-23
-## 2 GO_PROTEIN_BINDING_INVOLVED_IN_PROTEIN_FOLDING     11        Up 1.879662e-18
-## 3                    GO_UNFOLDED_PROTEIN_BINDING     66        Up 3.724544e-18
-## 4        GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     15        Up 8.739456e-14
-## 5                     GO_PEPTIDE_ANTIGEN_BINDING     18        Up 1.824862e-13
-## 6                     GO_VIRUS_RECEPTOR_ACTIVITY     29        Up 9.338810e-13
-## 7                 GO_MHC_PROTEIN_COMPLEX_BINDING     18        Up 1.462019e-11
-## 8                 GO_HISTONE_DEACETYLASE_BINDING     75        Up 8.894395e-10
+## 1                     GO_PEPTIDE_ANTIGEN_BINDING     18        Up 3.838648e-22
+## 2                              GO_OXYGEN_BINDING      6        Up 7.898394e-20
+## 3 GO_PROTEIN_BINDING_INVOLVED_IN_PROTEIN_FOLDING     11        Up 1.557198e-16
+## 4                    GO_UNFOLDED_PROTEIN_BINDING     66        Up 5.441501e-16
+## 5        GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     15        Up 1.004987e-12
+## 6                     GO_VIRUS_RECEPTOR_ACTIVITY     29        Up 7.284313e-12
+## 7                             GO_ANTIGEN_BINDING     66        Up 5.827814e-11
+## 8                 GO_MHC_PROTEIN_COMPLEX_BINDING     18        Up 1.158177e-10
 ##            FDR
-## 1 6.793935e-20
-## 2 8.298708e-16
-## 3 1.096257e-15
-## 4 1.929235e-11
-## 5 3.222707e-11
-## 6 1.374362e-10
-## 7 1.844232e-09
-## 8 9.817188e-08</code></pre>
+## 1 3.389526e-19
+## 2 3.487141e-17
+## 3 4.583352e-14
+## 4 1.201211e-13
+## 5 1.774807e-10
+## 6 1.072008e-09
+## 7 7.351371e-09
+## 8 1.278338e-08</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-12.png" width="672" /></p>
-<pre><code>## Cluster: 11 Contrast: pat1-pat2 Num genes: 8331 Num DE: 910 
+<pre><code>## Cluster: 11 Contrast: pat1-pat2 Num genes: 8331 Num DE: 911 
 ##                                             category NGenes Direction
-## 1                         GO_PEPTIDE_ANTIGEN_BINDING     18        Up
-## 2                       GO_LIGASE_REGULATOR_ACTIVITY      9        Up
-## 3 GO_MITOGEN_ACTIVATED_PROTEIN_KINASE_KINASE_BINDING     10        Up
-## 4                  GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      8        Up
-## 5                                  GO_OXYGEN_BINDING      6        Up
+## 1                       GO_LIGASE_REGULATOR_ACTIVITY      9        Up
+## 2 GO_MITOGEN_ACTIVATED_PROTEIN_KINASE_KINASE_BINDING     10        Up
+## 3                         GO_PEPTIDE_ANTIGEN_BINDING     18        Up
+## 4                                  GO_OXYGEN_BINDING      6        Up
+## 5                  GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      8        Up
 ##         PValue          FDR
-## 1 5.218435e-11 4.607878e-08
-## 2 1.690727e-08 7.464561e-06
-## 3 2.674972e-07 7.873335e-05
-## 4 8.745216e-06 1.930506e-03
-## 5 1.356234e-05 2.395109e-03</code></pre>
+## 1 5.426372e-13 4.791487e-10
+## 2 1.857740e-11 8.201924e-09
+## 3 2.168058e-10 6.381318e-08
+## 4 2.489279e-07 5.495084e-05
+## 5 6.987374e-05 1.233970e-02</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-13.png" width="672" /></p>
 <pre><code>## Cluster: 12 Contrast: pat1-pat2 Num genes: 8331 Num DE: 227 
 ## [1] category  NGenes    Direction PValue    FDR      
 ## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/pval%20lfc-14.png" width="672" /></p>
-<pre><code>## Cluster: 13 Contrast: pat1-pat2 Num genes: 8331 Num DE: 621 
-##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 8.767737e-19
-## 2                     GO_OXYGEN_BINDING      6        Up 1.826855e-09
-## 3                       GO_RRNA_BINDING     47        Up 1.644603e-07
-## 4       GO_STRUCTURAL_MOLECULE_ACTIVITY    314        Up 5.429821e-06
+<pre><code>## Cluster: 13 Contrast: pat1-pat2 Num genes: 8331 Num DE: 619 
+##                                    category NGenes Direction       PValue
+## 1     GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    169        Up 1.080915e-38
+## 2                           GO_RRNA_BINDING     47        Up 5.524094e-15
+## 3           GO_STRUCTURAL_MOLECULE_ACTIVITY    314        Up 1.851228e-12
+## 4                         GO_OXYGEN_BINDING      6        Up 2.280301e-11
+## 5 GO_TRANSLATION_ELONGATION_FACTOR_ACTIVITY     15        Up 7.573918e-06
 ##            FDR
-## 1 7.741912e-16
-## 2 5.377044e-07
-## 3 3.630460e-05
-## 4 9.589064e-04</code></pre>
+## 1 9.544477e-36
+## 2 2.438887e-12
+## 3 5.448781e-10
+## 4 5.033764e-09
+## 5 1.114628e-03</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 <span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
@@ -1008,6 +977,16 @@ panel.hist &lt;-<span class="st"> </span>function(x, ...){
 <p><img src="batch_effect_pbmc2_pat_files/figure-html/ct%20de%20dist%20-1.png" width="1920" /></p>
 <pre><code>## [[1]]
 ## NULL</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#extract correlation coefficients</span>
+<span class="co"># correlation coefficients from celltype specific gege logFC</span>
+
+lfc_cor_list &lt;-<span class="kw">lapply</span>(<span class="kw">names</span>(all_folds), function(com){
+  exclude &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">table</span>(<span class="kw">colData</span>(sce)[,celltype]) &lt;<span class="st"> </span><span class="dv">100</span>)
+  r &lt;-<span class="st"> </span><span class="kw">cor</span>(all_folds[[com]][, -<span class="kw">c</span>(<span class="dv">1</span>, (exclude +<span class="st"> </span><span class="dv">1</span>))])
+  mean_r &lt;-<span class="st"> </span>(<span class="kw">sum</span>(r) -<span class="st"> </span><span class="kw">ncol</span>(r))/<span class="st"> </span>(<span class="kw">ncol</span>(r)^<span class="dv">2</span> -<span class="st"> </span><span class="kw">ncol</span>(r))
+})
+
+mean_lfc_cor &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(lfc_cor_list))</code></pre></div>
 </div>
 </div>
 <div id="batch-categorization" class="section level2 tabset tabset-pills">
@@ -1145,7 +1124,8 @@ celltype &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
                        <span class="st">&quot;max_de_overlap&quot;</span> =<span class="st"> </span>max_de_overlap,
                        <span class="st">&quot;mean_rel_cluster_spec&quot;</span>=<span class="st"> </span>mean_rel_spec,
                        <span class="st">&quot;min_rel_cluster_spec&quot;</span>=<span class="st"> </span>min_rel_spec,
-                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec)
+                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec,
+                       <span class="st">&quot;mean_lfc_cor&quot;</span> =<span class="st"> </span>mean_lfc_cor )
 
 
 sim &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;mean_p_be&quot;</span> =<span class="st"> </span>mean_p_be,
@@ -1237,23 +1217,24 @@ summary &lt;-<span class="st"> </span><span class="kw">cbind</span>(size, cellty
 ##  [73] XML_3.99-0.3             jpeg_0.1-8.1             shape_1.4.4             
 ##  [76] compiler_3.6.1           KernSmooth_2.23-16       ncdf4_1.17              
 ##  [79] crayon_1.3.4             minqa_1.2.4              htmltools_0.4.0         
-##  [82] Formula_1.2-3            lubridate_1.7.4          DBI_1.1.0               
-##  [85] dbplyr_1.4.2             MASS_7.3-51.5            rappdirs_0.3.1          
-##  [88] boot_1.3-24              Matrix_1.2-18            cli_2.0.2               
-##  [91] vsn_3.54.0               gdata_2.18.0             igraph_1.2.4.2          
-##  [94] pkgconfig_2.0.3          foreign_0.8-76           MALDIquant_1.19.3       
-##  [97] vipor_0.4.5              dqrng_0.2.1              multtest_2.42.0         
-## [100] XVector_0.26.0           digest_0.6.25            graph_1.64.0            
-## [103] rmarkdown_2.1            htmlTable_1.13.3         edgeR_3.28.1            
-## [106] DelayedMatrixStats_1.8.0 listarrays_0.3.1         curl_4.3                
-## [109] gtools_3.8.1             rjson_0.2.20             nloptr_1.2.2.1          
-## [112] lifecycle_0.2.0          nlme_3.1-145             BiocNeighbors_1.4.2     
-## [115] fansi_0.4.1              viridisLite_0.3.0        pillar_1.4.3            
-## [118] lattice_0.20-40          httr_1.4.1               DEoptimR_1.0-8          
-## [121] survival_3.1-11          glue_1.3.1               png_0.1-7               
-## [124] iterators_1.0.12         bit_1.1-15.2             stringi_1.4.6           
-## [127] blob_1.2.1               BiocSingular_1.2.2       latticeExtra_0.6-29     
-## [130] caTools_1.18.0           memoise_1.1.0            irlba_2.3.3</code></pre>
+##  [82] mgcv_1.8-31              Formula_1.2-3            lubridate_1.7.4         
+##  [85] DBI_1.1.0                dbplyr_1.4.2             MASS_7.3-51.5           
+##  [88] rappdirs_0.3.1           boot_1.3-24              Matrix_1.2-18           
+##  [91] cli_2.0.2                vsn_3.54.0               gdata_2.18.0            
+##  [94] igraph_1.2.4.2           pkgconfig_2.0.3          foreign_0.8-76          
+##  [97] MALDIquant_1.19.3        vipor_0.4.5              dqrng_0.2.1             
+## [100] multtest_2.42.0          XVector_0.26.0           digest_0.6.25           
+## [103] graph_1.64.0             rmarkdown_2.1            htmlTable_1.13.3        
+## [106] edgeR_3.28.1             DelayedMatrixStats_1.8.0 listarrays_0.3.1        
+## [109] curl_4.3                 gtools_3.8.1             rjson_0.2.20            
+## [112] nloptr_1.2.2.1           lifecycle_0.2.0          nlme_3.1-145            
+## [115] BiocNeighbors_1.4.2      fansi_0.4.1              viridisLite_0.3.0       
+## [118] pillar_1.4.3             lattice_0.20-40          httr_1.4.1              
+## [121] DEoptimR_1.0-8           survival_3.1-11          glue_1.3.1              
+## [124] png_0.1-7                iterators_1.0.12         bit_1.1-15.2            
+## [127] stringi_1.4.6            blob_1.2.1               BiocSingular_1.2.2      
+## [130] latticeExtra_0.6-29      caTools_1.18.0           memoise_1.1.0           
+## [133] irlba_2.3.3</code></pre>
 </div>
 
 

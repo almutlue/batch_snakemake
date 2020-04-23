@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">13 March, 2020</h4>
+<h4 class="date">19 April, 2020</h4>
 
 </div>
 
@@ -459,26 +459,26 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 
 ## Summarize variance partitioning
 <span class="co"># How many genes have a variance component affected by batch with &gt; 1%</span>
-n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
-n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
-n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_celltype&quot;</span>&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_batch &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_batch &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_celltype&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
 n_rel &lt;-<span class="st"> </span>n_batch_gene/n_celltype_gene
 
 <span class="co"># Mean variance that is explained by the batch effect/celltype</span>
-m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_batch&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_batch&quot;]), na.rm = TRUE): argument is
-## not numeric or logical: returning NA</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_celltype&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_celltype&quot;]), na.rm = TRUE): argument
-## is not numeric or logical: returning NA</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
+m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(vp_sub$vp_batch, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(vp_sub$vp_celltype, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
 <div id="scatterplot-batch" class="section level4">
 <h4>Scatterplot batch</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_dev(&quot;vp_batch&quot;, &quot;vp_batch&quot;)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_batch&quot;</span>, <span class="st">&quot;vp_batch&quot;</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="batch_effect_pbmc_roche_files/figure-html/var_plot_batch-1.png" width="672" /></p>
 </div>
 <div id="scatterplot-celltype" class="section level4">
 <h4>Scatterplot celltype</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_dev(&quot;vp_celltype&quot;, &quot;vp_celltype&quot;)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_celltype&quot;</span>, <span class="st">&quot;vp_celltype&quot;</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="batch_effect_pbmc_roche_files/figure-html/var_plot_celltype-1.png" width="672" /></p>
 </div>
 <div id="ternary-plot-all-genes" class="section level4">
 <h4>Ternary plot all genes</h4>
@@ -590,72 +590,6 @@ mean_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(bids, fun
 </div>
 <div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
 <h3>Batch to batch comparisons of expression distributions</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#mean expression</span>
-mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;batch&quot;</span> ) %&gt;%<span class="st"> </span><span class="kw">spread</span>(batch, logcounts)
-batch_all &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[,batch]))
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;_&quot;</span>, batch_all)
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;_&quot;</span>, batch_all)
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;&quot;</span>, batch_all)
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-
-
-<span class="kw">lapply</span>(batch_all, function(batch_var){
-  batch_var_2 &lt;-<span class="st"> </span>batch_all[-<span class="kw">which</span>(batch_all %in%<span class="st"> </span>batch_var)]
-  <span class="kw">lapply</span>(batch_var_2, function(batch_var_3){
-    <span class="kw">ggplot</span>(mean_expr, <span class="kw">aes_string</span>(<span class="dt">x=</span>batch_var, <span class="dt">y =</span> batch_var_3)) +
-<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> .<span class="dv">3</span>, <span class="kw">aes</span>(<span class="dt">color=</span>cluster)) +
-<span class="st">      </span><span class="kw">ggtitle</span>(batch_var) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">geom_abline</span>(<span class="dt">slope =</span> <span class="dv">1</span>) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">coord_fixed</span>() +
-<span class="st">      </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
-<span class="st">      </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span>cols) +
-<span class="st">      </span><span class="kw">theme_classic</span>()
-  })
-})</code></pre></div>
-<pre><code>## [[1]]
-## [[1]][[1]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-1.png" width="672" /></p>
-<pre><code>## 
-## [[1]][[2]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-2.png" width="672" /></p>
-<pre><code>## 
-## [[1]][[3]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-3.png" width="672" /></p>
-<pre><code>## 
-## 
-## [[2]]
-## [[2]][[1]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-4.png" width="672" /></p>
-<pre><code>## 
-## [[2]][[2]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-5.png" width="672" /></p>
-<pre><code>## 
-## [[2]][[3]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-6.png" width="672" /></p>
-<pre><code>## 
-## 
-## [[3]]
-## [[3]][[1]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-7.png" width="672" /></p>
-<pre><code>## 
-## [[3]][[2]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-8.png" width="672" /></p>
-<pre><code>## 
-## [[3]][[3]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-9.png" width="672" /></p>
-<pre><code>## 
-## 
-## [[4]]
-## [[4]][[1]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-10.png" width="672" /></p>
-<pre><code>## 
-## [[4]][[2]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-11.png" width="672" /></p>
-<pre><code>## 
-## [[4]][[3]]</code></pre>
-<p><img src="batch_effect_pbmc_roche_files/figure-html/mean%20expression-12.png" width="672" /></p>
 </div>
 </div>
 <div id="differentially-expressed-genes" class="section level2">
@@ -731,7 +665,7 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
     res_s[[ct]]$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, res_s[[ct]]$gene)
     
     <span class="co">#p &lt;- ggplot(ct_de, aes(x = AveExpr, y = logFC, colour = abs(logFC) &gt; 1, label = gene)) + </span>
-    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> logCPM, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
+    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> logCPM, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">2</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
 <span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> .<span class="dv">5</span>) +
 <span class="st">      </span><span class="kw">geom_label_repel</span>(<span class="dt">data =</span> res_s[[ct]]) +
 <span class="st">      </span><span class="kw">ggtitle</span>(<span class="kw">paste0</span>(ct,<span class="st">&quot;: &quot;</span>, cont_var)) +
@@ -765,14 +699,14 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 7                         GO_VIRUS_RECEPTOR_ACTIVITY     19        Up
 ## 8                GO_FIBROBLAST_GROWTH_FACTOR_BINDING      9        Up
 ##         PValue          FDR
-## 1 5.094115e-10 4.314715e-07
-## 2 2.341544e-08 9.916440e-06
-## 3 6.331346e-07 1.229695e-04
-## 4 7.259121e-07 1.229695e-04
-## 5 2.795275e-06 3.945996e-04
-## 6 3.425921e-05 4.031138e-03
-## 7 3.807450e-05 4.031138e-03
-## 8 4.409258e-05 4.149602e-03</code></pre>
+## 1 4.684898e-10 3.968109e-07
+## 2 2.154834e-08 9.125720e-06
+## 3 5.474379e-07 1.159200e-04
+## 4 7.562472e-07 1.281083e-04
+## 5 3.033735e-06 4.282623e-04
+## 6 3.616275e-05 4.164931e-03
+## 7 4.046945e-05 4.164931e-03
+## 8 4.425546e-05 4.164931e-03</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-2.png" width="672" /></p>
 <pre><code>## Cluster: 1 Contrast: fresh-DMSO Num genes: 4756 Num DE: 4 
 ##                                                                                                          category
@@ -785,14 +719,14 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 7 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
 ## 8                                                                                        GO_GROWTH_FACTOR_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 8.982951e-22 7.608560e-19
-## 2      5        Up 3.699805e-12 1.566867e-09
-## 3      6        Up 6.196261e-12 1.749411e-09
-## 4      5        Up 7.403465e-11 1.567684e-08
-## 5     13        Up 1.689011e-07 2.384320e-05
-## 6     26        Up 2.503503e-07 3.029238e-05
-## 7     58        Up 7.492874e-07 7.933081e-05
-## 8     24        Up 1.574250e-06 1.481544e-04</code></pre>
+## 1     10        Up 2.170195e-21 1.838155e-18
+## 2      5        Up 4.952199e-12 1.914428e-09
+## 3      6        Up 6.780738e-12 1.914428e-09
+## 4      5        Up 1.153938e-10 2.443465e-08
+## 5     13        Up 1.573749e-07 2.221608e-05
+## 6     26        Up 3.311013e-07 4.006326e-05
+## 7     58        Up 8.763981e-07 9.278865e-05
+## 8     24        Up 1.656878e-06 1.559307e-04</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-3.png" width="672" /></p>
 <pre><code>## Cluster: 2 Contrast: fresh-DMSO Num genes: 4756 Num DE: 16 
 ##                                                                                                          category
@@ -803,46 +737,46 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 5 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
 ## 6                                                                                        GO_RAGE_RECEPTOR_BINDING
 ## 7                                                                               GO_MHC_CLASS_II_RECEPTOR_ACTIVITY
-## 8                                                                              GO_MAP_KINASE_PHOSPHATASE_ACTIVITY
+## 8                                                                                GO_LONG_CHAIN_FATTY_ACID_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 1.060059e-54 8.978703e-52
-## 2      5        Up 1.308925e-17 5.543295e-15
-## 3     26        Up 6.788002e-16 1.916479e-13
-## 4      5        Up 2.807836e-15 5.945592e-13
-## 5     58        Up 3.590196e-14 6.081792e-12
-## 6      9        Up 2.065934e-13 2.916410e-11
-## 7      6        Up 3.078977e-12 3.725562e-10
-## 8      6        Up 7.924732e-10 8.390310e-08</code></pre>
+## 1     10        Up 1.017488e-54 8.618127e-52
+## 2      5        Up 1.695466e-17 7.180300e-15
+## 3     26        Up 6.609728e-16 1.866147e-13
+## 4      5        Up 3.093258e-15 6.549974e-13
+## 5     58        Up 2.998428e-14 5.079338e-12
+## 6      9        Up 1.814293e-13 2.561177e-11
+## 7      6        Up 7.331462e-12 8.871069e-10
+## 8      5        Up 9.681998e-10 1.025082e-07</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-4.png" width="672" /></p>
 <pre><code>## Cluster: 3 Contrast: fresh-DMSO Num genes: 4756 Num DE: 1 
 ##                                              category NGenes Direction
 ## 1 GO_PHOSPHATIDYLINOSITOL_3_4_5_TRISPHOSPHATE_BINDING     12        Up
 ## 2                          GO_PEPTIDE_ANTIGEN_BINDING     17        Up
 ## 3                  GO_CXCR_CHEMOKINE_RECEPTOR_BINDING      6        Up
-##         PValue          FDR
-## 1 8.200906e-07 0.0002315389
-## 2 3.207260e-05 0.0067913738
-## 3 2.277479e-04 0.0385805004</code></pre>
+##         PValue         FDR
+## 1 8.794747e-07 0.000248305
+## 2 2.902878e-05 0.006146843
+## 3 2.972816e-04 0.035971069</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-5.png" width="672" /></p>
 <pre><code>## Cluster: 4 Contrast: fresh-DMSO Num genes: 4756 Num DE: 3 
 ##                                     category NGenes Direction       PValue
-## 1                             GO_IGG_BINDING      5        Up 3.423850e-05
-## 2 GO_ACYLGLYCEROL_O_ACYLTRANSFERASE_ACTIVITY      5        Up 8.327462e-05
-## 3   GO_SERINE_TYPE_CARBOXYPEPTIDASE_ACTIVITY      6        Up 1.065899e-04
-## 4                  GO_IMMUNOGLOBULIN_BINDING      8        Up 1.828060e-04
-## 5          GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 2.501324e-04
-## 6           GO_LIGAND_GATED_CHANNEL_ACTIVITY     10        Up 3.257722e-04
-## 7               GO_CARBOXYPEPTIDASE_ACTIVITY      7        Up 3.983730e-04
-## 8       GO_SERINE_TYPE_EXOPEPTIDASE_ACTIVITY      7        Up 4.648256e-04
+## 1                             GO_IGG_BINDING      5        Up 5.590511e-05
+## 2 GO_ACYLGLYCEROL_O_ACYLTRANSFERASE_ACTIVITY      5        Up 6.815654e-05
+## 3   GO_SERINE_TYPE_CARBOXYPEPTIDASE_ACTIVITY      6        Up 1.386371e-04
+## 4          GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.936765e-04
+## 5                  GO_IMMUNOGLOBULIN_BINDING      8        Up 2.098191e-04
+## 6               GO_CARBOXYPEPTIDASE_ACTIVITY      7        Up 5.062926e-04
+## 7       GO_SERINE_TYPE_EXOPEPTIDASE_ACTIVITY      7        Up 5.887839e-04
+## 8              GO_O_ACYLTRANSFERASE_ACTIVITY      7        Up 6.642764e-04
 ##           FDR
-## 1 0.004833335
-## 2 0.010076229
-## 3 0.011285200
-## 4 0.017204078
-## 5 0.021186212
-## 6 0.025084457
-## 7 0.028118498
-## 8 0.030285174</code></pre>
+## 1 0.007891939
+## 2 0.008246941
+## 3 0.014678204
+## 4 0.017771675
+## 5 0.017771675
+## 6 0.038984530
+## 7 0.041558331
+## 8 0.043280164</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-6.png" width="672" /></p>
 <pre><code>## Cluster: 5 Contrast: fresh-DMSO Num genes: 4756 Num DE: 4 
 ##                                              category NGenes Direction
@@ -850,17 +784,15 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 2                                 GO_COLLAGEN_BINDING     10        Up
 ## 3                               GO_CHEMOKINE_ACTIVITY     16        Up
 ## 4                                   GO_R_SMAD_BINDING     10        Up
-## 5 GO_PHOSPHATIDYLINOSITOL_3_4_5_TRISPHOSPHATE_BINDING     12        Up
-## 6                       GO_CHEMOKINE_RECEPTOR_BINDING     20        Up
-## 7  GO_SIGNALING_PATTERN_RECOGNITION_RECEPTOR_ACTIVITY      9        Up
+## 5  GO_SIGNALING_PATTERN_RECOGNITION_RECEPTOR_ACTIVITY      9        Up
+## 6 GO_PHOSPHATIDYLINOSITOL_3_4_5_TRISPHOSPHATE_BINDING     12        Up
 ##         PValue          FDR
-## 1 2.433933e-11 2.061541e-08
-## 2 4.464736e-06 1.260544e-03
-## 3 1.002705e-05 2.123228e-03
-## 4 3.717063e-05 6.296705e-03
-## 5 1.503529e-04 1.819270e-02
-## 6 3.448717e-04 3.245626e-02
-## 7 5.291294e-04 4.481726e-02</code></pre>
+## 1 9.326749e-11 7.899756e-08
+## 2 1.470949e-05 4.152979e-03
+## 3 2.530683e-05 5.358722e-03
+## 4 5.069952e-05 8.588498e-03
+## 5 1.487778e-04 1.664528e-02
+## 6 1.572164e-04 1.664528e-02</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-7.png" width="672" /></p>
 <pre><code>## Cluster: 6 Contrast: fresh-DMSO Num genes: 4756 Num DE: 6 
 ##                                                                                                            category
@@ -868,70 +800,70 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 2                                                                                  GO_CAMP_RESPONSE_ELEMENT_BINDING
 ## 3                                                                                         GO_HMG_BOX_DOMAIN_BINDING
 ## 4                                                                                                   GO_SMAD_BINDING
-## 5   GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
-## 6                   GO_TRANSCRIPTIONAL_REPRESSOR_ACTIVITY_RNA_POLYMERASE_II_ACTIVATING_TRANSCRIPTION_FACTOR_BINDING
+## 5                   GO_TRANSCRIPTIONAL_REPRESSOR_ACTIVITY_RNA_POLYMERASE_II_ACTIVATING_TRANSCRIPTION_FACTOR_BINDING
+## 6   GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
 ## 7                                                      GO_RNA_POLYMERASE_II_ACTIVATING_TRANSCRIPTION_FACTOR_BINDING
 ## 8 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_TRANSCRIPTION_REGULATORY_REGION_SEQUENCE_SPECIFIC_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 9.993681e-62 8.464648e-59
-## 2      5        Up 3.353858e-34 1.420359e-31
-## 3      5        Up 1.883626e-30 5.318104e-28
-## 4     26        Up 4.595782e-21 9.731568e-19
-## 5     58        Up 9.009876e-16 1.526273e-13
-## 6     14        Up 1.229686e-15 1.735907e-13
-## 7     14        Up 6.381005e-13 7.721017e-11
-## 8     82        Up 1.308663e-09 1.385547e-07</code></pre>
+## 1     10        Up 2.367825e-62 2.005548e-59
+## 2      5        Up 2.666747e-34 1.129367e-31
+## 3      5        Up 5.646842e-32 1.594292e-29
+## 4     26        Up 2.706861e-21 5.731779e-19
+## 5     14        Up 5.858343e-16 9.628128e-14
+## 6     58        Up 6.820398e-16 9.628128e-14
+## 7     14        Up 3.268195e-13 3.954517e-11
+## 8     82        Up 8.845510e-10 9.365183e-08</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-8.png" width="672" /></p>
 <pre><code>## Cluster: 7 Contrast: fresh-DMSO Num genes: 4756 Num DE: 92 
 ##                                                                                                            category
 ## 1                                                                                                 GO_R_SMAD_BINDING
-## 2                                                                                GO_MAP_KINASE_PHOSPHATASE_ACTIVITY
-## 3                                                                                                   GO_SMAD_BINDING
-## 4   GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
+## 2                                                                                                   GO_SMAD_BINDING
+## 3   GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
+## 4                                                                                GO_MAP_KINASE_PHOSPHATASE_ACTIVITY
 ## 5                                                  GO_RNA_POLYMERASE_II_CORE_PROMOTER_SEQUENCE_SPECIFIC_DNA_BINDING
-## 6                                                                                          GO_RAGE_RECEPTOR_BINDING
-## 7                                                         GO_PROTEIN_TYROSINE_SERINE_THREONINE_PHOSPHATASE_ACTIVITY
-## 8 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_TRANSCRIPTION_REGULATORY_REGION_SEQUENCE_SPECIFIC_BINDING
+## 6 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_TRANSCRIPTION_REGULATORY_REGION_SEQUENCE_SPECIFIC_BINDING
+## 7                                                                      GO_CORE_PROMOTER_PROXIMAL_REGION_DNA_BINDING
+## 8        GO_TRANSCRIPTION_FACTOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 3.154853e-23 2.672161e-20
-## 2      6        Up 1.330868e-09 5.636225e-07
-## 3     26        Up 1.993123e-08 4.934542e-06
-## 4     58        Up 2.330362e-08 4.934542e-06
-## 5     25        Up 9.464123e-06 1.336019e-03
-## 6      9        Up 3.364029e-05 4.070475e-03
-## 7     14        Up 4.639331e-05 4.911892e-03
-## 8     82        Up 6.418735e-05 6.040743e-03</code></pre>
+## 1     10        Up 3.836351e-27 3.249389e-24
+## 2     26        Up 5.976624e-10 2.166623e-07
+## 3     58        Up 7.673988e-10 2.166623e-07
+## 4      6        Up 1.584677e-07 3.355553e-05
+## 5     25        Up 6.632929e-07 1.123618e-04
+## 6     82        Up 8.026180e-06 1.133029e-03
+## 7    102        Up 3.855990e-05 4.220541e-03
+## 8     89        Up 3.986343e-05 4.220541e-03</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-9.png" width="672" /></p>
-<pre><code>## Cluster: 8 Contrast: fresh-DMSO Num genes: 4756 Num DE: 293 
+<pre><code>## Cluster: 8 Contrast: fresh-DMSO Num genes: 4756 Num DE: 308 
 ##                                  category NGenes Direction       PValue
-## 1       GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 2.118588e-59
-## 2              GO_PEPTIDE_ANTIGEN_BINDING     17        Up 5.303081e-21
-## 3 GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 3.059891e-19
-## 4          GO_MHC_PROTEIN_COMPLEX_BINDING     15        Up 1.278605e-13
-## 5                      GO_ANTIGEN_BINDING     45        Up 1.351342e-11
-## 6                 GO_S100_PROTEIN_BINDING      9        Up 2.982608e-06
-## 7                          GO_IGG_BINDING      5        Up 4.705644e-06
-## 8                  GO_FIBRONECTIN_BINDING      5        Up 1.144258e-04
+## 1       GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.956429e-58
+## 2              GO_PEPTIDE_ANTIGEN_BINDING     17        Up 4.984973e-22
+## 3 GO_MHC_CLASS_II_PROTEIN_COMPLEX_BINDING     12        Up 4.031053e-18
+## 4          GO_MHC_PROTEIN_COMPLEX_BINDING     15        Up 9.972236e-13
+## 5                      GO_ANTIGEN_BINDING     45        Up 5.028906e-12
+## 6                 GO_S100_PROTEIN_BINDING      9        Up 8.821407e-08
+## 7                  GO_FIBRONECTIN_BINDING      5        Up 8.124173e-06
+## 8            GO_MISFOLDED_PROTEIN_BINDING      7        Up 9.740536e-06
 ##            FDR
-## 1 1.794444e-56
-## 2 2.245855e-18
-## 3 6.479320e-17
-## 4 2.165957e-11
-## 5 1.907645e-09
-## 6 3.157837e-04
-## 7 4.428534e-04
-## 8 9.691868e-03</code></pre>
+## 1 1.657095e-55
+## 2 2.111136e-19
+## 3 1.138101e-15
+## 4 1.689297e-10
+## 5 7.099139e-10
+## 6 9.339664e-06
+## 7 7.645749e-04
+## 8 8.250234e-04</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-10.png" width="672" /></p>
 <pre><code>## Cluster: 0 Contrast: fresh-PSC Num genes: 4756 Num DE: 16 
 ##                            category NGenes Direction       PValue          FDR
-## 1  GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 1.018635e-28 8.627840e-26
-## 2          GO_RAGE_RECEPTOR_BINDING      9        Up 1.130254e-23 4.786627e-21
-## 3 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.078655e-13 2.284052e-11
-## 4             GO_FATTY_ACID_BINDING     10        Up 1.364743e-13 2.311874e-11
-## 5    GO_MONOCARBOXYLIC_ACID_BINDING     11        Up 2.029570e-12 2.865076e-10
-## 6             GO_CHEMOKINE_ACTIVITY     16        Up 4.428147e-12 5.358058e-10
-## 7     GO_CHEMOKINE_RECEPTOR_BINDING     20        Up 1.145169e-09 1.077731e-07
-## 8 GO_CCR_CHEMOKINE_RECEPTOR_BINDING     12        Up 2.433787e-09 2.061418e-07</code></pre>
+## 1  GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 6.651469e-29 5.633794e-26
+## 2          GO_RAGE_RECEPTOR_BINDING      9        Up 9.341843e-24 3.956271e-21
+## 3 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.024998e-13 1.901272e-11
+## 4             GO_FATTY_ACID_BINDING     10        Up 1.122357e-13 1.901272e-11
+## 5    GO_MONOCARBOXYLIC_ACID_BINDING     11        Up 1.704079e-12 2.405591e-10
+## 6             GO_CHEMOKINE_ACTIVITY     16        Up 5.691750e-12 6.887018e-10
+## 7     GO_CHEMOKINE_RECEPTOR_BINDING     20        Up 1.389672e-09 1.307836e-07
+## 8 GO_CCR_CHEMOKINE_RECEPTOR_BINDING     12        Up 2.904749e-09 2.460323e-07</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-11.png" width="672" /></p>
 <pre><code>## Cluster: 1 Contrast: fresh-PSC Num genes: 4756 Num DE: 21 
 ##                                             category NGenes Direction
@@ -944,14 +876,14 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 7                      GO_CHEMOKINE_RECEPTOR_BINDING     20        Up
 ## 8                                     GO_IGG_BINDING      5        Up
 ##         PValue          FDR
-## 1 5.286378e-22 4.477562e-19
-## 2 2.325478e-21 9.848399e-19
-## 3 6.645155e-11 1.407112e-08
-## 4 1.120934e-10 1.898863e-08
-## 5 2.972551e-10 4.196251e-08
-## 6 3.749584e-09 4.536997e-07
-## 7 1.804647e-08 1.698373e-06
-## 8 4.230605e-07 3.406179e-05</code></pre>
+## 1 3.374894e-22 2.858535e-19
+## 2 1.766447e-21 7.480903e-19
+## 3 7.578659e-11 1.604781e-08
+## 4 1.581671e-10 2.679351e-08
+## 5 2.421248e-10 3.417995e-08
+## 6 3.122440e-09 3.778153e-07
+## 7 2.345237e-08 2.207129e-06
+## 8 2.919832e-07 2.473098e-05</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-12.png" width="672" /></p>
 <pre><code>## Cluster: 2 Contrast: fresh-PSC Num genes: 4756 Num DE: 19 
 ##                                                                                                          category
@@ -962,16 +894,16 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 5                                                                                                 GO_SMAD_BINDING
 ## 6 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
 ## 7                                                                                GO_CAMP_RESPONSE_ELEMENT_BINDING
-## 8                                                                               GO_MHC_CLASS_II_RECEPTOR_ACTIVITY
+## 8                                                                               GO_CCR_CHEMOKINE_RECEPTOR_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 1.971171e-13 1.669582e-10
-## 2      6        Up 2.556309e-08 1.082597e-05
-## 3      9        Up 2.424097e-07 6.844033e-05
-## 4      5        Up 1.901248e-06 3.220714e-04
-## 5     26        Up 5.543231e-05 6.837600e-03
-## 6     58        Up 1.144502e-04 1.211741e-02
-## 7      5        Up 3.259340e-04 2.760661e-02
-## 8      6        Up 3.927647e-04 3.024288e-02</code></pre>
+## 1     10        Up 3.146026e-13 2.664684e-10
+## 2      6        Up 2.756223e-08 1.167260e-05
+## 3      9        Up 2.847086e-07 8.038272e-05
+## 4      5        Up 2.428130e-06 4.113253e-04
+## 5     26        Up 6.505066e-05 7.871130e-03
+## 6     58        Up 1.144835e-04 1.212094e-02
+## 7      5        Up 3.857930e-04 3.267667e-02
+## 8     12        Up 4.920288e-04 3.788622e-02</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-13.png" width="672" /></p>
 <pre><code>## Cluster: 3 Contrast: fresh-PSC Num genes: 4756 Num DE: 19 
 ##                                             category NGenes Direction
@@ -984,34 +916,34 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 7             GO_RECEPTOR_SIGNALING_PROTEIN_ACTIVITY     45        Up
 ## 8          GO_NUCLEOSIDE_DIPHOSPHATE_KINASE_ACTIVITY      5        Up
 ##         PValue          FDR
-## 1 1.697142e-11 7.187396e-09
-## 2 2.718003e-09 4.604297e-07
-## 3 7.566786e-09 9.155811e-07
-## 4 3.910265e-08 4.139993e-06
-## 5 6.063261e-06 5.135582e-04
-## 6 1.588938e-05 1.121526e-03
-## 7 1.945951e-05 1.267862e-03
-## 8 2.499733e-05 1.512338e-03</code></pre>
+## 1 2.354824e-11 9.972678e-09
+## 2 1.068235e-09 2.261988e-07
+## 3 6.061870e-09 8.557339e-07
+## 4 8.594482e-08 9.099408e-06
+## 5 3.457625e-06 2.928609e-04
+## 6 9.513922e-06 7.258019e-04
+## 7 2.036984e-05 1.327174e-03
+## 8 6.434710e-05 3.892999e-03</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-14.png" width="672" /></p>
 <pre><code>## Cluster: 4 Contrast: fresh-PSC Num genes: 4756 Num DE: 19 
 ##                                category NGenes Direction       PValue
-## 1      GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 4.534137e-13
-## 2              GO_RAGE_RECEPTOR_BINDING      9        Up 1.010592e-12
-## 3                 GO_FATTY_ACID_BINDING     10        Up 3.716048e-08
-## 4        GO_MONOCARBOXYLIC_ACID_BINDING     11        Up 3.035683e-07
-## 5                 GO_CHEMOKINE_ACTIVITY     16        Up 3.745035e-05
-## 6 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    153        Up 9.378663e-05
-## 7                GO_CALCIUM_ION_BINDING    104        Up 2.049866e-04
-## 8          GO_SERINE_HYDROLASE_ACTIVITY     36        Up 2.565957e-04
+## 1      GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 4.254675e-14
+## 2              GO_RAGE_RECEPTOR_BINDING      9        Up 3.637421e-13
+## 3                 GO_FATTY_ACID_BINDING     10        Up 1.231460e-08
+## 4        GO_MONOCARBOXYLIC_ACID_BINDING     11        Up 1.133599e-07
+## 5 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    153        Up 3.647666e-05
+## 6                 GO_CHEMOKINE_ACTIVITY     16        Up 6.562860e-05
+## 7                GO_CALCIUM_ION_BINDING    104        Up 2.994959e-04
+## 8          GO_SERINE_HYDROLASE_ACTIVITY     36        Up 4.615439e-04
 ##            FDR
-## 1 3.840414e-10
-## 2 4.279856e-10
-## 3 7.868732e-06
-## 4 4.285372e-05
-## 5 4.531492e-03
-## 6 8.995728e-03
-## 7 1.578397e-02
-## 8 1.671820e-02</code></pre>
+## 1 3.603710e-11
+## 2 1.540448e-10
+## 3 2.607616e-06
+## 4 1.920318e-05
+## 5 4.413676e-03
+## 6 6.032569e-03
+## 7 2.078763e-02
+## 8 2.789955e-02</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-15.png" width="672" /></p>
 <pre><code>## Cluster: 5 Contrast: fresh-PSC Num genes: 4756 Num DE: 16 
 ##                                             category NGenes Direction
@@ -1019,66 +951,55 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 2                           GO_RAGE_RECEPTOR_BINDING      9        Up
 ## 3                   GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up
 ## 4                      GO_LIPOPOLYSACCHARIDE_BINDING      9        Up
-## 5                              GO_FATTY_ACID_BINDING     10        Up
-## 6                  GO_1_PHOSPHATIDYLINOSITOL_BINDING      7        Up
-## 7                         GO_VIRUS_RECEPTOR_ACTIVITY     19        Up
+## 5                         GO_VIRUS_RECEPTOR_ACTIVITY     19        Up
+## 6                              GO_FATTY_ACID_BINDING     10        Up
+## 7   GO_PHOSPHATIDYLINOSITOL_3_4_BISPHOSPHATE_BINDING      9        Up
 ## 8             GO_RECEPTOR_SIGNALING_PROTEIN_ACTIVITY     45        Up
 ##         PValue          FDR
-## 1 2.199114e-12 1.862650e-09
-## 2 4.151911e-10 1.758334e-07
-## 3 3.784789e-07 8.014292e-05
-## 4 5.271436e-06 7.834444e-04
-## 5 5.336354e-05 5.649865e-03
-## 6 6.965828e-05 6.555618e-03
-## 7 9.554902e-05 7.207722e-03
-## 8 9.946791e-05 7.207722e-03</code></pre>
+## 1 1.019089e-12 8.631685e-10
+## 2 1.216446e-10 5.151648e-08
+## 3 1.021816e-07 2.163696e-05
+## 4 3.379612e-06 5.247555e-04
+## 5 2.578853e-05 2.862549e-03
+## 6 3.290834e-05 2.862549e-03
+## 7 3.379633e-05 2.862549e-03
+## 8 9.665090e-05 7.442119e-03</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-16.png" width="672" /></p>
 <pre><code>## Cluster: 6 Contrast: fresh-PSC Num genes: 4756 Num DE: 28 
 ##                            category NGenes Direction       PValue          FDR
-## 1          GO_RAGE_RECEPTOR_BINDING      9        Up 3.002636e-10 2.543233e-07
-## 2  GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 6.019844e-09 2.549404e-06
-## 3        GO_PEPTIDE_ANTIGEN_BINDING     17        Up 2.580742e-08 7.286296e-06
-## 4             GO_CHEMOKINE_ACTIVITY     16        Up 6.513735e-07 1.379283e-04
-## 5 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.173480e-05 1.656563e-03
-## 6     GO_CHEMOKINE_RECEPTOR_BINDING     20        Up 1.675403e-05 2.027238e-03
-## 7                 GO_R_SMAD_BINDING     10        Up 3.544236e-05 3.752460e-03
-## 8             GO_FATTY_ACID_BINDING     10        Up 1.116619e-04 1.050862e-02</code></pre>
+## 1          GO_RAGE_RECEPTOR_BINDING      9        Up 8.850627e-11 7.496481e-08
+## 2  GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 1.153940e-09 4.886937e-07
+## 3        GO_PEPTIDE_ANTIGEN_BINDING     17        Up 4.287271e-08 1.210440e-05
+## 4             GO_CHEMOKINE_ACTIVITY     16        Up 1.025628e-06 2.171767e-04
+## 5 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.081751e-05 1.527072e-03
+## 6     GO_CHEMOKINE_RECEPTOR_BINDING     20        Up 2.312261e-05 2.797835e-03
+## 7                 GO_R_SMAD_BINDING     10        Up 3.669754e-05 3.885352e-03
+## 8             GO_FATTY_ACID_BINDING     10        Up 4.995858e-05 4.701657e-03</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-17.png" width="672" /></p>
 <pre><code>## Cluster: 7 Contrast: fresh-PSC Num genes: 4756 Num DE: 114 
-##                                                 category NGenes Direction
-## 1                       GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up
-## 2                               GO_RAGE_RECEPTOR_BINDING      9        Up
-## 3                          GO_DNA_N_GLYCOSYLASE_ACTIVITY      6        Up
-## 4 GO_HYDROLASE_ACTIVITY_HYDROLYZING_N_GLYCOSYL_COMPOUNDS      7        Up
-## 5                               GO_ACTIN_MONOMER_BINDING      6        Up
-## 6                                  GO_FATTY_ACID_BINDING     10        Up
-##         PValue          FDR
-## 1 5.699435e-09 2.413711e-06
-## 2 1.602395e-05 2.714458e-03
-## 3 1.971700e-05 2.783383e-03
-## 4 1.952567e-04 2.067280e-02
-## 5 2.896721e-04 2.726136e-02
-## 6 5.767558e-04 4.885121e-02</code></pre>
+##                           category NGenes Direction       PValue          FDR
+## 1 GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 3.027665e-06 0.0005128865
+## 2         GO_RAGE_RECEPTOR_BINDING      9        Up 1.309111e-04 0.0158402416</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-18.png" width="672" /></p>
-<pre><code>## Cluster: 8 Contrast: fresh-PSC Num genes: 4756 Num DE: 569 
+<pre><code>## Cluster: 8 Contrast: fresh-PSC Num genes: 4756 Num DE: 579 
 ##                                             category NGenes Direction
 ## 1                           GO_RAGE_RECEPTOR_BINDING      9        Up
 ## 2                   GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up
 ## 3                              GO_FATTY_ACID_BINDING     10        Up
 ## 4                     GO_MONOCARBOXYLIC_ACID_BINDING     11        Up
-## 5 GO_SIGNALING_PATTERN_RECOGNITION_RECEPTOR_ACTIVITY      9        Up
-## 6                            GO_S100_PROTEIN_BINDING      9        Up
+## 5                            GO_S100_PROTEIN_BINDING      9        Up
+## 6 GO_SIGNALING_PATTERN_RECOGNITION_RECEPTOR_ACTIVITY      9        Up
 ## 7                  GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up
 ## 8                             GO_CALCIUM_ION_BINDING    104        Up
 ##         PValue          FDR
-## 1 1.131668e-77 9.585230e-75
-## 2 1.000305e-53 2.824194e-51
-## 3 1.666438e-26 3.528683e-24
-## 4 1.089009e-23 1.844781e-21
-## 5 7.161121e-19 1.010912e-16
-## 6 1.775439e-16 2.148281e-14
-## 7 9.149810e-16 9.687361e-14
-## 8 1.569347e-13 1.476930e-11</code></pre>
+## 1 4.733011e-85 4.008860e-82
+## 2 6.170322e-70 2.613131e-67
+## 3 3.900974e-34 8.260312e-32
+## 4 1.551354e-30 2.627993e-28
+## 5 2.393476e-21 3.378790e-19
+## 6 3.248643e-16 3.930857e-14
+## 7 9.305548e-16 9.852249e-14
+## 8 5.222678e-15 4.915120e-13</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-19.png" width="672" /></p>
 <pre><code>## Cluster: 0 Contrast: fresh-CS10 Num genes: 4756 Num DE: 8 
 ##                                                                                                            category
@@ -1091,14 +1012,14 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 7                                                                                                   GO_SMAD_BINDING
 ## 8                                                                                                GO_ANTIGEN_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 8.270659e-17 7.005248e-14
-## 2      5        Up 2.271013e-09 9.617741e-07
-## 3     58        Up 2.006088e-07 5.663855e-05
-## 4     17        Up 8.072718e-07 1.709398e-04
-## 5      6        Up 5.749866e-06 9.740273e-04
-## 6     82        Up 1.307398e-05 1.602888e-03
-## 7     26        Up 1.324701e-05 1.602888e-03
-## 8     45        Up 2.029729e-05 2.148976e-03</code></pre>
+## 1     10        Up 9.378151e-17 7.943294e-14
+## 2      5        Up 2.165527e-09 9.171006e-07
+## 3     58        Up 2.053371e-07 5.797352e-05
+## 4     17        Up 7.645361e-07 1.618905e-04
+## 5      6        Up 5.769051e-06 9.772772e-04
+## 6     82        Up 1.370111e-05 1.664214e-03
+## 7     26        Up 1.375384e-05 1.664214e-03
+## 8     45        Up 2.007591e-05 2.125537e-03</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-20.png" width="672" /></p>
 <pre><code>## Cluster: 1 Contrast: fresh-CS10 Num genes: 4756 Num DE: 9 
 ##                                                                                                            category
@@ -1106,19 +1027,19 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 2                                                                                         GO_HMG_BOX_DOMAIN_BINDING
 ## 3   GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
 ## 4                                                                                GO_MAP_KINASE_PHOSPHATASE_ACTIVITY
-## 5                                                                                                   GO_SMAD_BINDING
-## 6 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_TRANSCRIPTION_REGULATORY_REGION_SEQUENCE_SPECIFIC_BINDING
+## 5 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_TRANSCRIPTION_REGULATORY_REGION_SEQUENCE_SPECIFIC_BINDING
+## 6                                                                                                   GO_SMAD_BINDING
 ## 7        GO_TRANSCRIPTION_FACTOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
 ## 8                   GO_TRANSCRIPTIONAL_REPRESSOR_ACTIVITY_RNA_POLYMERASE_II_ACTIVATING_TRANSCRIPTION_FACTOR_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 7.453842e-31 6.313405e-28
-## 2      5        Up 6.769595e-18 2.866924e-15
-## 3     58        Up 8.278219e-15 2.337217e-12
-## 4      6        Up 1.986256e-11 4.205898e-09
-## 5     26        Up 1.437272e-09 2.321585e-07
-## 6     82        Up 1.644571e-09 2.321585e-07
-## 7     89        Up 3.122032e-09 3.777659e-07
-## 8     14        Up 4.854899e-08 5.140124e-06</code></pre>
+## 1     10        Up 2.351131e-30 1.991408e-27
+## 2      5        Up 6.458851e-18 2.735323e-15
+## 3     58        Up 9.867639e-15 2.785963e-12
+## 4      6        Up 1.911115e-11 4.046785e-09
+## 5     82        Up 1.970139e-09 2.902086e-07
+## 6     26        Up 2.055787e-09 2.902086e-07
+## 7     89        Up 3.304935e-09 3.998972e-07
+## 8     14        Up 7.634344e-08 8.082862e-06</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-21.png" width="672" /></p>
 <pre><code>## Cluster: 2 Contrast: fresh-CS10 Num genes: 4756 Num DE: 18 
 ##                                                                                                            category
@@ -1131,14 +1052,14 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 7                                                                                         GO_HMG_BOX_DOMAIN_BINDING
 ## 8        GO_TRANSCRIPTION_FACTOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 1.103305e-35 9.344997e-33
-## 2     58        Up 3.931979e-17 1.665193e-14
-## 3      6        Up 1.324427e-12 3.739298e-10
-## 4     26        Up 2.134560e-11 4.519930e-09
-## 5     25        Up 1.138907e-10 1.929309e-08
-## 6     82        Up 3.784841e-10 5.342934e-08
-## 7      5        Up 9.807570e-09 1.186716e-06
-## 8     89        Up 1.458945e-08 1.544659e-06</code></pre>
+## 1     10        Up 1.763399e-35 1.493599e-32
+## 2     58        Up 4.796461e-17 2.031301e-14
+## 3      6        Up 5.503268e-12 1.553756e-09
+## 4     26        Up 2.486064e-11 5.264241e-09
+## 5     25        Up 1.298407e-10 2.199501e-08
+## 6     82        Up 4.198135e-10 5.926367e-08
+## 7      5        Up 1.119063e-08 1.354066e-06
+## 8     89        Up 1.637168e-08 1.733352e-06</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-22.png" width="672" /></p>
 <pre><code>## Cluster: 3 Contrast: fresh-CS10 Num genes: 4756 Num DE: 5 
 ##                                                 category NGenes Direction
@@ -1147,38 +1068,38 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 3                          GO_CYTOKINE_RECEPTOR_ACTIVITY     24        Up
 ## 4                           GO_GLYCOSAMINOGLYCAN_BINDING     27        Up
 ## 5                           GO_PEPTIDE_RECEPTOR_ACTIVITY     16        Up
-## 6                   GO_CARBOHYDRATE_TRANSPORTER_ACTIVITY      9        Up
+## 6     GO_SIGNALING_PATTERN_RECOGNITION_RECEPTOR_ACTIVITY      9        Up
 ## 7              GO_PHOSPHATIDYLINOSITOL_3_KINASE_ACTIVITY     18        Up
-## 8     GO_SIGNALING_PATTERN_RECOGNITION_RECEPTOR_ACTIVITY      9        Up
+## 8                   GO_CARBOHYDRATE_TRANSPORTER_ACTIVITY      9        Up
 ##         PValue          FDR
-## 1 2.728433e-08 2.310983e-05
-## 2 3.266168e-06 6.528836e-04
-## 3 3.854094e-06 6.528836e-04
-## 4 3.330221e-04 2.820697e-02
-## 5 6.215482e-04 3.621361e-02
-## 6 6.218967e-04 3.621361e-02
-## 7 6.291732e-04 3.621361e-02
-## 8 7.011140e-04 3.621361e-02</code></pre>
+## 1 1.922097e-08 1.628016e-05
+## 2 2.653455e-06 1.112634e-03
+## 3 3.940852e-06 1.112634e-03
+## 4 3.835094e-04 3.248324e-02
+## 5 5.073399e-04 3.580974e-02
+## 6 5.840136e-04 3.805073e-02
+## 7 6.669248e-04 3.930418e-02
+## 8 6.960598e-04 3.930418e-02</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-23.png" width="672" /></p>
 <pre><code>## Cluster: 4 Contrast: fresh-CS10 Num genes: 4756 Num DE: 17 
 ##                                             category NGenes Direction
 ## 1 GO_SIGNALING_PATTERN_RECOGNITION_RECEPTOR_ACTIVITY      9        Up
 ## 2                     GO_SIGNALING_RECEPTOR_ACTIVITY    156        Up
-## 3                               GO_RECEPTOR_ACTIVITY    215        Up
+## 3    GO_G_PROTEIN_BETA_GAMMA_SUBUNIT_COMPLEX_BINDING      8        Up
 ## 4        GO_SUGAR_TRANSMEMBRANE_TRANSPORTER_ACTIVITY      7        Up
-## 5    GO_G_PROTEIN_BETA_GAMMA_SUBUNIT_COMPLEX_BINDING      8        Up
+## 5                               GO_RECEPTOR_ACTIVITY    215        Up
 ##         PValue          FDR
-## 1 5.691512e-07 0.0001606904
-## 2 9.552420e-06 0.0020227250
-## 3 1.726173e-04 0.0288932360
-## 4 2.046746e-04 0.0288932360
-## 5 2.944960e-04 0.0356340142</code></pre>
+## 1 1.538678e-06 0.0004344201
+## 2 1.341988e-05 0.0028416593
+## 3 1.898078e-04 0.0262009856
+## 4 2.012054e-04 0.0262009856
+## 5 2.165371e-04 0.0262009856</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-24.png" width="672" /></p>
 <pre><code>## Cluster: 5 Contrast: fresh-CS10 Num genes: 4756 Num DE: 12 
-##                             category NGenes Direction       PValue         FDR
-## 1                  GO_R_SMAD_BINDING     10        Up 1.151616e-05 0.009635137
-## 2         GO_PEPTIDE_ANTIGEN_BINDING     17        Up 2.275121e-05 0.009635137
-## 3 GO_MAP_KINASE_PHOSPHATASE_ACTIVITY      6        Up 4.152771e-05 0.011724656</code></pre>
+##                             category NGenes Direction       PValue       FDR
+## 1                  GO_R_SMAD_BINDING     10        Up 1.928926e-05 0.0163380
+## 2         GO_PEPTIDE_ANTIGEN_BINDING     17        Up 4.697037e-05 0.0188623
+## 3 GO_MAP_KINASE_PHOSPHATASE_ACTIVITY      6        Up 6.680863e-05 0.0188623</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-25.png" width="672" /></p>
 <pre><code>## Cluster: 6 Contrast: fresh-CS10 Num genes: 4756 Num DE: 19 
 ##                                                                                                            category
@@ -1191,41 +1112,41 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 ## 7                                                                                GO_MAP_KINASE_PHOSPHATASE_ACTIVITY
 ## 8 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_TRANSCRIPTION_REGULATORY_REGION_SEQUENCE_SPECIFIC_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1     10        Up 2.555579e-51 2.164575e-48
-## 2      5        Up 4.203184e-21 1.780048e-18
-## 3      5        Up 3.292675e-19 9.296320e-17
-## 4     26        Up 2.048357e-17 4.337397e-15
-## 5     58        Up 1.002808e-16 1.698756e-14
-## 6     14        Up 6.469477e-11 9.132746e-09
-## 7      6        Up 8.323276e-11 1.007116e-08
-## 8     82        Up 4.695994e-10 4.971884e-08</code></pre>
+## 1     10        Up 7.601816e-52 6.438738e-49
+## 2      5        Up 2.004703e-20 8.489917e-18
+## 3      5        Up 2.697768e-19 7.616698e-17
+## 4     26        Up 1.392488e-17 2.948592e-15
+## 5     58        Up 6.925128e-17 1.173117e-14
+## 6     14        Up 7.139213e-11 1.007819e-08
+## 7      6        Up 1.703831e-10 2.061636e-08
+## 8     82        Up 3.388324e-10 3.587388e-08</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-26.png" width="672" /></p>
 <pre><code>## Cluster: 7 Contrast: fresh-CS10 Num genes: 4756 Num DE: 33 
 ##                                                                                                          category
-## 1                                                                              GO_MAP_KINASE_PHOSPHATASE_ACTIVITY
-## 2                                                                                               GO_R_SMAD_BINDING
-## 3                                                GO_RNA_POLYMERASE_II_CORE_PROMOTER_SEQUENCE_SPECIFIC_DNA_BINDING
-## 4                                                                                        GO_GROWTH_FACTOR_BINDING
-## 5                                                       GO_PROTEIN_TYROSINE_SERINE_THREONINE_PHOSPHATASE_ACTIVITY
-## 6 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
+## 1                                                                                               GO_R_SMAD_BINDING
+## 2                                                GO_RNA_POLYMERASE_II_CORE_PROMOTER_SEQUENCE_SPECIFIC_DNA_BINDING
+## 3                                                                              GO_MAP_KINASE_PHOSPHATASE_ACTIVITY
+## 4 GO_TRANSCRIPTIONAL_ACTIVATOR_ACTIVITY_RNA_POLYMERASE_II_CORE_PROMOTER_PROXIMAL_REGION_SEQUENCE_SPECIFIC_BINDING
+## 5                                                                  GO_CORE_PROMOTER_SEQUENCE_SPECIFIC_DNA_BINDING
+## 6                                                                                        GO_CORE_PROMOTER_BINDING
 ##   NGenes Direction       PValue          FDR
-## 1      6        Up 1.247500e-11 1.056632e-08
-## 2     10        Up 5.373573e-10 2.275708e-07
-## 3     25        Up 2.428923e-07 6.857658e-05
-## 4     24        Up 1.661211e-05 3.517613e-03
-## 5     14        Up 1.710375e-04 2.414479e-02
-## 6     58        Up 2.329987e-04 2.819284e-02</code></pre>
+## 1     10        Up 6.889623e-12 5.835511e-09
+## 2     25        Up 6.340945e-09 2.685390e-06
+## 3      6        Up 1.130845e-07 3.192754e-05
+## 4     58        Up 1.989822e-05 4.213449e-03
+## 5     46        Up 9.346393e-05 1.583279e-02
+## 6     71        Up 1.590669e-04 2.245494e-02</code></pre>
 <p><img src="batch_effect_pbmc_roche_files/figure-html/pval%20lfc-27.png" width="672" /></p>
-<pre><code>## Cluster: 8 Contrast: fresh-CS10 Num genes: 4756 Num DE: 392 
+<pre><code>## Cluster: 8 Contrast: fresh-CS10 Num genes: 4756 Num DE: 416 
 ##                            category NGenes Direction       PValue          FDR
-## 1          GO_RAGE_RECEPTOR_BINDING      9        Up 7.831824e-23 3.316778e-20
-## 2  GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 5.946017e-19 1.678759e-16
-## 3    GO_MONOCARBOXYLIC_ACID_BINDING     11        Up 5.319582e-18 1.126421e-15
-## 4             GO_FATTY_ACID_BINDING     10        Up 1.993366e-16 3.376762e-14
-## 5           GO_ORGANIC_ACID_BINDING     33        Up 8.091275e-11 1.142218e-08
-## 6 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 5.493403e-09 6.647018e-07
-## 7        GO_PEPTIDE_ANTIGEN_BINDING     17        Up 5.805528e-08 6.146603e-06
-## 8            GO_CALCIUM_ION_BINDING    104        Up 6.857913e-08 6.454058e-06</code></pre>
+## 1          GO_RAGE_RECEPTOR_BINDING      9        Up 7.163028e-26 3.033542e-23
+## 2  GO_LONG_CHAIN_FATTY_ACID_BINDING      5        Up 1.005865e-24 2.839892e-22
+## 3    GO_MONOCARBOXYLIC_ACID_BINDING     11        Up 3.676774e-24 7.785568e-22
+## 4             GO_FATTY_ACID_BINDING     10        Up 3.224566e-22 5.462414e-20
+## 5           GO_ORGANIC_ACID_BINDING     33        Up 1.100163e-12 1.553063e-10
+## 6        GO_PEPTIDE_ANTIGEN_BINDING     17        Up 1.204752e-10 1.457750e-08
+## 7            GO_CALCIUM_ION_BINDING    104        Up 3.151178e-09 3.336309e-07
+## 8 GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 2.893871e-08 2.723455e-06</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 <span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
@@ -1346,6 +1267,16 @@ panel.hist &lt;-<span class="st"> </span>function(x, ...){
 ## 
 ## [[3]]
 ## NULL</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#extract correlation coefficients</span>
+<span class="co"># correlation coefficients from celltype specific gege logFC</span>
+
+lfc_cor_list &lt;-<span class="kw">lapply</span>(<span class="kw">names</span>(all_folds), function(com){
+  exclude &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">table</span>(<span class="kw">colData</span>(sce)[,celltype]) &lt;<span class="st"> </span><span class="dv">100</span>)
+  r &lt;-<span class="st"> </span><span class="kw">cor</span>(all_folds[[com]][, -<span class="kw">c</span>(<span class="dv">1</span>, (exclude +<span class="st"> </span><span class="dv">1</span>))])
+  mean_r &lt;-<span class="st"> </span>(<span class="kw">sum</span>(r) -<span class="st"> </span><span class="kw">ncol</span>(r))/<span class="st"> </span>(<span class="kw">ncol</span>(r)^<span class="dv">2</span> -<span class="st"> </span><span class="kw">ncol</span>(r))
+})
+
+mean_lfc_cor &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(lfc_cor_list))</code></pre></div>
 </div>
 </div>
 <div id="batch-categorization" class="section level2 tabset tabset-pills">
@@ -1483,7 +1414,8 @@ celltype &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
                        <span class="st">&quot;max_de_overlap&quot;</span> =<span class="st"> </span>max_de_overlap,
                        <span class="st">&quot;mean_rel_cluster_spec&quot;</span>=<span class="st"> </span>mean_rel_spec,
                        <span class="st">&quot;min_rel_cluster_spec&quot;</span>=<span class="st"> </span>min_rel_spec,
-                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec)
+                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec,
+                       <span class="st">&quot;mean_lfc_cor&quot;</span> =<span class="st"> </span>mean_lfc_cor )
 
 
 sim &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;mean_p_be&quot;</span> =<span class="st"> </span>mean_p_be,
@@ -1575,23 +1507,24 @@ summary &lt;-<span class="st"> </span><span class="kw">cbind</span>(size, cellty
 ##  [73] XML_3.99-0.3             jpeg_0.1-8.1             shape_1.4.4             
 ##  [76] compiler_3.6.1           KernSmooth_2.23-16       ncdf4_1.17              
 ##  [79] crayon_1.3.4             minqa_1.2.4              htmltools_0.4.0         
-##  [82] Formula_1.2-3            lubridate_1.7.4          DBI_1.1.0               
-##  [85] dbplyr_1.4.2             MASS_7.3-51.5            rappdirs_0.3.1          
-##  [88] boot_1.3-24              Matrix_1.2-18            cli_2.0.2               
-##  [91] vsn_3.54.0               gdata_2.18.0             igraph_1.2.4.2          
-##  [94] pkgconfig_2.0.3          foreign_0.8-76           MALDIquant_1.19.3       
-##  [97] vipor_0.4.5              dqrng_0.2.1              multtest_2.42.0         
-## [100] XVector_0.26.0           digest_0.6.25            graph_1.64.0            
-## [103] rmarkdown_2.1            htmlTable_1.13.3         edgeR_3.28.1            
-## [106] DelayedMatrixStats_1.8.0 listarrays_0.3.1         curl_4.3                
-## [109] gtools_3.8.1             rjson_0.2.20             nloptr_1.2.2.1          
-## [112] lifecycle_0.2.0          nlme_3.1-145             BiocNeighbors_1.4.2     
-## [115] fansi_0.4.1              viridisLite_0.3.0        pillar_1.4.3            
-## [118] lattice_0.20-40          httr_1.4.1               DEoptimR_1.0-8          
-## [121] survival_3.1-11          glue_1.3.1               png_0.1-7               
-## [124] iterators_1.0.12         bit_1.1-15.2             stringi_1.4.6           
-## [127] blob_1.2.1               BiocSingular_1.2.2       latticeExtra_0.6-29     
-## [130] caTools_1.18.0           memoise_1.1.0            irlba_2.3.3</code></pre>
+##  [82] mgcv_1.8-31              Formula_1.2-3            lubridate_1.7.4         
+##  [85] DBI_1.1.0                dbplyr_1.4.2             MASS_7.3-51.5           
+##  [88] rappdirs_0.3.1           boot_1.3-24              Matrix_1.2-18           
+##  [91] cli_2.0.2                vsn_3.54.0               gdata_2.18.0            
+##  [94] igraph_1.2.4.2           pkgconfig_2.0.3          foreign_0.8-76          
+##  [97] MALDIquant_1.19.3        vipor_0.4.5              dqrng_0.2.1             
+## [100] multtest_2.42.0          XVector_0.26.0           digest_0.6.25           
+## [103] graph_1.64.0             rmarkdown_2.1            htmlTable_1.13.3        
+## [106] edgeR_3.28.1             DelayedMatrixStats_1.8.0 listarrays_0.3.1        
+## [109] curl_4.3                 gtools_3.8.1             rjson_0.2.20            
+## [112] nloptr_1.2.2.1           lifecycle_0.2.0          nlme_3.1-145            
+## [115] BiocNeighbors_1.4.2      fansi_0.4.1              viridisLite_0.3.0       
+## [118] pillar_1.4.3             lattice_0.20-40          httr_1.4.1              
+## [121] DEoptimR_1.0-8           survival_3.1-11          glue_1.3.1              
+## [124] png_0.1-7                iterators_1.0.12         bit_1.1-15.2            
+## [127] stringi_1.4.6            blob_1.2.1               BiocSingular_1.2.2      
+## [130] latticeExtra_0.6-29      caTools_1.18.0           memoise_1.1.0           
+## [133] irlba_2.3.3</code></pre>
 </div>
 
 

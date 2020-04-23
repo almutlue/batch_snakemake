@@ -64,26 +64,12 @@ doDE <- function(sce, lfc_cutoff = 0){
     grp <- group[n]
     dge <- DGEList(es_tmp, group = grp)
     dge <- calcNormFactors(dge)
-    # cdr <- scale(colMeans(es_tmp > 0))
-    # design <- model.matrix(~ cdr + grp)
-    # colnames(design) <- c("(Intercept)", "cdr", levels(group)[-1])
     design <- model.matrix(~ 0 + grp)
     colnames(design) <- levels(group)
     dge <- estimateDisp(dge, design = design)
-    f <- glmQLFit(dge, design = design, robust = TRUE)
+    f <- glmQLFit(dge, design = design, robust = FALSE, abundance.trend=FALSE)
     tt <- lapply(names(cont), function(cc){
         f <- glmQLFTest(f, contrast = cont[[cc]])
-        # c1 <- gsub('-.*', '', cc)
-        # c2 <- gsub('.*-', '', cc)
-        # if( c1 %in% colnames(design) & c2 %in% colnames(design) ){
-        #     cont_new <- rep(0, ncol(design))
-        #     cont_new[which(colnames(design) %in% c1)] <- 1
-        #     cont_new[which(colnames(design) %in% c2)] <- -1
-        #     f <- glmQLFTest(f, contrast = cont_new)
-        # }else{
-        #     coeff <- ifelse(c2 %in% colnames(design), c2, c1)
-        #     f <- glmQLFTest(f, coef = which(colnames(design) %in% coeff))
-        # }
         res_df(k, f[["table"]], ctype, cc, f[["table"]]$logFC)
     }) %>% set_names(names(cont))
     return(list(tt = tt, data = es_tmp))

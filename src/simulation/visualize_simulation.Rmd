@@ -86,10 +86,10 @@ tsne_cols <- c(
   "#7570B3", "#E6AB02", "#BEAED4", "#666666", "#999999")
 
 mds_cols <- c(
-    "#DC050C", "#FB8072", "#1965B0", "#7BAFDE", "#882E72",
-    "#B17BA6", "#FF7F00", "#FDB462", "#E7298A", "#E78AC3",
-    "#33A02C", "#B2DF8A", "#55A1B1", "#8DD3C7", "#A6761D",
-    "#E6AB02", "#7570B3", "#BEAED4", "#666666", "#999999") 
+  "#DC050C", "#1965B0", "#FB8072","#7BAFDE", "#B17BA6",  
+  "#FDB462", "#882E72", "#FF7F00", "#E78AC3", "#B2DF8A",
+  "#33A02C", "#55A1B1", "#B2DF8A", "#8DD3C7", "#A6761D",
+  "#7570B3", "#E6AB02", "#BEAED4", "#666666", "#999999")
 ```
 
 
@@ -238,13 +238,6 @@ visMDS <-function(simulation, title, ids){
 
 ### TSNE {.tabset}
 ```{r tsne, warning=FALSE, echo = FALSE}
-# lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
-#     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-#     sim_sce <- readRDS(file = filename)
-#     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
-#     visTSNE(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
-# })
-#"sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)",
 
 template_tsne <- c(
     "#### {{nm}}\n",
@@ -266,13 +259,6 @@ plots_tsne <- lapply(sim_list[[1]][[1]],
 
 ### UMAP {.tabset}
 ```{r umap, warning=FALSE}
-# lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
-#     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-#     sim_sce <- readRDS(file = filename)
-#     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
-#     visUMAP(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
-# })
-# "sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)",
 
 template_umap <- c(
     "#### {{nm}}\n",
@@ -294,13 +280,6 @@ plots_umap <- lapply(sim_list[[1]][[1]],
 
 ### MDS plot {.tabset}
 ```{r mds, warning=FALSE}
-# lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){
-#     filename <- paste0("out/sim_char/", name, "/sim_", name, "_", sim, "_sce.rds")
-#     sim_sce <- readRDS(file = filename)
-#     sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)
-#     visMDS(sim_sce, title = paste0("Simulate: ", name, " - ", sim), ids = batch)
-# })
-# "sim_sce$sample_id <- gsub('\\..', '', sim_sce$sample_id)",
 
 template_mds <- c(
     "#### {{nm}}\n",
@@ -339,14 +318,9 @@ visMDS(sce_real, title = "Real dataset", ids = "batch_id")
 ```{r sim cms, echo = FALSE}
 #get all cms scores
 cms_all <- names(colData(sce))[grep("cms_sim", names(colData(sce)))]
-cms_all <- cms_all[!cms_all %in% c("cms_sim_5__1", "cms_sim_5__1_0", "cms_sim_5__2_1")]
-# plot list
-# cms_list <- lapply(cms_all, function(sim){
-#     dim_nam <- gsub("cms_sim_","X", sim)
-#     p <- visMetric(sce, metric = sim, dim_red = dim_nam)
-#     #p2 <- visGroup(sce, group = "batch_id", dim_red = dim_nam)
-#     #p3 <- plot_grid(p, p2, nrow = 2)
-# })
+cms_na <- colnames(colData(sce)[,cms_all])[colSums(is.na(colData(sce)[,cms_all])) > 0]
+cms_all <- cms_all[!cms_all %in% cms_na]
+
 
 template_cms <- c(
     "#### {{nm}}\n",

@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Visualize simulated batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">31 March, 2020</h4>
+<h4 class="date">22 April, 2020</h4>
 
 </div>
 
@@ -355,8 +355,9 @@ sce_real &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$re
 sim_list =<span class="st"> </span><span class="kw">list</span>(<span class="kw">strsplit</span>(params$sim, <span class="st">&quot;,&quot;</span>))
 
 <span class="kw">print</span>(sim_list[[<span class="dv">1</span>]][[<span class="dv">1</span>]])</code></pre></div>
-<pre><code>##  [1] &quot;1__1_0&quot;   &quot;0.5__1&quot;   &quot;5__2_1&quot;   &quot;0.5__2_1&quot; &quot;0.5__1_0&quot; &quot;1__1&quot;    
-##  [7] &quot;5__1&quot;     &quot;0__0&quot;     &quot;5__1_0&quot;   &quot;1__2_1&quot;</code></pre>
+<pre><code>##  [1] &quot;1__1_0&quot;   &quot;2__1_0&quot;   &quot;0.5__1&quot;   &quot;4__1&quot;     &quot;2__2_1&quot;   &quot;0.5__2_1&quot;
+##  [7] &quot;0.5__1_0&quot; &quot;1__1&quot;     &quot;4__1_0&quot;   &quot;0__0&quot;     &quot;2__1&quot;     &quot;4__2_1&quot;  
+## [13] &quot;1__2_1&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">param &lt;-<span class="st"> </span><span class="kw">readRDS</span>(params$param)
 celltype &lt;-<span class="st"> </span>param[[<span class="st">&quot;celltype&quot;</span>]]
 batch &lt;-<span class="st"> </span>param[[<span class="st">&quot;batch&quot;</span>]]
@@ -380,10 +381,10 @@ tsne_cols &lt;-<span class="st"> </span><span class="kw">c</span>(
   <span class="st">&quot;#7570B3&quot;</span>, <span class="st">&quot;#E6AB02&quot;</span>, <span class="st">&quot;#BEAED4&quot;</span>, <span class="st">&quot;#666666&quot;</span>, <span class="st">&quot;#999999&quot;</span>)
 
 mds_cols &lt;-<span class="st"> </span><span class="kw">c</span>(
-    <span class="st">&quot;#DC050C&quot;</span>, <span class="st">&quot;#FB8072&quot;</span>, <span class="st">&quot;#1965B0&quot;</span>, <span class="st">&quot;#7BAFDE&quot;</span>, <span class="st">&quot;#882E72&quot;</span>,
-    <span class="st">&quot;#B17BA6&quot;</span>, <span class="st">&quot;#FF7F00&quot;</span>, <span class="st">&quot;#FDB462&quot;</span>, <span class="st">&quot;#E7298A&quot;</span>, <span class="st">&quot;#E78AC3&quot;</span>,
-    <span class="st">&quot;#33A02C&quot;</span>, <span class="st">&quot;#B2DF8A&quot;</span>, <span class="st">&quot;#55A1B1&quot;</span>, <span class="st">&quot;#8DD3C7&quot;</span>, <span class="st">&quot;#A6761D&quot;</span>,
-    <span class="st">&quot;#E6AB02&quot;</span>, <span class="st">&quot;#7570B3&quot;</span>, <span class="st">&quot;#BEAED4&quot;</span>, <span class="st">&quot;#666666&quot;</span>, <span class="st">&quot;#999999&quot;</span>) </code></pre></div>
+  <span class="st">&quot;#DC050C&quot;</span>, <span class="st">&quot;#1965B0&quot;</span>, <span class="st">&quot;#FB8072&quot;</span>,<span class="st">&quot;#7BAFDE&quot;</span>, <span class="st">&quot;#B17BA6&quot;</span>,  
+  <span class="st">&quot;#FDB462&quot;</span>, <span class="st">&quot;#882E72&quot;</span>, <span class="st">&quot;#FF7F00&quot;</span>, <span class="st">&quot;#E78AC3&quot;</span>, <span class="st">&quot;#B2DF8A&quot;</span>,
+  <span class="st">&quot;#33A02C&quot;</span>, <span class="st">&quot;#55A1B1&quot;</span>, <span class="st">&quot;#B2DF8A&quot;</span>, <span class="st">&quot;#8DD3C7&quot;</span>, <span class="st">&quot;#A6761D&quot;</span>,
+  <span class="st">&quot;#7570B3&quot;</span>, <span class="st">&quot;#E6AB02&quot;</span>, <span class="st">&quot;#BEAED4&quot;</span>, <span class="st">&quot;#666666&quot;</span>, <span class="st">&quot;#999999&quot;</span>)</code></pre></div>
 </div>
 <div id="visualize-simulations" class="section level3">
 <h3>Visualize simulations</h3>
@@ -534,54 +535,72 @@ visMDS &lt;-function(simulation, title, ids){
 <p><img src="vis_sim_csf_media_files/figure-html/tsne1__1_0-1.png" width="672" /></p>
 </div>
 <div id="section-1" class="section level4">
+<h4>2__1_0</h4>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne2__1_0-1.png" width="672" /></p>
+</div>
+<div id="section-2" class="section level4">
 <h4>0.5__1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/tsne0.5__1-1.png" width="672" /></p>
 </div>
-<div id="section-2" class="section level4">
-<h4>5__2_1</h4>
+<div id="section-3" class="section level4">
+<h4>4__1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
-<p><img src="vis_sim_csf_media_files/figure-html/tsne5__2_1-1.png" width="672" /></p>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne4__1-1.png" width="672" /></p>
 </div>
-<div id="section-3" class="section level4">
+<div id="section-4" class="section level4">
+<h4>2__2_1</h4>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne2__2_1-1.png" width="672" /></p>
+</div>
+<div id="section-5" class="section level4">
 <h4>0.5__2_1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/tsne0.5__2_1-1.png" width="672" /></p>
 </div>
-<div id="section-4" class="section level4">
+<div id="section-6" class="section level4">
 <h4>0.5__1_0</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/tsne0.5__1_0-1.png" width="672" /></p>
 </div>
-<div id="section-5" class="section level4">
+<div id="section-7" class="section level4">
 <h4>1__1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/tsne1__1-1.png" width="672" /></p>
 </div>
-<div id="section-6" class="section level4">
-<h4>5__1</h4>
+<div id="section-8" class="section level4">
+<h4>4__1_0</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
-<p><img src="vis_sim_csf_media_files/figure-html/tsne5__1-1.png" width="672" /></p>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne4__1_0-1.png" width="672" /></p>
 </div>
-<div id="section-7" class="section level4">
+<div id="section-9" class="section level4">
 <h4>0__0</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/tsne0__0-1.png" width="672" /></p>
 </div>
-<div id="section-8" class="section level4">
-<h4>5__1_0</h4>
+<div id="section-10" class="section level4">
+<h4>2__1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
-<p><img src="vis_sim_csf_media_files/figure-html/tsne5__1_0-1.png" width="672" /></p>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne2__1-1.png" width="672" /></p>
 </div>
-<div id="section-9" class="section level4">
+<div id="section-11" class="section level4">
+<h4>4__2_1</h4>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/tsne4__2_1-1.png" width="672" /></p>
+</div>
+<div id="section-12" class="section level4">
 <h4>1__2_1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
@@ -590,15 +609,7 @@ visMDS &lt;-function(simulation, title, ids){
 </div>
 <div id="umap" class="section level3 tabset">
 <h3>UMAP</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){</span>
-<span class="co">#     filename &lt;- paste0(&quot;out/sim_char/&quot;, name, &quot;/sim_&quot;, name, &quot;_&quot;, sim, &quot;_sce.rds&quot;)</span>
-<span class="co">#     sim_sce &lt;- readRDS(file = filename)</span>
-<span class="co">#     sim_sce$sample_id &lt;- gsub(&#39;\\..&#39;, &#39;&#39;, sim_sce$sample_id)</span>
-<span class="co">#     visUMAP(sim_sce, title = paste0(&quot;Simulate: &quot;, name, &quot; - &quot;, sim), ids = batch)</span>
-<span class="co"># })</span>
-<span class="co"># &quot;sim_sce$sample_id &lt;- gsub(&#39;\\..&#39;, &#39;&#39;, sim_sce$sample_id)&quot;,</span>
-
-template_umap &lt;-<span class="st"> </span><span class="kw">c</span>(
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">template_umap &lt;-<span class="st"> </span><span class="kw">c</span>(
     <span class="st">&quot;#### {{nm}}</span><span class="ch">\n</span><span class="st">&quot;</span>,
     <span class="st">&quot;```{r umap{{nm}}, echo = FALSE}</span><span class="ch">\n</span><span class="st">&quot;</span>,
     <span class="st">&quot;filename &lt;- paste0(&#39;out/sim_char/&#39;, &#39;{{name}}&#39;, &#39;/sim_&#39;, &#39;{{name}}&#39;, &#39;_&#39;, &#39;{{nm}}&#39;, &#39;_sce.rds&#39;)&quot;</span>,
@@ -611,61 +622,79 @@ template_umap &lt;-<span class="st"> </span><span class="kw">c</span>(
 plots_umap &lt;-<span class="st"> </span><span class="kw">lapply</span>(sim_list[[<span class="dv">1</span>]][[<span class="dv">1</span>]], 
   function(nm, <span class="dt">name =</span> dataset_name) knitr::<span class="kw">knit_expand</span>(<span class="dt">text =</span> template_umap)
 )</code></pre></div>
-<div id="section-10" class="section level4">
+<div id="section-13" class="section level4">
 <h4>1__1_0</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/umap1__1_0-1.png" width="672" /></p>
 </div>
-<div id="section-11" class="section level4">
+<div id="section-14" class="section level4">
+<h4>2__1_0</h4>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap2__1_0-1.png" width="672" /></p>
+</div>
+<div id="section-15" class="section level4">
 <h4>0.5__1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/umap0.5__1-1.png" width="672" /></p>
 </div>
-<div id="section-12" class="section level4">
-<h4>5__2_1</h4>
+<div id="section-16" class="section level4">
+<h4>4__1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
-<p><img src="vis_sim_csf_media_files/figure-html/umap5__2_1-1.png" width="672" /></p>
+<p><img src="vis_sim_csf_media_files/figure-html/umap4__1-1.png" width="672" /></p>
 </div>
-<div id="section-13" class="section level4">
+<div id="section-17" class="section level4">
+<h4>2__2_1</h4>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap2__2_1-1.png" width="672" /></p>
+</div>
+<div id="section-18" class="section level4">
 <h4>0.5__2_1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/umap0.5__2_1-1.png" width="672" /></p>
 </div>
-<div id="section-14" class="section level4">
+<div id="section-19" class="section level4">
 <h4>0.5__1_0</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/umap0.5__1_0-1.png" width="672" /></p>
 </div>
-<div id="section-15" class="section level4">
+<div id="section-20" class="section level4">
 <h4>1__1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/umap1__1-1.png" width="672" /></p>
 </div>
-<div id="section-16" class="section level4">
-<h4>5__1</h4>
+<div id="section-21" class="section level4">
+<h4>4__1_0</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
-<p><img src="vis_sim_csf_media_files/figure-html/umap5__1-1.png" width="672" /></p>
+<p><img src="vis_sim_csf_media_files/figure-html/umap4__1_0-1.png" width="672" /></p>
 </div>
-<div id="section-17" class="section level4">
+<div id="section-22" class="section level4">
 <h4>0__0</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
 <p><img src="vis_sim_csf_media_files/figure-html/umap0__0-1.png" width="672" /></p>
 </div>
-<div id="section-18" class="section level4">
-<h4>5__1_0</h4>
+<div id="section-23" class="section level4">
+<h4>2__1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
-<p><img src="vis_sim_csf_media_files/figure-html/umap5__1_0-1.png" width="672" /></p>
+<p><img src="vis_sim_csf_media_files/figure-html/umap2__1-1.png" width="672" /></p>
 </div>
-<div id="section-19" class="section level4">
+<div id="section-24" class="section level4">
+<h4>4__2_1</h4>
+<pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+## which will replace the existing scale.</code></pre>
+<p><img src="vis_sim_csf_media_files/figure-html/umap4__2_1-1.png" width="672" /></p>
+</div>
+<div id="section-25" class="section level4">
 <h4>1__2_1</h4>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
@@ -674,15 +703,7 @@ plots_umap &lt;-<span class="st"> </span><span class="kw">lapply</span>(sim_list
 </div>
 <div id="mds-plot" class="section level3 tabset">
 <h3>MDS plot</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># lapply(sim_list[[1]][[1]], function(sim, name = dataset_name){</span>
-<span class="co">#     filename &lt;- paste0(&quot;out/sim_char/&quot;, name, &quot;/sim_&quot;, name, &quot;_&quot;, sim, &quot;_sce.rds&quot;)</span>
-<span class="co">#     sim_sce &lt;- readRDS(file = filename)</span>
-<span class="co">#     sim_sce$sample_id &lt;- gsub(&#39;\\..&#39;, &#39;&#39;, sim_sce$sample_id)</span>
-<span class="co">#     visMDS(sim_sce, title = paste0(&quot;Simulate: &quot;, name, &quot; - &quot;, sim), ids = batch)</span>
-<span class="co"># })</span>
-<span class="co"># &quot;sim_sce$sample_id &lt;- gsub(&#39;\\..&#39;, &#39;&#39;, sim_sce$sample_id)&quot;,</span>
-
-template_mds &lt;-<span class="st"> </span><span class="kw">c</span>(
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">template_mds &lt;-<span class="st"> </span><span class="kw">c</span>(
     <span class="st">&quot;#### {{nm}}</span><span class="ch">\n</span><span class="st">&quot;</span>,
     <span class="st">&quot;```{r mds{{nm}}, echo = FALSE}</span><span class="ch">\n</span><span class="st">&quot;</span>,
     <span class="st">&quot;filename &lt;- paste0(&#39;out/sim_char/&#39;, &#39;{{name}}&#39;, &#39;/sim_&#39;, &#39;{{name}}&#39;, &#39;_&#39;, &#39;{{nm}}&#39;, &#39;_sce.rds&#39;)&quot;</span>,
@@ -695,43 +716,55 @@ template_mds &lt;-<span class="st"> </span><span class="kw">c</span>(
 plots_mds &lt;-<span class="st"> </span><span class="kw">lapply</span>(sim_list[[<span class="dv">1</span>]][[<span class="dv">1</span>]], 
   function(nm, <span class="dt">name =</span> dataset_name) knitr::<span class="kw">knit_expand</span>(<span class="dt">text =</span> template_mds)
 )</code></pre></div>
-<div id="section-20" class="section level4">
+<div id="section-26" class="section level4">
 <h4>1__1_0</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/mds1__1_0-1.png" width="672" /></p>
 </div>
-<div id="section-21" class="section level4">
+<div id="section-27" class="section level4">
+<h4>2__1_0</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/mds2__1_0-1.png" width="672" /></p>
+</div>
+<div id="section-28" class="section level4">
 <h4>0.5__1</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/mds0.5__1-1.png" width="672" /></p>
 </div>
-<div id="section-22" class="section level4">
-<h4>5__2_1</h4>
-<p><img src="vis_sim_csf_media_files/figure-html/mds5__2_1-1.png" width="672" /></p>
+<div id="section-29" class="section level4">
+<h4>4__1</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/mds4__1-1.png" width="672" /></p>
 </div>
-<div id="section-23" class="section level4">
+<div id="section-30" class="section level4">
+<h4>2__2_1</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/mds2__2_1-1.png" width="672" /></p>
+</div>
+<div id="section-31" class="section level4">
 <h4>0.5__2_1</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/mds0.5__2_1-1.png" width="672" /></p>
 </div>
-<div id="section-24" class="section level4">
+<div id="section-32" class="section level4">
 <h4>0.5__1_0</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/mds0.5__1_0-1.png" width="672" /></p>
 </div>
-<div id="section-25" class="section level4">
+<div id="section-33" class="section level4">
 <h4>1__1</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/mds1__1-1.png" width="672" /></p>
 </div>
-<div id="section-26" class="section level4">
-<h4>5__1</h4>
-<p><img src="vis_sim_csf_media_files/figure-html/mds5__1-1.png" width="672" /></p>
+<div id="section-34" class="section level4">
+<h4>4__1_0</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/mds4__1_0-1.png" width="672" /></p>
 </div>
-<div id="section-27" class="section level4">
+<div id="section-35" class="section level4">
 <h4>0__0</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/mds0__0-1.png" width="672" /></p>
 </div>
-<div id="section-28" class="section level4">
-<h4>5__1_0</h4>
-<p><img src="vis_sim_csf_media_files/figure-html/mds5__1_0-1.png" width="672" /></p>
+<div id="section-36" class="section level4">
+<h4>2__1</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/mds2__1-1.png" width="672" /></p>
 </div>
-<div id="section-29" class="section level4">
+<div id="section-37" class="section level4">
+<h4>4__2_1</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/mds4__2_1-1.png" width="672" /></p>
+</div>
+<div id="section-38" class="section level4">
 <h4>1__2_1</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/mds1__2_1-1.png" width="672" /></p>
 </div>
@@ -762,9 +795,17 @@ sce_real$group_id &lt;-<span class="st"> </span><span class="kw">as.factor</span
 <h4>cms_sim_1__1_0</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/cmscms_sim_1__1_0-1.png" width="672" /></p>
 </div>
+<div id="cms_sim_2__1_0" class="section level4">
+<h4>cms_sim_2__1_0</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/cmscms_sim_2__1_0-1.png" width="672" /></p>
+</div>
 <div id="cms_sim_0.5__1" class="section level4">
 <h4>cms_sim_0.5__1</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/cmscms_sim_0.5__1-1.png" width="672" /></p>
+</div>
+<div id="cms_sim_2__2_1" class="section level4">
+<h4>cms_sim_2__2_1</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/cmscms_sim_2__2_1-1.png" width="672" /></p>
 </div>
 <div id="cms_sim_0.5__2_1" class="section level4">
 <h4>cms_sim_0.5__2_1</h4>
@@ -781,6 +822,10 @@ sce_real$group_id &lt;-<span class="st"> </span><span class="kw">as.factor</span
 <div id="cms_sim_0__0" class="section level4">
 <h4>cms_sim_0__0</h4>
 <p><img src="vis_sim_csf_media_files/figure-html/cmscms_sim_0__0-1.png" width="672" /></p>
+</div>
+<div id="cms_sim_2__1" class="section level4">
+<h4>cms_sim_2__1</h4>
+<p><img src="vis_sim_csf_media_files/figure-html/cmscms_sim_2__1-1.png" width="672" /></p>
 </div>
 <div id="cms_sim_1__2_1" class="section level4">
 <h4>cms_sim_1__2_1</h4>

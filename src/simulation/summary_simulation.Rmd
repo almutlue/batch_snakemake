@@ -159,14 +159,14 @@ plot_dev <- function(var, var_col){
 
 ## Summarize variance partitioning
 # How many genes have a variance component affected by batch with > 1%
-n_batch_gene <- vp_sub %>% dplyr::filter("vp_batch" > 0.01) %>% nrow()/n_genes
-n_batch_gene10 <- vp_sub %>% dplyr::filter("vp_batch" > 0.1) %>% nrow()/n_genes
-n_celltype_gene <- vp_sub %>% dplyr::filter("vp_celltype"> 0.01) %>% nrow()/n_genes
+n_batch_gene <- vp_sub %>% dplyr::filter(vp_batch > 0.01) %>% nrow()/n_genes
+n_batch_gene10 <- vp_sub %>% dplyr::filter(vp_batch > 0.1) %>% nrow()/n_genes
+n_celltype_gene <- vp_sub %>% dplyr::filter(vp_celltype> 0.01) %>% nrow()/n_genes
 n_rel <- n_batch_gene/n_celltype_gene
 
 # Mean variance that is explained by the batch effect/celltype
-m_batch <- mean(asin(vp_sub[, "vp_batch"]), na.rm = TRUE)
-m_celltype <- mean(asin(vp_sub[, "vp_celltype"]), na.rm = TRUE)
+m_batch <- mean(vp_sub$vp_batch, na.rm = TRUE)
+m_celltype <- mean(vp_sub$vp_celltype, na.rm = TRUE)
 m_rel <- m_batch/m_celltype
 
 ```
@@ -291,7 +291,7 @@ ggplot(mean_expr, aes(x=logcounts, colour=batch)) + geom_density(alpha=.3) +
 ```
 
 ### Batch to batch comparisons of expression distributions
-```{r mean expression, fig.height=8}
+```{r mean expression, eval=FALSE, fig.height=8, include=FALSE}
 
 #mean expression
 mean_expr <- mean_list %>% bind_rows(.id = "batch" ) %>% spread(batch, logcounts)
@@ -366,7 +366,7 @@ cats <- lapply(cats, function(u) u[-1])
 
 plotDE <- function(cont_var){
   #res_s <- res[[cont_var]] %>% map(filter, adj.P.Val < .05) %>% map(filter, abs(logFC) > 1)
-  res_s <- res[[cont_var]] %>% map(filter, PValue < .05) %>% map(filter, abs(logFC) > 1)
+  res_s <- res[[cont_var]] %>% map(filter, PValue < .05) %>% map(filter, abs(logFC) > 2)
   
   #plot
   lapply(names(res[[cont_var]]), function(ct){
@@ -513,6 +513,18 @@ lapply(names(all_folds), function(x) pairs(all_folds[[x]][,-1],
                                            lower.panel = panel.smooth, 
                                            upper.panel = panel.cor, 
                                            diag.panel = panel.hist, main = x))
+
+#extract correlation coefficients
+# correlation coefficients from celltype specific gege logFC
+
+lfc_cor_list <-lapply(names(all_folds), function(com){
+  exclude <- which(table(colData(sce)[,celltype]) < 100)
+  r <- cor(all_folds[[com]][, -c(1, (exclude + 1))])
+  mean_r <- (sum(r) - ncol(r))/ (ncol(r)^2 - ncol(r))
+})
+
+mean_lfc_cor <- mean(unlist(lfc_cor_list))
+
 ```
 
 
@@ -521,7 +533,7 @@ This can give as a feeling for how much we underestimate the batch effect.
 In extremer case the batch tuning parameters can be used to get a batch effect 
 closer to the real batch effect.
 
-```{r compare lfcs}
+```{r compare lfcs, warning=FALSE, message=FALSE}
 comp_lfcs <- function(cont_var){
     print(cont_var)
     lapply(cids, function(cell_t){
@@ -695,7 +707,8 @@ celltype <- data.frame('mean_rel_abund_diff' = mean_rel_abund_diff, #1.abundance
                        "max_de_overlap" = max_de_overlap,
                        "mean_rel_cluster_spec"= mean_rel_spec,
                        "min_rel_cluster_spec"= min_rel_spec,
-                       "max_rel_cluster_spec"= max_rel_spec)
+                       "max_rel_cluster_spec"= max_rel_spec,
+                       "mean_lfc_cor" = mean_lfc_cor)
 
 
 sim <- data.frame("mean_p_be" = mean_p_be,

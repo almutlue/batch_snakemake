@@ -237,4 +237,31 @@ rule summary_sim:
         out_file = config["out_sim_summary"] + "summary_sim_{sample_sim}.rds"
     shell:
         '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', de ='{input.de}', gs = '{input.gs}', abund = '{input.abund}', out_file = '{output.out_file}'))"'''
-        
+
+
+
+## -------------------------------------------------------------------------- ##
+## Overview on all batch characterizations
+## -------------------------------------------------------------------------- ##
+
+rule overview_sim:
+    input: 
+        check = expand(config["out_sim_sumcms"] + "summarize_cms_sim_{sample_sim}_sce.rds", sample_sim = sample_sim),
+        script = config["src_sim"] + "overall_sim_batch_characteristics.Rmd"
+    params:
+        outdir = config["docs"],
+        sce = config["out_sim_sumcms"] + "summarize_cms_sim_",
+        sce_name = ",".join(sample_sim),
+        meta = config["out_adjust_params"] + "adjust_params_",
+        summary = config["out_sim_summary"] + "summary_sim_",
+        sce_norm = config["out_sim_char"] 
+    output:
+        out = config["docs"] + "overall_sim_batch_characteristics.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(sce='{params.sce}', sce_name ='{params.sce_name}', meta ='{params.meta}', summary = '{params.summary}', sce_norm = '{params.sce_norm}'))"'''
+
+
+
+
+
+

@@ -1,5 +1,5 @@
 ##Generate combinations of simulation parameters :
-# Call this using 'snakemake generate_sim_vars' 
+# Call this using 'snakemake generate_sim_vars'
 
 args <- (commandArgs(trailingOnly = TRUE))
 for (i in seq_len(length(args))) {
@@ -17,8 +17,8 @@ suppressPackageStartupMessages({
 })
 
 #Parameter lists
-rel_be <- list(1, 0.5, 5)
-rel_be_names <- c("1", "0.5", "5")
+rel_be <- list(1, 0.5, 2, 4)
+rel_be_names <- c("1", "0.5", "2", "4")
 rel_be_c <- list(1, c(1, 0), c(2, 1))
 rel_be_c_names <- c("1", "1_0", "2_1")
 l <- list("rel_be" = rel_be, "rel_be_c" = rel_be_c)

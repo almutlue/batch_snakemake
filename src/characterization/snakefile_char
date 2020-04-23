@@ -156,6 +156,27 @@ rule summary:
         
 
 ## -------------------------------------------------------------------------- ##
+## Overview on all batch characterizations
+## -------------------------------------------------------------------------- ##
+
+rule overview:
+    input: 
+        check = expand(config["out_type"] + "type_{sample}_sce.rds", sample = sample),
+        script = config["src_summary"] + "overall_batch_characteristics.Rmd"
+    params:
+        outdir = config["docs"],
+        sce = config["out_type"] + "type_",
+        sce_name = ",".join(sample),
+        meta = config["out_set"] + "settings_",
+        summary = config["out_summary"] + "summary_",
+        sce_norm = config["out_norm"] + "norm_"
+    output:
+        out = config["docs"] + "overall_batch_characteristics.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(sce='{params.sce}', sce_name ='{params.sce_name}', meta ='{params.meta}', summary = '{params.summary}', sce_norm = '{params.sce_norm}'))"'''
+
+
+## -------------------------------------------------------------------------- ##
 ## Update index file
 ## -------------------------------------------------------------------------- ##
 

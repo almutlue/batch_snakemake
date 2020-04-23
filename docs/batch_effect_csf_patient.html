@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">13 March, 2020</h4>
+<h4 class="date">19 April, 2020</h4>
 
 </div>
 
@@ -459,26 +459,26 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 
 ## Summarize variance partitioning
 <span class="co"># How many genes have a variance component affected by batch with &gt; 1%</span>
-n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
-n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
-n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_celltype&quot;</span>&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_batch &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_batch &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_celltype&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
 n_rel &lt;-<span class="st"> </span>n_batch_gene/n_celltype_gene
 
 <span class="co"># Mean variance that is explained by the batch effect/celltype</span>
-m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_batch&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_batch&quot;]), na.rm = TRUE): argument is
-## not numeric or logical: returning NA</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_celltype&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_celltype&quot;]), na.rm = TRUE): argument
-## is not numeric or logical: returning NA</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
+m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(vp_sub$vp_batch, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(vp_sub$vp_celltype, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
 <div id="scatterplot-batch" class="section level4">
 <h4>Scatterplot batch</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_dev(&quot;vp_batch&quot;, &quot;vp_batch&quot;)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_batch&quot;</span>, <span class="st">&quot;vp_batch&quot;</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/var_plot_batch-1.png" width="672" /></p>
 </div>
 <div id="scatterplot-celltype" class="section level4">
 <h4>Scatterplot celltype</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_dev(&quot;vp_celltype&quot;, &quot;vp_celltype&quot;)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_celltype&quot;</span>, <span class="st">&quot;vp_celltype&quot;</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="batch_effect_csf_patient_files/figure-html/var_plot_celltype-1.png" width="672" /></p>
 </div>
 <div id="ternary-plot-all-genes" class="section level4">
 <h4>Ternary plot all genes</h4>
@@ -591,38 +591,6 @@ mean_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(bids, fun
 </div>
 <div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
 <h3>Batch to batch comparisons of expression distributions</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#mean expression</span>
-mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;batch&quot;</span> ) %&gt;%<span class="st"> </span><span class="kw">spread</span>(batch, logcounts)
-batch_all &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[,batch]))
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;_&quot;</span>, batch_all)
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;_&quot;</span>, batch_all)
-batch_all &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;&quot;</span>, batch_all)
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">(&quot;</span>, <span class="st">&quot;_&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-<span class="kw">colnames</span>(mean_expr) &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">)&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">colnames</span>(mean_expr))
-
-
-<span class="kw">lapply</span>(batch_all, function(batch_var){
-  batch_var_2 &lt;-<span class="st"> </span>batch_all[-<span class="kw">which</span>(batch_all %in%<span class="st"> </span>batch_var)]
-  <span class="kw">lapply</span>(batch_var_2, function(batch_var_3){
-    <span class="kw">ggplot</span>(mean_expr, <span class="kw">aes_string</span>(<span class="dt">x=</span>batch_var, <span class="dt">y =</span> batch_var_3)) +
-<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> .<span class="dv">3</span>, <span class="kw">aes</span>(<span class="dt">color=</span>cluster)) +
-<span class="st">      </span><span class="kw">ggtitle</span>(batch_var) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">geom_abline</span>(<span class="dt">slope =</span> <span class="dv">1</span>) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">coord_fixed</span>() +
-<span class="st">      </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
-<span class="st">      </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span>cols) +
-<span class="st">      </span><span class="kw">theme_classic</span>()
-  })
-})</code></pre></div>
-<pre><code>## [[1]]
-## [[1]][[1]]</code></pre>
-<p><img src="batch_effect_csf_patient_files/figure-html/mean%20expression-1.png" width="672" /></p>
-<pre><code>## 
-## 
-## [[2]]
-## [[2]][[1]]</code></pre>
-<p><img src="batch_effect_csf_patient_files/figure-html/mean%20expression-2.png" width="672" /></p>
 </div>
 </div>
 <div id="differentially-expressed-genes" class="section level2">
@@ -692,7 +660,7 @@ plotDE &lt;-<span class="st"> </span>function(cont_var){
     res_s[[ct]]$gene &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;[A-z0-9]*</span><span class="ch">\\</span><span class="st">.&#39;</span>, <span class="st">&#39;&#39;</span>, res_s[[ct]]$gene)
     
     <span class="co">#p &lt;- ggplot(ct_de, aes(x = AveExpr, y = logFC, colour = abs(logFC) &gt; 1, label = gene)) + </span>
-    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> logCPM, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
+    p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ct_de, <span class="kw">aes</span>(<span class="dt">x =</span> logCPM, <span class="dt">y =</span> logFC, <span class="dt">colour =</span> <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">2</span>, <span class="dt">label =</span> gene)) +<span class="st"> </span>
 <span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> .<span class="dv">5</span>) +
 <span class="st">      </span><span class="kw">geom_label_repel</span>(<span class="dt">data =</span> res_s[[ct]]) +
 <span class="st">      </span><span class="kw">ggtitle</span>(<span class="kw">paste0</span>(ct,<span class="st">&quot;: &quot;</span>, cont_var)) +
@@ -717,67 +685,81 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-1.png" width="672" /></p>
 <pre><code>## Cluster: 0 Contrast: pat2-pat3 Num genes: 3613 Num DE: 40 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 3.476756e-18
-## 2                       GO_RRNA_BINDING     37        Up 2.450312e-15
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    221        Up 1.186632e-09
-## 4                       GO_MRNA_BINDING     75        Up 2.168617e-06
-## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 1.009888e-04
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 7.248703e-18
+## 2                       GO_RRNA_BINDING     37        Up 6.807396e-15
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    221        Up 1.887682e-09
+## 4                       GO_MRNA_BINDING     75        Up 1.735930e-06
+## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 2.292739e-04
 ##            FDR
-## 1 2.875278e-15
-## 2 1.013204e-12
-## 3 3.271148e-07
-## 4 4.483616e-04
-## 5 1.670355e-02</code></pre>
+## 1 5.994677e-15
+## 2 2.814858e-12
+## 3 5.203709e-07
+## 4 3.589036e-04
+## 5 3.792191e-02</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-2.png" width="672" /></p>
 <pre><code>## Cluster: 1 Contrast: pat2-pat3 Num genes: 3613 Num DE: 49 
 ##                                category NGenes Direction       PValue
-## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 5.277021e-15
-## 2                       GO_RRNA_BINDING     37        Up 7.064368e-13
-## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    221        Up 2.718606e-08
-## 4                       GO_MRNA_BINDING     75        Up 1.571176e-06
-## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 4.102740e-06
+## 1 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 1.424218e-14
+## 2                       GO_RRNA_BINDING     37        Up 9.958224e-13
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    221        Up 4.384143e-08
+## 4                       GO_MRNA_BINDING     75        Up 1.851777e-06
+## 5   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 6.449530e-05
+## 6     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 2.417833e-04
 ##            FDR
-## 1 4.364096e-12
-## 2 2.921116e-10
-## 3 7.494290e-06
-## 4 3.248406e-04
-## 5 6.785932e-04</code></pre>
+## 1 1.177828e-11
+## 2 4.117725e-10
+## 3 1.208562e-05
+## 4 3.828548e-04
+## 5 1.066752e-02
+## 6 3.332580e-02</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-3.png" width="672" /></p>
 <pre><code>## Cluster: 2 Contrast: pat2-pat3 Num genes: 3613 Num DE: 251 
 ##                                category NGenes Direction       PValue
-## 1     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 6.561668e-36
-## 2                 GO_CHEMOKINE_ACTIVITY      8        Up 6.763793e-16
-## 3     GO_CCR_CHEMOKINE_RECEPTOR_BINDING     10        Up 3.457691e-12
-## 4         GO_CHEMOKINE_RECEPTOR_BINDING     12        Up 1.688025e-11
-## 5                       GO_RRNA_BINDING     37        Up 8.159926e-09
-## 6            GO_PEPTIDE_ANTIGEN_BINDING     15        Up 1.302803e-07
-## 7                  GO_CYTOKINE_ACTIVITY     32        Up 1.575732e-05
-## 8 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 1.079959e-04
+## 1     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 1.191762e-19
+## 2                 GO_CHEMOKINE_ACTIVITY      8        Up 6.503417e-15
+## 3                       GO_RRNA_BINDING     37        Up 9.546398e-14
+## 4     GO_CCR_CHEMOKINE_RECEPTOR_BINDING     10        Up 2.899091e-11
+## 5         GO_CHEMOKINE_RECEPTOR_BINDING     12        Up 1.776821e-10
+## 6 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 4.779452e-07
+## 7                  GO_CYTOKINE_ACTIVITY     32        Up 2.874774e-05
+## 8            GO_PEPTIDE_ANTIGEN_BINDING     15        Up 6.119039e-05
 ##            FDR
-## 1 5.426499e-33
-## 2 2.796829e-13
-## 3 9.531700e-10
-## 4 3.489991e-09
-## 5 1.349652e-06
-## 6 1.795697e-05
-## 7 1.861614e-03
-## 8 1.116408e-02</code></pre>
+## 1 9.855871e-17
+## 2 2.689163e-12
+## 3 2.631624e-11
+## 4 5.993870e-09
+## 5 2.938863e-08
+## 6 6.587679e-05
+## 7 3.396341e-03
+## 8 6.325557e-03</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-4.png" width="672" /></p>
 <pre><code>## Cluster: 3 Contrast: pat2-pat3 Num genes: 3613 Num DE: 204 
 ##                                category NGenes Direction       PValue
-## 1                       GO_RRNA_BINDING     37        Up 4.653708e-09
-## 2     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 6.539914e-08
-## 3 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 6.842428e-08
-## 4       GO_STRUCTURAL_MOLECULE_ACTIVITY    221        Up 1.068500e-05
+## 1                       GO_RRNA_BINDING     37        Up 7.362623e-10
+## 2 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 3.339264e-09
+## 3       GO_STRUCTURAL_MOLECULE_ACTIVITY    221        Up 1.344513e-06
+## 4     GO_MHC_CLASS_II_RECEPTOR_ACTIVITY      6        Up 4.500976e-05
 ##            FDR
-## 1 3.848616e-06
-## 2 1.886229e-05
-## 3 1.886229e-05
-## 4 2.209124e-03</code></pre>
+## 1 6.088889e-07
+## 2 1.380786e-06
+## 3 3.706375e-04
+## 4 9.305768e-03</code></pre>
 <p><img src="batch_effect_csf_patient_files/figure-html/pval%20lfc-5.png" width="672" /></p>
 <pre><code>## Cluster: 4 Contrast: pat2-pat3 Num genes: 3613 Num DE: 346 
-## [1] category  NGenes    Direction PValue    FDR      
-## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+##                                category NGenes Direction       PValue
+## 1                       GO_RRNA_BINDING     37        Up 5.222733e-06
+## 2                       GO_MRNA_BINDING     75        Up 6.778257e-06
+## 3   GO_FIBROBLAST_GROWTH_FACTOR_BINDING      7        Up 7.702916e-06
+## 4 GO_STRUCTURAL_CONSTITUENT_OF_RIBOSOME    145        Up 5.078346e-05
+## 5      GO_POLY_PYRIMIDINE_TRACT_BINDING      7        Up 5.350885e-05
+## 6     GO_TRANSLATION_REGULATOR_ACTIVITY     11        Up 1.770948e-04
+##           FDR
+## 1 0.002123437
+## 2 0.002123437
+## 3 0.002123437
+## 4 0.008850364
+## 5 0.008850364
+## 6 0.024409571</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 <span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
@@ -892,6 +874,16 @@ panel.hist &lt;-<span class="st"> </span>function(x, ...){
 <p><img src="batch_effect_csf_patient_files/figure-html/ct%20de%20dist%20-1.png" width="1920" /></p>
 <pre><code>## [[1]]
 ## NULL</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#extract correlation coefficients</span>
+<span class="co"># correlation coefficients from celltype specific gege logFC</span>
+
+lfc_cor_list &lt;-<span class="kw">lapply</span>(<span class="kw">names</span>(all_folds), function(com){
+  exclude &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">table</span>(<span class="kw">colData</span>(sce)[,celltype]) &lt;<span class="st"> </span><span class="dv">100</span>)
+  r &lt;-<span class="st"> </span><span class="kw">cor</span>(all_folds[[com]][, -<span class="kw">c</span>(<span class="dv">1</span>, (exclude +<span class="st"> </span><span class="dv">1</span>))])
+  mean_r &lt;-<span class="st"> </span>(<span class="kw">sum</span>(r) -<span class="st"> </span><span class="kw">ncol</span>(r))/<span class="st"> </span>(<span class="kw">ncol</span>(r)^<span class="dv">2</span> -<span class="st"> </span><span class="kw">ncol</span>(r))
+})
+
+mean_lfc_cor &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(lfc_cor_list))</code></pre></div>
 </div>
 </div>
 <div id="batch-categorization" class="section level2 tabset tabset-pills">
@@ -1029,7 +1021,8 @@ celltype &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
                        <span class="st">&quot;max_de_overlap&quot;</span> =<span class="st"> </span>max_de_overlap,
                        <span class="st">&quot;mean_rel_cluster_spec&quot;</span>=<span class="st"> </span>mean_rel_spec,
                        <span class="st">&quot;min_rel_cluster_spec&quot;</span>=<span class="st"> </span>min_rel_spec,
-                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec)
+                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec,
+                       <span class="st">&quot;mean_lfc_cor&quot;</span> =<span class="st"> </span>mean_lfc_cor )
 
 
 sim &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;mean_p_be&quot;</span> =<span class="st"> </span>mean_p_be,
@@ -1121,23 +1114,24 @@ summary &lt;-<span class="st"> </span><span class="kw">cbind</span>(size, cellty
 ##  [73] XML_3.99-0.3             jpeg_0.1-8.1             shape_1.4.4             
 ##  [76] compiler_3.6.1           KernSmooth_2.23-16       ncdf4_1.17              
 ##  [79] crayon_1.3.4             minqa_1.2.4              htmltools_0.4.0         
-##  [82] Formula_1.2-3            lubridate_1.7.4          DBI_1.1.0               
-##  [85] dbplyr_1.4.2             MASS_7.3-51.5            rappdirs_0.3.1          
-##  [88] boot_1.3-24              Matrix_1.2-18            cli_2.0.2               
-##  [91] vsn_3.54.0               gdata_2.18.0             igraph_1.2.4.2          
-##  [94] pkgconfig_2.0.3          foreign_0.8-76           MALDIquant_1.19.3       
-##  [97] vipor_0.4.5              dqrng_0.2.1              multtest_2.42.0         
-## [100] XVector_0.26.0           digest_0.6.25            graph_1.64.0            
-## [103] rmarkdown_2.1            htmlTable_1.13.3         edgeR_3.28.1            
-## [106] DelayedMatrixStats_1.8.0 listarrays_0.3.1         curl_4.3                
-## [109] gtools_3.8.1             rjson_0.2.20             nloptr_1.2.2.1          
-## [112] lifecycle_0.2.0          nlme_3.1-145             BiocNeighbors_1.4.2     
-## [115] fansi_0.4.1              viridisLite_0.3.0        pillar_1.4.3            
-## [118] lattice_0.20-40          httr_1.4.1               DEoptimR_1.0-8          
-## [121] survival_3.1-11          glue_1.3.1               png_0.1-7               
-## [124] iterators_1.0.12         bit_1.1-15.2             stringi_1.4.6           
-## [127] blob_1.2.1               BiocSingular_1.2.2       latticeExtra_0.6-29     
-## [130] caTools_1.18.0           memoise_1.1.0            irlba_2.3.3</code></pre>
+##  [82] mgcv_1.8-31              Formula_1.2-3            lubridate_1.7.4         
+##  [85] DBI_1.1.0                dbplyr_1.4.2             MASS_7.3-51.5           
+##  [88] rappdirs_0.3.1           boot_1.3-24              Matrix_1.2-18           
+##  [91] cli_2.0.2                vsn_3.54.0               gdata_2.18.0            
+##  [94] igraph_1.2.4.2           pkgconfig_2.0.3          foreign_0.8-76          
+##  [97] MALDIquant_1.19.3        vipor_0.4.5              dqrng_0.2.1             
+## [100] multtest_2.42.0          XVector_0.26.0           digest_0.6.25           
+## [103] graph_1.64.0             rmarkdown_2.1            htmlTable_1.13.3        
+## [106] edgeR_3.28.1             DelayedMatrixStats_1.8.0 listarrays_0.3.1        
+## [109] curl_4.3                 gtools_3.8.1             rjson_0.2.20            
+## [112] nloptr_1.2.2.1           lifecycle_0.2.0          nlme_3.1-145            
+## [115] BiocNeighbors_1.4.2      fansi_0.4.1              viridisLite_0.3.0       
+## [118] pillar_1.4.3             lattice_0.20-40          httr_1.4.1              
+## [121] DEoptimR_1.0-8           survival_3.1-11          glue_1.3.1              
+## [124] png_0.1-7                iterators_1.0.12         bit_1.1-15.2            
+## [127] stringi_1.4.6            blob_1.2.1               BiocSingular_1.2.2      
+## [130] latticeExtra_0.6-29      caTools_1.18.0           memoise_1.1.0           
+## [133] irlba_2.3.3</code></pre>
 </div>
 
 

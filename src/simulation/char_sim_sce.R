@@ -26,9 +26,10 @@ suppressPackageStartupMessages({
 params <- readRDS(file = params)
 
 name <- params[["dataset_name"]]
-flag <- ifelse(sim_sce %in% c(paste0('out/sim/', name, '/sim_', name, '_5__2_1_sce.rds'),
-                              paste0('out/sim/', name, '/sim_', name, '_5__1_0_sce.rds'),
-                              paste0('out/sim/', name, '/sim_', name, '_5__1_sce.rds')),
+flag <- ifelse(sim_sce %in% c(paste0('out/sim/', name, '/sim_', name, '_4__2_1_sce.rds'),
+                              paste0('out/sim/', name, '/sim_', name, '_4__1_0_sce.rds'),
+                              paste0('out/sim/', name, '/sim_', name, '_4__1_sce.rds'),
+                              "out/sim/hca/sim_hca_2__2_1_sce.rds"),
                TRUE, FALSE)
 
 if( name %in% "pancreas"){

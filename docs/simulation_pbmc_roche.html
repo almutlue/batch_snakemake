@@ -324,7 +324,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Characterize simulated batch effects</h1>
 <h4 class="author">Almut Lütge</h4>
-<h4 class="date">31 March, 2020</h4>
+<h4 class="date">21 April, 2020</h4>
 
 </div>
 
@@ -460,19 +460,15 @@ plot_dev &lt;-<span class="st"> </span>function(var, var_col){
 
 ## Summarize variance partitioning
 <span class="co"># How many genes have a variance component affected by batch with &gt; 1%</span>
-n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
-n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_batch&quot;</span> &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
-n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(<span class="st">&quot;vp_celltype&quot;</span>&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_batch &gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_batch_gene10 &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_batch &gt;<span class="st"> </span><span class="fl">0.1</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
+n_celltype_gene &lt;-<span class="st"> </span>vp_sub %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(vp_celltype&gt;<span class="st"> </span><span class="fl">0.01</span>) %&gt;%<span class="st"> </span><span class="kw">nrow</span>()/n_genes
 n_rel &lt;-<span class="st"> </span>n_batch_gene/n_celltype_gene
 
 <span class="co"># Mean variance that is explained by the batch effect/celltype</span>
-m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_batch&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_batch&quot;]), na.rm = TRUE): argument is
-## not numeric or logical: returning NA</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">asin</span>(vp_sub[, <span class="st">&quot;vp_celltype&quot;</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## Warning in mean.default(asin(vp_sub[, &quot;vp_celltype&quot;]), na.rm = TRUE): argument
-## is not numeric or logical: returning NA</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
+m_batch &lt;-<span class="st"> </span><span class="kw">mean</span>(vp_sub$vp_batch, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+m_celltype &lt;-<span class="st"> </span><span class="kw">mean</span>(vp_sub$vp_celltype, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+m_rel &lt;-<span class="st"> </span>m_batch/m_celltype</code></pre></div>
 <div id="scatterplot-batch" class="section level4">
 <h4>Scatterplot batch</h4>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_dev</span>(<span class="st">&quot;vp_batch&quot;</span>, <span class="st">&quot;vp_batch&quot;</span>)</code></pre></div>
@@ -595,65 +591,6 @@ mean_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(bids, fun
 </div>
 <div id="batch-to-batch-comparisons-of-expression-distributions" class="section level3">
 <h3>Batch to batch comparisons of expression distributions</h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#mean expression</span>
-mean_expr &lt;-<span class="st"> </span>mean_list %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>(<span class="dt">.id =</span> <span class="st">&quot;batch&quot;</span> ) %&gt;%<span class="st"> </span><span class="kw">spread</span>(batch, logcounts)
-batch_all &lt;-<span class="st"> </span><span class="kw">levels</span>(<span class="kw">as.factor</span>(<span class="kw">colData</span>(sce)[,batch]))
-
-<span class="kw">lapply</span>(batch_all, function(batch_var){
-  batch_var_2 &lt;-<span class="st"> </span>batch_all[-<span class="kw">which</span>(batch_all %in%<span class="st"> </span>batch_var)]
-  <span class="kw">lapply</span>(batch_var_2, function(batch_var_3){
-    <span class="kw">ggplot</span>(mean_expr, <span class="kw">aes_string</span>(<span class="dt">x=</span>batch_var, <span class="dt">y =</span> batch_var_3)) +
-<span class="st">      </span><span class="kw">geom_point</span>(<span class="dt">alpha =</span> .<span class="dv">3</span>, <span class="kw">aes</span>(<span class="dt">color=</span>cluster)) +
-<span class="st">      </span><span class="kw">ggtitle</span>(batch_var) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">geom_abline</span>(<span class="dt">slope =</span> <span class="dv">1</span>) +<span class="st"> </span>
-<span class="st">      </span><span class="kw">coord_fixed</span>() +
-<span class="st">      </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>cluster, <span class="dt">ncol =</span> <span class="dv">3</span>) +
-<span class="st">      </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span>cols) +
-<span class="st">      </span><span class="kw">theme_classic</span>()
-  })
-})</code></pre></div>
-<pre><code>## [[1]]
-## [[1]][[1]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-1.png" width="672" /></p>
-<pre><code>## 
-## [[1]][[2]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-2.png" width="672" /></p>
-<pre><code>## 
-## [[1]][[3]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-3.png" width="672" /></p>
-<pre><code>## 
-## 
-## [[2]]
-## [[2]][[1]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-4.png" width="672" /></p>
-<pre><code>## 
-## [[2]][[2]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-5.png" width="672" /></p>
-<pre><code>## 
-## [[2]][[3]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-6.png" width="672" /></p>
-<pre><code>## 
-## 
-## [[3]]
-## [[3]][[1]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-7.png" width="672" /></p>
-<pre><code>## 
-## [[3]][[2]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-8.png" width="672" /></p>
-<pre><code>## 
-## [[3]][[3]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-9.png" width="672" /></p>
-<pre><code>## 
-## 
-## [[4]]
-## [[4]][[1]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-10.png" width="672" /></p>
-<pre><code>## 
-## [[4]][[2]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-11.png" width="672" /></p>
-<pre><code>## 
-## [[4]][[3]]</code></pre>
-<p><img src="simulation_pbmc_roche_files/figure-html/mean%20expression-12.png" width="672" /></p>
 </div>
 </div>
 <div id="differentially-expressed-genes" class="section level2">
@@ -719,7 +656,7 @@ cats &lt;-<span class="st"> </span><span class="kw">lapply</span>(cats, function
 
 plotDE &lt;-<span class="st"> </span>function(cont_var){
   <span class="co">#res_s &lt;- res[[cont_var]] %&gt;% map(filter, adj.P.Val &lt; .05) %&gt;% map(filter, abs(logFC) &gt; 1)</span>
-  res_s &lt;-<span class="st"> </span>res[[cont_var]] %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, PValue &lt;<span class="st"> </span>.<span class="dv">05</span>) %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">1</span>)
+  res_s &lt;-<span class="st"> </span>res[[cont_var]] %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, PValue &lt;<span class="st"> </span>.<span class="dv">05</span>) %&gt;%<span class="st"> </span><span class="kw">map</span>(filter, <span class="kw">abs</span>(logFC) &gt;<span class="st"> </span><span class="dv">2</span>)
   
   <span class="co">#plot</span>
   <span class="kw">lapply</span>(<span class="kw">names</span>(res[[cont_var]]), function(ct){
@@ -745,59 +682,59 @@ if( <span class="kw">length</span>(<span class="kw">names</span>(res)) &lt;=<spa
     pathways &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(res), plotDE)
 }</code></pre></div>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-1.png" width="672" /></p>
-<pre><code>## Cluster: 0 Contrast: fresh-DMSO Num genes: 4755 Num DE: 1</code></pre>
+<pre><code>## Cluster: 0 Contrast: fresh-DMSO Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-2.png" width="672" /></p>
 <pre><code>## Cluster: 1 Contrast: fresh-DMSO Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-3.png" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: fresh-DMSO Num genes: 4755 Num DE: 1</code></pre>
+<pre><code>## Cluster: 2 Contrast: fresh-DMSO Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-4.png" width="672" /></p>
 <pre><code>## Cluster: 3 Contrast: fresh-DMSO Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-5.png" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: fresh-DMSO Num genes: 4755 Num DE: 3</code></pre>
+<pre><code>## Cluster: 4 Contrast: fresh-DMSO Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-6.png" width="672" /></p>
-<pre><code>## Cluster: 5 Contrast: fresh-DMSO Num genes: 4755 Num DE: 1</code></pre>
+<pre><code>## Cluster: 5 Contrast: fresh-DMSO Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-7.png" width="672" /></p>
 <pre><code>## Cluster: 6 Contrast: fresh-DMSO Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-8.png" width="672" /></p>
-<pre><code>## Cluster: 7 Contrast: fresh-DMSO Num genes: 4755 Num DE: 151</code></pre>
+<pre><code>## Cluster: 7 Contrast: fresh-DMSO Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-9.png" width="672" /></p>
-<pre><code>## Cluster: 8 Contrast: fresh-DMSO Num genes: 4755 Num DE: 727</code></pre>
+<pre><code>## Cluster: 8 Contrast: fresh-DMSO Num genes: 4755 Num DE: 126</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-10.png" width="672" /></p>
-<pre><code>## Cluster: 0 Contrast: fresh-PSC Num genes: 4755 Num DE: 3</code></pre>
+<pre><code>## Cluster: 0 Contrast: fresh-PSC Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-11.png" width="672" /></p>
-<pre><code>## Cluster: 1 Contrast: fresh-PSC Num genes: 4755 Num DE: 1</code></pre>
+<pre><code>## Cluster: 1 Contrast: fresh-PSC Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-12.png" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: fresh-PSC Num genes: 4755 Num DE: 3</code></pre>
+<pre><code>## Cluster: 2 Contrast: fresh-PSC Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-13.png" width="672" /></p>
-<pre><code>## Cluster: 3 Contrast: fresh-PSC Num genes: 4755 Num DE: 3</code></pre>
+<pre><code>## Cluster: 3 Contrast: fresh-PSC Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-14.png" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: fresh-PSC Num genes: 4755 Num DE: 9</code></pre>
+<pre><code>## Cluster: 4 Contrast: fresh-PSC Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-15.png" width="672" /></p>
-<pre><code>## Cluster: 5 Contrast: fresh-PSC Num genes: 4755 Num DE: 6</code></pre>
+<pre><code>## Cluster: 5 Contrast: fresh-PSC Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-16.png" width="672" /></p>
-<pre><code>## Cluster: 6 Contrast: fresh-PSC Num genes: 4755 Num DE: 6</code></pre>
+<pre><code>## Cluster: 6 Contrast: fresh-PSC Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-17.png" width="672" /></p>
-<pre><code>## Cluster: 7 Contrast: fresh-PSC Num genes: 4755 Num DE: 176</code></pre>
+<pre><code>## Cluster: 7 Contrast: fresh-PSC Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-18.png" width="672" /></p>
-<pre><code>## Cluster: 8 Contrast: fresh-PSC Num genes: 4755 Num DE: 643</code></pre>
+<pre><code>## Cluster: 8 Contrast: fresh-PSC Num genes: 4755 Num DE: 163</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-19.png" width="672" /></p>
 <pre><code>## Cluster: 0 Contrast: fresh-CS10 Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-20.png" width="672" /></p>
 <pre><code>## Cluster: 1 Contrast: fresh-CS10 Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-21.png" width="672" /></p>
-<pre><code>## Cluster: 2 Contrast: fresh-CS10 Num genes: 4755 Num DE: 3</code></pre>
+<pre><code>## Cluster: 2 Contrast: fresh-CS10 Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-22.png" width="672" /></p>
 <pre><code>## Cluster: 3 Contrast: fresh-CS10 Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-23.png" width="672" /></p>
-<pre><code>## Cluster: 4 Contrast: fresh-CS10 Num genes: 4755 Num DE: 9</code></pre>
+<pre><code>## Cluster: 4 Contrast: fresh-CS10 Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-24.png" width="672" /></p>
-<pre><code>## Cluster: 5 Contrast: fresh-CS10 Num genes: 4755 Num DE: 2</code></pre>
+<pre><code>## Cluster: 5 Contrast: fresh-CS10 Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-25.png" width="672" /></p>
-<pre><code>## Cluster: 6 Contrast: fresh-CS10 Num genes: 4755 Num DE: 4</code></pre>
+<pre><code>## Cluster: 6 Contrast: fresh-CS10 Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-26.png" width="672" /></p>
-<pre><code>## Cluster: 7 Contrast: fresh-CS10 Num genes: 4755 Num DE: 71</code></pre>
+<pre><code>## Cluster: 7 Contrast: fresh-CS10 Num genes: 4755 Num DE: 0</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/pval%20lfc-27.png" width="672" /></p>
-<pre><code>## Cluster: 8 Contrast: fresh-CS10 Num genes: 4755 Num DE: 608</code></pre>
+<pre><code>## Cluster: 8 Contrast: fresh-CS10 Num genes: 4755 Num DE: 114</code></pre>
 <p>Summarize differential expression analysis</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DE genes (per cluster and mean)</span>
 <span class="co">#n_de &lt;- lapply(res, function(y) vapply(y, function(x) sum(x$adj.P.Val &lt; 0.05), numeric(1)))</span>
@@ -918,6 +855,16 @@ panel.hist &lt;-<span class="st"> </span>function(x, ...){
 ## 
 ## [[3]]
 ## NULL</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#extract correlation coefficients</span>
+<span class="co"># correlation coefficients from celltype specific gege logFC</span>
+
+lfc_cor_list &lt;-<span class="kw">lapply</span>(<span class="kw">names</span>(all_folds), function(com){
+  exclude &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">table</span>(<span class="kw">colData</span>(sce)[,celltype]) &lt;<span class="st"> </span><span class="dv">100</span>)
+  r &lt;-<span class="st"> </span><span class="kw">cor</span>(all_folds[[com]][, -<span class="kw">c</span>(<span class="dv">1</span>, (exclude +<span class="st"> </span><span class="dv">1</span>))])
+  mean_r &lt;-<span class="st"> </span>(<span class="kw">sum</span>(r) -<span class="st"> </span><span class="kw">ncol</span>(r))/<span class="st"> </span>(<span class="kw">ncol</span>(r)^<span class="dv">2</span> -<span class="st"> </span><span class="kw">ncol</span>(r))
+})
+
+mean_lfc_cor &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">unlist</span>(lfc_cor_list))</code></pre></div>
 <p>Compare estimated logFC between real data and simulated data. This can give as a feeling for how much we underestimate the batch effect. In extremer case the batch tuning parameters can be used to get a batch effect closer to the real batch effect.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">comp_lfcs &lt;-<span class="st"> </span>function(cont_var){
     <span class="kw">print</span>(cont_var)
@@ -947,173 +894,119 @@ panel.hist &lt;-<span class="st"> </span>function(x, ...){
 
 <span class="kw">lapply</span>(cs, comp_lfcs)</code></pre></div>
 <pre><code>## [1] &quot;fresh-DMSO&quot;
-## [1] &quot;0&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;1&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;2&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;3&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;4&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;5&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;6&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;7&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;8&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;fresh-PSC&quot;
-## [1] &quot;0&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;1&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;2&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;3&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;4&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;5&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;6&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;7&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;8&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;fresh-CS10&quot;
-## [1] &quot;0&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;1&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;2&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;3&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;4&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;5&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;6&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;7&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
-<pre><code>## [1] &quot;8&quot;</code></pre>
-<pre><code>## Joining, by = &quot;gene&quot;</code></pre>
+## [1] &quot;0&quot;
+## [1] &quot;1&quot;
+## [1] &quot;2&quot;
+## [1] &quot;3&quot;
+## [1] &quot;4&quot;
+## [1] &quot;5&quot;
+## [1] &quot;6&quot;
+## [1] &quot;7&quot;
+## [1] &quot;8&quot;
+## [1] &quot;fresh-PSC&quot;
+## [1] &quot;0&quot;
+## [1] &quot;1&quot;
+## [1] &quot;2&quot;
+## [1] &quot;3&quot;
+## [1] &quot;4&quot;
+## [1] &quot;5&quot;
+## [1] &quot;6&quot;
+## [1] &quot;7&quot;
+## [1] &quot;8&quot;
+## [1] &quot;fresh-CS10&quot;
+## [1] &quot;0&quot;
+## [1] &quot;1&quot;
+## [1] &quot;2&quot;
+## [1] &quot;3&quot;
+## [1] &quot;4&quot;
+## [1] &quot;5&quot;
+## [1] &quot;6&quot;
+## [1] &quot;7&quot;
+## [1] &quot;8&quot;</code></pre>
 <pre><code>## $`fresh-DMSO`
 ## $`fresh-DMSO`$`0`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-1.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-DMSO`$`1`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-2.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-DMSO`$`2`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-3.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-DMSO`$`3`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-4.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-DMSO`$`4`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-5.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-DMSO`$`5`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-6.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-DMSO`$`6`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-7.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-DMSO`$`7`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-8.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-DMSO`$`8`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-9.png" width="672" /></p>
 <pre><code>## 
 ## 
 ## $`fresh-PSC`
 ## $`fresh-PSC`$`0`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-10.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-PSC`$`1`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-11.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-PSC`$`2`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-12.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-PSC`$`3`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-13.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-PSC`$`4`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-14.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-PSC`$`5`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-15.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-PSC`$`6`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-16.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-PSC`$`7`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-17.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-PSC`$`8`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-18.png" width="672" /></p>
 <pre><code>## 
 ## 
 ## $`fresh-CS10`
 ## $`fresh-CS10`$`0`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-19.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-CS10`$`1`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-20.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-CS10`$`2`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-21.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-CS10`$`3`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-22.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-CS10`$`4`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-23.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-CS10`$`5`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-24.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-CS10`$`6`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-25.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-CS10`$`7`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-26.png" width="672" /></p>
 <pre><code>## 
 ## $`fresh-CS10`$`8`</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
 <p><img src="simulation_pbmc_roche_files/figure-html/compare%20lfcs-27.png" width="672" /></p>
 </div>
 </div>
@@ -1252,7 +1145,8 @@ celltype &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span 
                        <span class="st">&quot;max_de_overlap&quot;</span> =<span class="st"> </span>max_de_overlap,
                        <span class="st">&quot;mean_rel_cluster_spec&quot;</span>=<span class="st"> </span>mean_rel_spec,
                        <span class="st">&quot;min_rel_cluster_spec&quot;</span>=<span class="st"> </span>min_rel_spec,
-                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec)
+                       <span class="st">&quot;max_rel_cluster_spec&quot;</span>=<span class="st"> </span>max_rel_spec,
+                       <span class="st">&quot;mean_lfc_cor&quot;</span> =<span class="st"> </span>mean_lfc_cor)
 
 
 sim &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;mean_p_be&quot;</span> =<span class="st"> </span>mean_p_be,
