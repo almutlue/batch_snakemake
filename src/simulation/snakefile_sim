@@ -111,7 +111,7 @@ rule change_params:
 ## -------------------------------------------------------------------------- ##
 
 rule variance_part:
-    input: 
+    input:
         data = config["out_sim_char"] + "{sample_sim}/sim_{sample_sim}_1__1_sce.rds",
         param = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds",
         script = config["src_analysis"] + "variance_part.R"
@@ -204,16 +204,16 @@ rule summarize_cms:
 
 rule vis_sim:
     input: 
-        data = config["out_sim_sumcms"] + "summarize_cms_sim_{sample}_sce.rds",
-        param = config["out_adjust_params"] + "adjust_params_{sample}.rds",
-        real = config["out_norm"] + "norm_{sample}_sce.rds",
-        param_real = config["out_set"] + "settings_{sample}.rds",
+        data = config["out_sim_sumcms"] + "summarize_cms_sim_{sample_sim}_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds",
+        real = config["out_norm"] + "norm_{sample_sim}_sce.rds",
+        param_real = config["out_set"] + "settings_{sample_sim}.rds",
         script = config["src_sim"] + "visualize_simulation.Rmd"
     params:
         outdir = config["docs"],
         sim = ",".join(sim_name)
     output:
-        out = config["docs"] + "vis_sim_{sample}.html",
+        out = config["docs"] + "vis_sim_{sample_sim}.html",
     shell:
         '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data='{input.data}', param ='{input.param}', real ='{input.real}', param_real = '{input.param_real}', sim = '{params.sim}'))"'''
   
@@ -247,6 +247,7 @@ rule summary_sim:
 rule overview_sim:
     input: 
         check = expand(config["out_sim_sumcms"] + "summarize_cms_sim_{sample_sim}_sce.rds", sample_sim = sample_sim),
+        check2 = expand(config["out_sim_summary"] + "summary_sim_{sample_sim}.rds", sample_sim = sample_sim),
         script = config["src_sim"] + "overall_sim_batch_characteristics.Rmd"
     params:
         outdir = config["docs"],
@@ -268,7 +269,7 @@ rule overview_sim:
 
 rule sim index:
     input: 
-        check = expand(config["docs"] + "vis_sim_{sample}.html", sample = sample),
+        check = expand(config["docs"] + "vis_sim_{sample}.html", sample = sample_sim),
         script = config["src_sim"] + "simulation_index.Rmd"
     params:
         outdir = config["docs"],
