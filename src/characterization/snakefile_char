@@ -61,7 +61,39 @@ rule variance_part:
     shell:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
         
+## -------------------------------------------------------------------------- ##
+## Variance partitioning celltype
+## -------------------------------------------------------------------------- ##
+
+rule variance_part_ct:
+    input: 
+        data = config["out_norm"] + "norm_{sample}_sce.rds",
+        param = config["out_set"] + "settings_{sample}.rds",
+        script = config["src_analysis"] + "variance_part_ct.R"
+    output:
+        out = config["out_vp_ct"] + "vp_ct_{sample}_sce.rds"
+    log:
+        config["log_vp_ct"] + "vp_ct_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
         
+## -------------------------------------------------------------------------- ##
+## Variance partitioning celltype summary
+## -------------------------------------------------------------------------- ##
+
+rule var_part_ct_sum:
+    input: 
+        data_path = config["out_vp_ct"],
+        out_path = config["out_fig"] + "var_part/",
+        check = expand(config["out_vp_ct"] + "vp_ct_{sample}_sce.rds", sample = sample_sim),        
+        script = config["src_summary"] + "var_part_ct.Rmd"
+    params:
+        outdir = config["docs"]
+    output:
+        out = config["docs"] + "var_part_ct.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data_path='{input.data_path}', out_path ='{input.out_path}'))"'''
+
 ## -------------------------------------------------------------------------- ##
 ## Differential abundance
 ## -------------------------------------------------------------------------- ##
@@ -131,6 +163,41 @@ rule batch_type:
         config["log_type"] + "type_{sample}.Rout"
     shell:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
+        
+        
+## -------------------------------------------------------------------------- ##
+## Batch type variance partitioning
+## -------------------------------------------------------------------------- ##
+
+rule batch_type_var:
+    input: 
+        data = config["out_de"] + "de_{sample}_sce.rds",
+        param = config["out_set"] + "settings_{sample}.rds",
+        script = config["src_analysis"] + "batch_type_var.R"
+    output:
+        out = config["out_type_var"] + "type_var_{sample}_sce.rds"
+    log:
+        config["log_type_var"] + "type_var_{sample}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
+        
+
+## -------------------------------------------------------------------------- ##
+## Batch type variance partitioning summary
+## -------------------------------------------------------------------------- ##
+
+rule batch_type_var_sum:
+    input: 
+        data_path = config["out_type_var"],
+        out_path = config["out_fig"] + "var_part/",
+        check = expand(config["out_type_var"] + "type_var_{sample}_sce.rds", sample = sample),        
+        script = config["src_summary"] + "batch_type_var_part.Rmd"
+    params:
+        outdir = config["docs"]
+    output:
+        out = config["docs"] + "batch_type_var_part.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data_path='{input.data_path}', out_path ='{input.out_path}'))"'''
     
     
     
@@ -169,11 +236,13 @@ rule overview:
         sce_name = ",".join(sample),
         meta = config["out_set"] + "settings_",
         summary = config["out_summary"] + "summary_",
-        sce_norm = config["out_norm"] + "norm_"
+        sce_norm = config["out_norm"] + "norm_",
+        out_figpath = config["out_fig"] + "over_real/over_real"
     output:
-        out = config["docs"] + "overall_batch_characteristics.html"
+        out = config["docs"] + "overall_batch_characteristics.html",
+        out_fig = config["out_fig"] + "over_real/over_real_ct_spec.rds"
     shell:
-        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(sce='{params.sce}', sce_name ='{params.sce_name}', meta ='{params.meta}', summary = '{params.summary}', sce_norm = '{params.sce_norm}'))"'''
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(sce='{params.sce}', sce_name ='{params.sce_name}', meta ='{params.meta}', summary = '{params.summary}', sce_norm = '{params.sce_norm}', fig_res ='{params.out_figpath}'))"'''
 
 
 ## -------------------------------------------------------------------------- ##

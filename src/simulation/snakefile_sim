@@ -123,6 +123,41 @@ rule variance_part:
         '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
         
 
+
+## -------------------------------------------------------------------------- ##
+## Variance partitioning simulation celltype_specific
+## -------------------------------------------------------------------------- ##
+
+rule variance_part_ct:
+    input:
+        data = config["out_sim_char"] + "{sample_sim}/sim_{sample_sim}_1__1_sce.rds",
+        param = config["out_adjust_params"] + "adjust_params_{sample_sim}.rds",
+        script = config["src_analysis"] + "variance_part_ct.R"
+    output:
+        out = config["out_sim_vp_ct"] + "vp_ct_sim_{sample_sim}_sce.rds"
+    log:
+        config["log_sim_vp_ct"] + "vp_ct_sim_{sample_sim}.Rout"
+    shell:
+        '''R CMD BATCH --no-restore --no-save "--args data='{input.data}' params='{input.param}' outputfile='{output.out}'" {input.script} {log}'''
+
+
+## -------------------------------------------------------------------------- ##
+## Variance partitioning celltype summary
+## -------------------------------------------------------------------------- ##
+
+rule var_part_ct_sum:
+    input: 
+        data_path = config["out_sim_vp_ct"],
+        out_path = config["out_fig"] + "var_part/",
+        check = expand(config["out_sim_vp_ct"] + "vp_ct_sim_{sample}_sce.rds", sample = sample_sim),        
+        script = config["src_summary"] + "var_part_ct_sim.Rmd"
+    params:
+        outdir = config["docs"]
+    output:
+        out = config["docs"] + "var_part_ct_sim.html"
+    shell:
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(data_path='{input.data_path}', out_path ='{input.out_path}'))"'''
+
         
 ## -------------------------------------------------------------------------- ##
 ## Differential abundance
@@ -255,11 +290,13 @@ rule overview_sim:
         sce_name = ",".join(sample_sim),
         meta = config["out_adjust_params"] + "adjust_params_",
         summary = config["out_sim_summary"] + "summary_sim_",
-        sce_norm = config["out_sim_char"] 
+        sce_norm = config["out_sim_char"],
+        out_figpath = config["out_fig"] + "over_sim/over_sim"
     output:
-        out = config["docs"] + "overall_sim_batch_characteristics.html"
+        out = config["docs"] + "overall_sim_batch_characteristics.html",
+        out_fig = config["out_fig"] + "over_sim/over_sim_ct_spec.rds"
     shell:
-        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(sce='{params.sce}', sce_name ='{params.sce_name}', meta ='{params.meta}', summary = '{params.summary}', sce_norm = '{params.sce_norm}'))"'''
+        '''R -e "rmarkdown::render(input ='{input.script}', output_file=basename('{output.out}'), output_dir='{params.outdir}', knit_root_dir=getwd(), params = list(sce='{params.sce}', sce_name ='{params.sce_name}', meta ='{params.meta}', summary = '{params.summary}', sce_norm = '{params.sce_norm}', fig_res ='{params.out_figpath}'))"'''
 
 
 

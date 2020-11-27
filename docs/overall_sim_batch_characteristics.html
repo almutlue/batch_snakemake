@@ -488,6 +488,7 @@ sce_small_vec &lt;-<span class="st"> </span><span class="kw">c</span>(<span clas
 sum_vec &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">paste0</span>(params$summary, sce_name, <span class="st">&quot;.rds&quot;</span>))
 <span class="kw">names</span>(sum_vec) &lt;-<span class="st"> </span>sce_name
 
+out_path_fig &lt;-<span class="st"> </span>params$fig_res
 
 cols &lt;-<span class="kw">c</span>(<span class="kw">c</span>(<span class="kw">jcolors</span>(<span class="st">&#39;pal6&#39;</span>),<span class="kw">jcolors</span>(<span class="st">&#39;pal8&#39;</span>))[<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">8</span>,<span class="dv">14</span>,<span class="dv">5</span>,<span class="dv">2</span>:<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">9</span>:<span class="dv">13</span>,<span class="dv">15</span>:<span class="dv">20</span>)],<span class="kw">jcolors</span>(<span class="st">&#39;pal4&#39;</span>))
 <span class="kw">names</span>(cols) &lt;-<span class="st"> </span><span class="kw">c</span>()</code></pre></div>
@@ -566,6 +567,8 @@ h_list &lt;-<span class="st">  </span>h_cells %v%<span class="st"> </span>h_gene
 
 <span class="kw">draw</span>(h_list, <span class="dt">annotation_legend_list =</span> pd)</code></pre></div>
 <p><img src="overall_sim_batch_characteristics_files/figure-html/plot%20general%20infos-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveRDS</span>(h_list, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_general_info.rds&quot;</span>))
+<span class="kw">saveRDS</span>(pd, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_general_info_lgd.rds&quot;</span>))</code></pre></div>
 </div>
 <div id="batch-sizestrength" class="section level3">
 <h3>Batch size/strength</h3>
@@ -657,6 +660,8 @@ h_list &lt;-<span class="st">  </span>h_size1 %v%<span class="st"> </span>h_size
 
 <span class="kw">draw</span>(h_list)</code></pre></div>
 <p><img src="overall_sim_batch_characteristics_files/figure-html/plot%20batch%20size-1.png" width="576" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h_list_plot &lt;-<span class="st"> </span>h_size1 %v%<span class="st"> </span>h_size2
+<span class="kw">saveRDS</span>(h_list_plot, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_size_hm.rds&quot;</span>))</code></pre></div>
 </div>
 <div id="batch-type" class="section level3">
 <h3>Batch type</h3>
@@ -691,6 +696,7 @@ h_cms &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(type,
 
 <span class="kw">draw</span>(h_cms)</code></pre></div>
 <p><img src="overall_sim_batch_characteristics_files/figure-html/batch%20type-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveRDS</span>(h_cms, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_batch_type.rds&quot;</span>))</code></pre></div>
 </div>
 <div id="celltype-specificity" class="section level3">
 <h3>Celltype specificity</h3>
@@ -771,7 +777,7 @@ over &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">as
 h_over &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(over, 
           <span class="dt">cluster_rows =</span> <span class="ot">FALSE</span>, 
           <span class="dt">cluster_columns =</span> <span class="ot">FALSE</span>,
-          <span class="dt">name =</span> <span class="st">&quot;de overlap [%]&quot;</span>,
+          <span class="dt">name =</span> <span class="st">&quot;de overlap&quot;</span>,
           <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
           <span class="dt">column_names_rot =</span> <span class="dv">0</span>,
           <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
@@ -784,6 +790,8 @@ h_list &lt;-<span class="st">  </span>h_cor %v%<span class="st"> </span>h_over %
 
 <span class="kw">draw</span>(h_list)</code></pre></div>
 <p><img src="overall_sim_batch_characteristics_files/figure-html/plot%20ct%20spec-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h_list_plot &lt;-<span class="st">  </span>h_cor %v%<span class="st"> </span>h_over
+<span class="kw">saveRDS</span>(h_list_plot, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_ct_spec.rds&quot;</span>))</code></pre></div>
 </div>
 <div id="distributions" class="section level4">
 <h4>Distributions</h4>
@@ -833,6 +841,7 @@ ct_info &lt;-<span class="st"> </span><span class="kw">lapply</span>(sce_name, f
                     <span class="dt">top_annotation =</span> ha_den,
                     <span class="dt">show_column_names =</span> <span class="ot">FALSE</span>
                     )
+  <span class="kw">saveRDS</span>(m, <span class="kw">paste0</span>(out_path_fig,<span class="st">&quot;_&quot;</span>, nam, <span class="st">&quot;_lfc_dist.rds&quot;</span>))
   <span class="kw">draw</span>(m)
 }
 
@@ -880,6 +889,72 @@ plots_dens&lt;-<span class="st"> </span><span class="kw">lapply</span>(sce_name,
 <h4>cellbench</h4>
 <p><img src="overall_sim_batch_characteristics_files/figure-html/densitycellbench-1.png" width="672" /></p>
 </div>
+</div>
+<div id="further-logfc-plots" class="section level3">
+<h3>Further logFC plots</h3>
+<p>For figure plot</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plot_den_fig &lt;-<span class="st"> </span>function(nam){
+  mat &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(gene_info[[nam]])
+  be &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;_.*&quot;</span>,<span class="st">&quot;&quot;</span>,<span class="kw">colnames</span>(mat)) %&gt;%<span class="st"> </span><span class="kw">as.factor</span>() %&gt;%<span class="st"> </span><span class="kw">levels</span>()
+  be &lt;-<span class="st"> </span>be[<span class="dv">1</span>:<span class="kw">ifelse</span>(<span class="kw">length</span>(be &gt;<span class="st"> </span><span class="dv">3</span>), <span class="dv">3</span>, <span class="kw">length</span>(be))]
+  mat &lt;-<span class="st"> </span>mat[,<span class="kw">grep</span>(<span class="kw">paste</span>(be, <span class="dt">collapse=</span><span class="st">&quot;|&quot;</span>), <span class="kw">colnames</span>(mat))]
+  ct &lt;-<span class="st"> </span>ct_info[[nam]]
+  <span class="co">#col and factors</span>
+  ba_tab &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;_.*&quot;</span>,<span class="st">&quot;&quot;</span>,<span class="kw">colnames</span>(mat)),
+                     <span class="st">&quot;celltype&quot;</span> =<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.*_logFC_&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">colnames</span>(mat)))
+  ba_tab$cells &lt;-<span class="st"> </span>ct[ba_tab$celltype]
+  col_den_b &lt;-<span class="st"> </span><span class="kw">rev</span>(cols)[<span class="dv">3</span>:(<span class="dv">2</span> +<span class="st"> </span><span class="kw">length</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$batch))))] %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">set_names</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$batch)))
+  col_den_c &lt;-<span class="st"> </span>cols[<span class="dv">1</span>:<span class="kw">length</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$celltype)))] %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">set_names</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$celltype)))
+  q_cells &lt;-<span class="st"> </span><span class="kw">sequential_hcl</span>(<span class="dv">3</span>, <span class="dt">palette =</span> <span class="st">&quot;Red-Blue&quot;</span>)
+  col_cells &lt;-<span class="st"> </span><span class="kw">colorRamp2</span>(<span class="kw">c</span>(<span class="kw">max</span>(ct), <span class="kw">mean</span>(ct), <span class="kw">min</span>(ct)), q_cells)
+  <span class="co">#annotations</span>
+  ha_den =<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span>ba_tab$batch,
+                            <span class="st">&quot;cell_type&quot;</span> =<span class="st"> </span>ba_tab$celltype,
+                            <span class="dt">simple_anno_size =</span> <span class="kw">unit</span>(<span class="fl">0.8</span>, <span class="st">&quot;cm&quot;</span>),
+                            <span class="dt">col =</span> <span class="kw">list</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span>col_den_b,
+                                       <span class="st">&quot;cell_type&quot;</span> =<span class="st"> </span>col_den_c,
+                                       <span class="st">&quot;cells&quot;</span> =<span class="st"> </span>col_cells),
+                            <span class="dt">show_legend =</span> <span class="kw">c</span>(<span class="dt">cell_type =</span> <span class="ot">FALSE</span>),
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;right&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>),
+                            <span class="dt">annotation_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                                           <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)))
+  <span class="co">#heatmap</span>
+  m &lt;-<span class="st"> </span><span class="kw">densityHeatmap</span>(mat, 
+                    <span class="dt">ylab =</span> <span class="st">&quot;batch logFC&quot;</span>,
+                    <span class="dt">ylim =</span> <span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">2</span>),
+                    <span class="dt">quantile_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+                    <span class="dt">title =</span> <span class="kw">paste0</span>(<span class="st">&quot;Simulated data from: &quot;</span>, nam),
+                    <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>),
+                    <span class="dt">ylab_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>),
+                    <span class="dt">top_annotation =</span> ha_den,
+                    <span class="dt">show_column_names =</span> <span class="ot">FALSE</span>,
+                    <span class="dt">tick_label_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+                    <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
+                    )
+  <span class="kw">saveRDS</span>(m, <span class="kw">paste0</span>(out_path_fig,<span class="st">&quot;_&quot;</span>, nam, <span class="st">&quot;_lfc_dist.rds&quot;</span>))
+  <span class="kw">draw</span>(m)
+}
+
+<span class="kw">plot_den_fig</span>(<span class="st">&quot;pbmc2_pat&quot;</span>)</code></pre></div>
+<p><img src="overall_sim_batch_characteristics_files/figure-html/fig%20plot%20den-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;pbmc2_media&quot;</span>)</code></pre></div>
+<p><img src="overall_sim_batch_characteristics_files/figure-html/fig%20plot%20den-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;cellbench&quot;</span>)</code></pre></div>
+<p><img src="overall_sim_batch_characteristics_files/figure-html/fig%20plot%20den-3.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;hca&quot;</span>)</code></pre></div>
+<p><img src="overall_sim_batch_characteristics_files/figure-html/fig%20plot%20den-4.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;kang&quot;</span>)</code></pre></div>
+<p><img src="overall_sim_batch_characteristics_files/figure-html/fig%20plot%20den-5.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;csf_media&quot;</span>)</code></pre></div>
+<p><img src="overall_sim_batch_characteristics_files/figure-html/fig%20plot%20den-6.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;csf_patient&quot;</span>)</code></pre></div>
+<p><img src="overall_sim_batch_characteristics_files/figure-html/fig%20plot%20den-7.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;pbmc_roche&quot;</span>)</code></pre></div>
+<p><img src="overall_sim_batch_characteristics_files/figure-html/fig%20plot%20den-8.png" width="672" /></p>
 </div>
 </div>
 

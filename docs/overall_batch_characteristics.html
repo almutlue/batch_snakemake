@@ -162,6 +162,93 @@ summary {
 </style>
 
 
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 61px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h2 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h3 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h4 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h5 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h6 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
 
 <!-- tabsets -->
 
@@ -311,6 +398,44 @@ div.tocify {
 
 
 
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Batch effects in scRNAseq data</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="batch_index.html">Characterization</a>
+</li>
+<li>
+  <a href="simulation_index.html">Simulation</a>
+</li>
+<li>
+  <a href="sim_char_index.html">Simulation Characteristics</a>
+</li>
+<li>
+  <a href="countSimQC_index.html">CountSimQC</a>
+</li>
+<li>
+  <a href="overview_index.html">Overview</a>
+</li>
+<li>
+  <a href="dataset_index.html">Datasets</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
 <div class="fluid-row" id="header">
 
 <div class="btn-group pull-right">
@@ -364,6 +489,7 @@ sce_small_vec &lt;-<span class="st"> </span><span class="kw">c</span>(<span clas
 sum_vec &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">paste0</span>(params$summary, sce_name, <span class="st">&quot;.rds&quot;</span>))
 <span class="kw">names</span>(sum_vec) &lt;-<span class="st"> </span>sce_name
 
+out_path_fig &lt;-<span class="st"> </span>params$fig_res
 
 cols &lt;-<span class="kw">c</span>(<span class="kw">c</span>(<span class="kw">jcolors</span>(<span class="st">&#39;pal6&#39;</span>),<span class="kw">jcolors</span>(<span class="st">&#39;pal8&#39;</span>))[<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">8</span>,<span class="dv">14</span>,<span class="dv">5</span>,<span class="dv">2</span>:<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">9</span>:<span class="dv">13</span>,<span class="dv">15</span>:<span class="dv">20</span>)],<span class="kw">jcolors</span>(<span class="st">&#39;pal4&#39;</span>))
 <span class="kw">names</span>(cols) &lt;-<span class="st"> </span><span class="kw">c</span>()</code></pre></div>
@@ -411,6 +537,34 @@ h_genes &lt;-<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(
                                                     <span class="dt">gp =</span> <span class="kw">gpar</span>(<span class="dt">fill =</span> col_type_vec),
                                                     <span class="dt">height =</span> <span class="kw">unit</span>(<span class="fl">2.2</span>, <span class="st">&quot;cm&quot;</span>)))
 
+<span class="co"># annotations plot (just for the manuscript plots)</span>
+h_cells &lt;-<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<span class="dt">cells =</span> <span class="kw">anno_barplot</span>(general_info$n_cells, 
+                                                    <span class="dt">gp =</span> <span class="kw">gpar</span>(<span class="dt">fill =</span> col_type_vec),
+                                                    <span class="dt">height =</span> <span class="kw">unit</span>(<span class="fl">2.2</span>, <span class="st">&quot;cm&quot;</span>),
+                                                    <span class="dt">axis_param =</span> <span class="kw">list</span>(<span class="dt">side =</span> <span class="st">&quot;right&quot;</span>, 
+                                                                      <span class="dt">gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+                                                                      <span class="dt">at =</span> <span class="kw">c</span>(<span class="dv">10000</span>, <span class="dv">20000</span>), 
+                                                                      <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;10K&quot;</span>, <span class="st">&quot;20K&quot;</span>))),
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>))
+
+h_genes &lt;-<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<span class="dt">genes =</span> <span class="kw">anno_barplot</span>(general_info$n_genes, 
+                                                    <span class="dt">gp =</span> <span class="kw">gpar</span>(<span class="dt">fill =</span> col_type_vec),
+                                                    <span class="dt">height =</span> <span class="kw">unit</span>(<span class="fl">2.2</span>, <span class="st">&quot;cm&quot;</span>),
+                                                    <span class="dt">axis_param =</span> <span class="kw">list</span>(<span class="dt">side =</span> <span class="st">&quot;right&quot;</span>,
+                                                                      <span class="dt">gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">15</span>),
+                                                                      <span class="dt">at =</span> <span class="kw">c</span>(<span class="dv">10000</span>, <span class="dv">20000</span>), 
+                                                                      <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;10K&quot;</span>, <span class="st">&quot;20K&quot;</span>))),
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>))
+                            
+h_data &lt;-<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<span class="dt">dataset =</span> <span class="kw">anno_text</span>(general_info$dataset,
+                                                <span class="dt">gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>),
+                                                <span class="dt">rot =</span> <span class="dv">45</span>),
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>))                         
+                            
+                            
 <span class="co"># heatmap</span>
 n_batches &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">as.matrix</span>(general_info[,<span class="kw">c</span>(<span class="st">&quot;n_batches&quot;</span>, <span class="st">&quot;n_celltypes&quot;</span>)])) %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">set_colnames</span>(general_info$dataset)
@@ -438,20 +592,35 @@ lgd2 =<span class="st"> </span><span class="kw">Legend</span>(<span class="dt">c
               <span class="dt">title =</span> <span class="st">&quot;celltype/batch&quot;</span>)
 pd =<span class="st"> </span><span class="kw">packLegend</span>(lgd1, lgd2)
 
+lgd_short =<span class="st"> </span><span class="kw">Legend</span>(<span class="dt">labels =</span> <span class="kw">names</span>(col_type), 
+                   <span class="dt">legend_gp =</span> <span class="kw">gpar</span>(<span class="dt">fill =</span> <span class="kw">unlist</span>(col_type)),
+                   <span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">16</span>),
+                   <span class="dt">grid_height =</span> <span class="kw">unit</span>(<span class="dv">6</span>, <span class="st">&quot;mm&quot;</span>), 
+                   <span class="dt">grid_width =</span> <span class="kw">unit</span>(<span class="dv">6</span>, <span class="st">&quot;mm&quot;</span>),
+                   <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>, <span class="dt">fontface =</span> <span class="st">&quot;bold&quot;</span>),
+              <span class="dt">title =</span> <span class="st">&quot;batch origin&quot;</span>)
+
 h_list &lt;-<span class="st">  </span>h_cells %v%<span class="st"> </span>h_genes %v%<span class="st"> </span>h_batch 
+h_list2 &lt;-<span class="st">  </span>h_cells %v%<span class="st"> </span>h_genes %v%<span class="st"> </span>h_data
 
 <span class="kw">draw</span>(h_list, <span class="dt">annotation_legend_list =</span> pd)</code></pre></div>
 <p><img src="overall_batch_characteristics_files/figure-html/plot%20general%20infos-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">draw</span>(h_list2,  <span class="dt">annotation_legend_list =</span> lgd_short)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/plot%20general%20infos-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveRDS</span>(h_list, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_general_info.rds&quot;</span>))
+<span class="kw">saveRDS</span>(pd, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_general_info_lgd.rds&quot;</span>))
+<span class="kw">saveRDS</span>(h_list2, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_general_info_short.rds&quot;</span>))
+<span class="kw">saveRDS</span>(lgd_short, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_general_info_short_lgd.rds&quot;</span>))</code></pre></div>
 </div>
 <div id="batch-sizestrength" class="section level3">
 <h3>Batch size/strength</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">batch_size &lt;-<span class="st"> </span><span class="kw">lapply</span>(sce_name, function(sce_nam){
   sum &lt;-<span class="st"> </span><span class="kw">readRDS</span>(sum_vec[sce_nam])
   meta &lt;-<span class="st"> </span><span class="kw">readRDS</span>(meta_vec[sce_nam])
-  d &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;mean_var_batch&quot;</span> =<span class="st"> </span>sum$mean_var_batch,
-                  <span class="st">&quot;mean_var_celltype&quot;</span> =<span class="st"> </span>sum$mean_var_celltype,
+  d &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;PVE_batch&quot;</span> =<span class="st"> </span>sum$mean_var_batch,
+                  <span class="st">&quot;PVE_celltype&quot;</span> =<span class="st"> </span>sum$mean_var_celltype,
                   <span class="st">&quot;mean_cms&quot;</span> =<span class="st"> </span>sum$mean_cms,
-                  <span class="st">&quot;mean_de_genes&quot;</span> =<span class="st"> </span>sum$mean_mean_n_de_genes)
+                  <span class="st">&quot;DE_genes&quot;</span> =<span class="st"> </span>sum$mean_mean_n_de_genes)
 }) %&gt;%<span class="st"> </span><span class="kw">set_names</span>(sce_name) %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>() %&gt;%<span class="st"> </span><span class="kw">set_rownames</span>(sce_name)
 
 batch_size$batch_origin &lt;-<span class="st"> </span>general_info[<span class="kw">rownames</span>(batch_size), <span class="st">&quot;batch_origin&quot;</span>]
@@ -475,7 +644,10 @@ ha_type =<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<spa
                             <span class="dt">simple_anno_size =</span> <span class="kw">unit</span>(<span class="dv">1</span>, <span class="st">&quot;cm&quot;</span>),
                             <span class="dt">col =</span> <span class="kw">list</span>(<span class="st">&quot;batch_origin&quot;</span> =<span class="st"> </span>col_type), 
                             <span class="dt">annotation_height =</span> <span class="kw">unit</span>(<span class="fl">2.2</span>, <span class="st">&quot;cm&quot;</span>),
-                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>)
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
+                            <span class="dt">annotation_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)))
 
 <span class="co">#heatmap</span>
 <span class="co">#cms</span>
@@ -490,13 +662,14 @@ h_cms &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(mean_cms,
           <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
           <span class="dt">column_names_rot =</span> <span class="dv">45</span>,
           <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
-          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">8</span>),
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
           <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
           <span class="dt">col =</span> col_cms,
           <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
 
 <span class="co"># mean variance part</span>
-n_batches &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">as.matrix</span>(batch_size[,<span class="kw">c</span>(<span class="st">&quot;mean_var_batch&quot;</span>, <span class="st">&quot;mean_var_celltype&quot;</span>)])) %&gt;%<span class="st"> </span>
+n_batches &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">as.matrix</span>(batch_size[,<span class="kw">c</span>(<span class="st">&quot;PVE_batch&quot;</span>, <span class="st">&quot;PVE_celltype&quot;</span>)])) %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">set_colnames</span>(batch_size$dataset)
 
 h_size1 &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(n_batches, 
@@ -506,25 +679,27 @@ h_size1 &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(n_batches,
           <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
           <span class="dt">column_names_rot =</span> <span class="dv">0</span>,
           <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
-          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">8</span>),
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
           <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
           <span class="dt">col =</span> col_size,
           <span class="dt">top_annotation =</span> ha_type,
           <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
 
 
-mean_de_genes &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">as.matrix</span>(batch_size$mean_de_genes))
+mean_de_genes &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">as.matrix</span>(batch_size$DE_genes))
 <span class="kw">colnames</span>(mean_de_genes) &lt;-<span class="st"> </span>batch_size$dataset
-<span class="kw">rownames</span>(mean_de_genes) &lt;-<span class="st"> &quot;mean_de_genes&quot;</span>
+<span class="kw">rownames</span>(mean_de_genes) &lt;-<span class="st"> &quot;DE_genes&quot;</span>
 
 h_size2 &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(mean_de_genes, 
           <span class="dt">cluster_rows =</span> <span class="ot">FALSE</span>, 
           <span class="dt">cluster_columns =</span> <span class="ot">FALSE</span>,
-          <span class="dt">name =</span> <span class="st">&quot;de genes [%]&quot;</span>,
+          <span class="dt">name =</span> <span class="st">&quot;# genes&quot;</span>,
           <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
           <span class="dt">column_names_rot =</span> <span class="dv">0</span>,
           <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
-          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">8</span>),
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
           <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
           <span class="dt">col =</span> col_size2,
           <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
@@ -532,7 +707,47 @@ h_size2 &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(mean_de_ge
 h_list &lt;-<span class="st">  </span>h_size1 %v%<span class="st"> </span>h_size2 %v%<span class="st"> </span>h_cms
 
 <span class="kw">draw</span>(h_list)</code></pre></div>
-<p><img src="overall_batch_characteristics_files/figure-html/plot%20batch%20size-1.png" width="576" /></p>
+<p><img src="overall_batch_characteristics_files/figure-html/plot%20batch%20size-1.png" width="672" /></p>
+<p>Generate plot object</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h_size1 &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(n_batches, 
+          <span class="dt">cluster_rows =</span> <span class="ot">FALSE</span>, 
+          <span class="dt">cluster_columns =</span> <span class="ot">FALSE</span>,
+          <span class="dt">name =</span> <span class="st">&quot;variance&quot;</span>,
+          <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
+          <span class="dt">column_names_rot =</span> <span class="dv">45</span>,
+          <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
+          <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
+          <span class="dt">col =</span> col_size,
+          <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
+          <span class="dt">top_annotation =</span> ha_type,
+          <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
+
+
+DE_genes &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">as.matrix</span>(batch_size$DE_genes))
+<span class="kw">colnames</span>(DE_genes) &lt;-<span class="st"> </span>batch_size$dataset
+<span class="kw">rownames</span>(DE_genes) &lt;-<span class="st"> &quot;DE_genes&quot;</span>
+
+h_size2 &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(DE_genes, 
+          <span class="dt">cluster_rows =</span> <span class="ot">FALSE</span>, 
+          <span class="dt">cluster_columns =</span> <span class="ot">FALSE</span>,
+          <span class="dt">name =</span> <span class="st">&quot;# genes&quot;</span>,
+          <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
+          <span class="dt">column_names_rot =</span> <span class="dv">45</span>,
+          <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
+          <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
+          <span class="dt">col =</span> col_size2,
+          <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
+          <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
+
+h_list_plot &lt;-<span class="st"> </span>h_size1 %v%<span class="st"> </span>h_size2
+
+<span class="kw">saveRDS</span>(h_list_plot, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_size_hm.rds&quot;</span>))</code></pre></div>
 </div>
 <div id="batch-type" class="section level3">
 <h3>Batch type</h3>
@@ -545,7 +760,10 @@ ha_type =<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<spa
                             <span class="dt">simple_anno_size =</span>  <span class="kw">unit</span>(<span class="dv">1</span>, <span class="st">&quot;cm&quot;</span>),
                             <span class="dt">col =</span> <span class="kw">list</span>(<span class="st">&quot;batch_origin&quot;</span> =<span class="st"> </span>col_type), 
                             <span class="dt">annotation_height =</span> <span class="kw">unit</span>(<span class="fl">2.2</span>, <span class="st">&quot;cm&quot;</span>),
-                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>)
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
+                            <span class="dt">annotation_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)))
 
 <span class="co">#heatmap</span>
 <span class="co">#cms</span>
@@ -559,14 +777,18 @@ h_cms &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(type,
           <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
           <span class="dt">column_names_rot =</span> <span class="dv">45</span>,
           <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
-          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">8</span>),
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
           <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
+          <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
           <span class="dt">col =</span> col_cms,
           <span class="dt">top_annotation =</span> ha_type,
           <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
 
 <span class="kw">draw</span>(h_cms)</code></pre></div>
 <p><img src="overall_batch_characteristics_files/figure-html/batch%20type-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">saveRDS</span>(h_cms, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_batch_type.rds&quot;</span>))</code></pre></div>
 </div>
 <div id="celltype-specificity" class="section level3">
 <h3>Celltype specificity</h3>
@@ -585,15 +807,15 @@ ct_spec$dataset &lt;-<span class="st"> </span><span class="kw">rownames</span>(c
 ct_spec &lt;-<span class="st"> </span>ct_spec %&gt;%<span class="st"> </span><span class="kw">arrange</span>(batch_origin)</code></pre></div>
 <p>Plot celltype specificity</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#colors</span>
-q_cms &lt;-<span class="st"> </span><span class="kw">sequential_hcl</span>(<span class="dv">5</span>, <span class="dt">palette =</span> <span class="st">&quot;BluYl&quot;</span>)
+q_cms &lt;-<span class="st"> </span><span class="kw">sequential_hcl</span>(<span class="dv">5</span>, <span class="dt">palette =</span> <span class="st">&quot;Reds&quot;</span>)
 col_cms =<span class="st"> </span><span class="kw">colorRamp2</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.002</span>, <span class="fl">0.004</span>, <span class="fl">0.006</span>, <span class="fl">0.008</span>), q_cms)
 
-q_cor &lt;-<span class="st"> </span><span class="kw">rev</span>(<span class="kw">sequential_hcl</span>(<span class="dv">6</span>, <span class="dt">palette =</span> <span class="st">&quot;Reds&quot;</span>))
+q_cor &lt;-<span class="st"> </span><span class="kw">rev</span>(<span class="kw">sequential_hcl</span>(<span class="dv">6</span>, <span class="dt">palette =</span> <span class="st">&quot;BluYl&quot;</span>))
 col_cor &lt;-<span class="st"> </span><span class="kw">colorRamp2</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>, <span class="fl">0.4</span>, <span class="fl">0.6</span>, <span class="fl">0.8</span>, <span class="fl">0.9</span>), q_cor)
 
 col_type &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;protocol&quot;</span> =<span class="st"> </span>q_type[<span class="dv">1</span>], <span class="st">&quot;media&quot;</span> =<span class="st"> </span>q_type[<span class="dv">3</span>], <span class="st">&quot;patient&quot;</span> =<span class="st"> </span>q_type[<span class="dv">4</span>])
 
-q_over &lt;-<span class="st"> </span><span class="kw">rev</span>(<span class="kw">sequential_hcl</span>(<span class="dv">6</span>, <span class="dt">palette =</span> <span class="st">&quot;Blues&quot;</span>))
+q_over &lt;-<span class="st"> </span><span class="kw">rev</span>(<span class="kw">sequential_hcl</span>(<span class="dv">6</span>, <span class="dt">palette =</span> <span class="st">&quot;RdPu&quot;</span>))
 col_over &lt;-<span class="st"> </span><span class="kw">colorRamp2</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">0.5</span>), q_over)
 
 <span class="co">#annotation</span>
@@ -601,7 +823,11 @@ ha_type =<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<spa
                             <span class="dt">simple_anno_size =</span> <span class="kw">unit</span>(<span class="dv">1</span>, <span class="st">&quot;cm&quot;</span>),
                             <span class="dt">col =</span> <span class="kw">list</span>(<span class="st">&quot;batch_origin&quot;</span> =<span class="st"> </span>col_type), 
                             <span class="dt">annotation_height =</span> <span class="kw">unit</span>(<span class="fl">2.2</span>, <span class="st">&quot;cm&quot;</span>),
-                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>)
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
+                            <span class="dt">annotation_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>))
+                            )
 
 <span class="co">#heatmap</span>
 <span class="co">#cms</span>
@@ -616,7 +842,8 @@ h_cms &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(var_cms,
           <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
           <span class="dt">column_names_rot =</span> <span class="dv">45</span>,
           <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
-          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">8</span>),
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
           <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
           <span class="dt">col =</span> col_cms,
           <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
@@ -633,10 +860,29 @@ h_cor &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(cor_tab,
           <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
           <span class="dt">column_names_rot =</span> <span class="dv">0</span>,
           <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
-          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">8</span>),
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>), 
+          <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
           <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
           <span class="dt">col =</span> col_cor,
           <span class="dt">top_annotation =</span> ha_type,
+          <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
+
+<span class="co">#just for figure plots</span>
+h_cor_fig &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(cor_tab, 
+          <span class="dt">cluster_rows =</span> <span class="ot">FALSE</span>, 
+          <span class="dt">cluster_columns =</span> <span class="ot">FALSE</span>,
+          <span class="dt">name =</span> <span class="st">&quot;lfc correlation&quot;</span>,
+          <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
+          <span class="dt">column_names_rot =</span> <span class="dv">45</span>,
+          <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>), 
+          <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
+          <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
+          <span class="dt">col =</span> col_cor,
           <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
 
 
@@ -647,12 +893,15 @@ over &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">as
 h_over &lt;-<span class="st"> </span><span class="kw">Heatmap</span>(over, 
           <span class="dt">cluster_rows =</span> <span class="ot">FALSE</span>, 
           <span class="dt">cluster_columns =</span> <span class="ot">FALSE</span>,
-          <span class="dt">name =</span> <span class="st">&quot;de overlap [%]&quot;</span>,
+          <span class="dt">name =</span> <span class="st">&quot;DE overlap&quot;</span>,
           <span class="dt">column_names_side =</span> <span class="st">&quot;bottom&quot;</span>,
-          <span class="dt">column_names_rot =</span> <span class="dv">0</span>,
+          <span class="dt">column_names_rot =</span> <span class="dv">45</span>,
           <span class="dt">column_names_centered =</span> <span class="ot">TRUE</span>,
-          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">8</span>),
-          <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>, 
+          <span class="dt">column_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+          <span class="dt">row_names_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">20</span>),
+          <span class="dt">row_names_side =</span> <span class="st">&quot;left&quot;</span>,  
+          <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
           <span class="dt">col =</span> col_over,
           <span class="dt">rect_gp =</span> <span class="kw">gpar</span>(<span class="dt">col=</span> <span class="st">&quot;white&quot;</span>))
 
@@ -660,6 +909,8 @@ h_list &lt;-<span class="st">  </span>h_cor %v%<span class="st"> </span>h_over %
 
 <span class="kw">draw</span>(h_list)</code></pre></div>
 <p><img src="overall_batch_characteristics_files/figure-html/plot%20ct%20spec-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">h_list_plot &lt;-<span class="st">  </span>h_cells %v%<span class="st"> </span>h_genes %v%<span class="st"> </span>h_size1 %v%<span class="st"> </span>h_size2 %v%<span class="st"> </span>h_cor_fig %v%<span class="st"> </span>h_over
+<span class="kw">saveRDS</span>(h_list_plot, <span class="kw">paste0</span>(out_path_fig, <span class="st">&quot;_ct_spec.rds&quot;</span>))</code></pre></div>
 </div>
 <div id="distributions" class="section level4">
 <h4>Distributions</h4>
@@ -709,6 +960,7 @@ ct_info &lt;-<span class="st"> </span><span class="kw">lapply</span>(sce_name, f
                     <span class="dt">top_annotation =</span> ha_den,
                     <span class="dt">show_column_names =</span> <span class="ot">FALSE</span>
                     )
+  <span class="kw">saveRDS</span>(m, <span class="kw">paste0</span>(out_path_fig,<span class="st">&quot;_&quot;</span>, nam, <span class="st">&quot;_lfc_dist.rds&quot;</span>))
   <span class="kw">draw</span>(m)
 }
 
@@ -760,6 +1012,125 @@ plots_dens&lt;-<span class="st"> </span><span class="kw">lapply</span>(sce_name,
 <h4>cellbench</h4>
 <p><img src="overall_batch_characteristics_files/figure-html/densitycellbench-1.png" width="672" /></p>
 </div>
+</div>
+<div id="further-logfc-plots" class="section level3">
+<h3>Further logFC plots</h3>
+<p>For figure plot</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plot_den_fig &lt;-<span class="st"> </span>function(nam){
+  mat &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(gene_info[[nam]])
+  be &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;_.*&quot;</span>,<span class="st">&quot;&quot;</span>,<span class="kw">colnames</span>(mat)) %&gt;%<span class="st"> </span><span class="kw">as.factor</span>() %&gt;%<span class="st"> </span><span class="kw">levels</span>()
+  be &lt;-<span class="st"> </span>be[<span class="dv">1</span>:<span class="kw">ifelse</span>(<span class="kw">length</span>(be &gt;<span class="st"> </span><span class="dv">3</span>), <span class="dv">3</span>, <span class="kw">length</span>(be))]
+  mat &lt;-<span class="st"> </span>mat[,<span class="kw">grep</span>(<span class="kw">paste</span>(be, <span class="dt">collapse=</span><span class="st">&quot;|&quot;</span>), <span class="kw">colnames</span>(mat))]
+  ct &lt;-<span class="st"> </span>ct_info[[nam]]
+  <span class="co">#col and factors</span>
+  ba_tab &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;_.*&quot;</span>,<span class="st">&quot;&quot;</span>,<span class="kw">colnames</span>(mat)),
+                     <span class="st">&quot;celltype&quot;</span> =<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.*_logFC_&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">colnames</span>(mat)))
+  ba_tab$cells &lt;-<span class="st"> </span>ct[ba_tab$celltype]
+  col_den_b &lt;-<span class="st"> </span><span class="kw">rev</span>(cols)[<span class="dv">3</span>:(<span class="dv">2</span> +<span class="st"> </span><span class="kw">length</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$batch))))] %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">set_names</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$batch)))
+  col_den_c &lt;-<span class="st"> </span>cols[<span class="dv">1</span>:<span class="kw">length</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$celltype)))] %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">set_names</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$celltype)))
+  q_cells &lt;-<span class="st"> </span><span class="kw">sequential_hcl</span>(<span class="dv">3</span>, <span class="dt">palette =</span> <span class="st">&quot;Red-Blue&quot;</span>)
+  col_cells &lt;-<span class="st"> </span><span class="kw">colorRamp2</span>(<span class="kw">c</span>(<span class="kw">max</span>(ct), <span class="kw">mean</span>(ct), <span class="kw">min</span>(ct)), q_cells)
+  <span class="co">#annotations</span>
+  ha_den =<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span>ba_tab$batch,
+                            <span class="st">&quot;cell_type&quot;</span> =<span class="st"> </span>ba_tab$celltype,
+                            <span class="dt">simple_anno_size =</span> <span class="kw">unit</span>(<span class="fl">0.8</span>, <span class="st">&quot;cm&quot;</span>),
+                            <span class="dt">col =</span> <span class="kw">list</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span>col_den_b,
+                                       <span class="st">&quot;cell_type&quot;</span> =<span class="st"> </span>col_den_c,
+                                       <span class="st">&quot;cells&quot;</span> =<span class="st"> </span>col_cells),
+                            <span class="dt">show_legend =</span> <span class="kw">c</span>(<span class="dt">cell_type =</span> <span class="ot">FALSE</span>),
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;right&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>),
+                            <span class="dt">annotation_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                                           <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)))
+  <span class="co">#heatmap</span>
+  m &lt;-<span class="st"> </span><span class="kw">densityHeatmap</span>(mat, 
+                    <span class="dt">ylab =</span> <span class="st">&quot;batch logFC&quot;</span>,
+                    <span class="dt">ylim =</span> <span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">2</span>),
+                    <span class="dt">quantile_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+                    <span class="dt">title =</span> <span class="kw">paste0</span>(nam),
+                    <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>),
+                    <span class="dt">ylab_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>),
+                    <span class="dt">top_annotation =</span> ha_den,
+                    <span class="dt">show_column_names =</span> <span class="ot">FALSE</span>,
+                    <span class="dt">tick_label_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+                    <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
+                    )
+  <span class="kw">saveRDS</span>(m, <span class="kw">paste0</span>(out_path_fig,<span class="st">&quot;_&quot;</span>, nam, <span class="st">&quot;_lfc_dist.rds&quot;</span>))
+  <span class="kw">draw</span>(m)
+}
+
+<span class="kw">plot_den_fig</span>(<span class="st">&quot;pbmc2_pat&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/fig%20plot%20den-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;pbmc2_media&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/fig%20plot%20den-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;cellbench&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/fig%20plot%20den-3.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;hca&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/fig%20plot%20den-4.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;kang&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/fig%20plot%20den-5.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;csf_media&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/fig%20plot%20den-6.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;csf_patient&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/fig%20plot%20den-7.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_fig</span>(<span class="st">&quot;pbmc_roche&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/fig%20plot%20den-8.png" width="672" /></p>
+</div>
+<div id="logfc-distribution-by-celltype" class="section level3">
+<h3>LogFC distribution by celltype</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plot_den_ct &lt;-<span class="st"> </span>function(nam){
+  mat &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(gene_info[[nam]])
+  be &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;_.*&quot;</span>,<span class="st">&quot;&quot;</span>,<span class="kw">colnames</span>(mat)) %&gt;%<span class="st"> </span><span class="kw">as.factor</span>() %&gt;%<span class="st"> </span><span class="kw">levels</span>()
+  be &lt;-<span class="st"> </span>be[<span class="dv">1</span>:<span class="kw">ifelse</span>(<span class="kw">length</span>(be &gt;<span class="st"> </span><span class="dv">5</span>), <span class="dv">5</span>, <span class="kw">length</span>(be))]
+  <span class="co">#mat &lt;- mat[,grep(paste(be, collapse=&quot;|&quot;), colnames(mat))]</span>
+  mat &lt;-<span class="st">  </span>mat[,<span class="kw">sort</span>(<span class="kw">gsub</span>(<span class="st">&quot;.*logFC_&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">colnames</span>(mat)), <span class="dt">index.return =</span> <span class="ot">TRUE</span>)$ix]
+  ct &lt;-<span class="st"> </span>ct_info[[nam]]
+  <span class="co">#col and factors</span>
+  ba_tab &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;_.*&quot;</span>,<span class="st">&quot;&quot;</span>,<span class="kw">colnames</span>(mat)),
+                     <span class="st">&quot;celltype&quot;</span> =<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;.*_logFC_&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">colnames</span>(mat)))
+  ba_tab$cells &lt;-<span class="st"> </span>ct[ba_tab$celltype]
+  col_den_b &lt;-<span class="st"> </span><span class="kw">rev</span>(cols)[<span class="dv">3</span>:(<span class="dv">2</span> +<span class="st"> </span><span class="kw">length</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$batch))))] %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">set_names</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$batch)))
+  col_den_c &lt;-<span class="st"> </span>cols[<span class="dv">1</span>:<span class="kw">length</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$celltype)))] %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">set_names</span>(<span class="kw">levels</span>(<span class="kw">as.factor</span>(ba_tab$celltype)))
+  q_cells &lt;-<span class="st"> </span><span class="kw">sequential_hcl</span>(<span class="dv">3</span>, <span class="dt">palette =</span> <span class="st">&quot;Red-Blue&quot;</span>)
+  col_cells &lt;-<span class="st"> </span><span class="kw">colorRamp2</span>(<span class="kw">c</span>(<span class="kw">max</span>(ct), <span class="kw">mean</span>(ct), <span class="kw">min</span>(ct)), q_cells)
+  <span class="co">#annotations</span>
+  ha_den =<span class="st"> </span><span class="kw">HeatmapAnnotation</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span>ba_tab$batch,
+                            <span class="st">&quot;cell_type&quot;</span> =<span class="st"> </span>ba_tab$celltype,
+                            <span class="dt">simple_anno_size =</span> <span class="kw">unit</span>(<span class="fl">0.8</span>, <span class="st">&quot;cm&quot;</span>),
+                            <span class="dt">col =</span> <span class="kw">list</span>(<span class="st">&quot;batch&quot;</span> =<span class="st"> </span>col_den_b,
+                                       <span class="st">&quot;cell_type&quot;</span> =<span class="st"> </span>col_den_c,
+                                       <span class="st">&quot;cells&quot;</span> =<span class="st"> </span>col_cells),
+                            <span class="dt">show_legend =</span> <span class="kw">c</span>(<span class="dt">cell_type =</span> <span class="ot">FALSE</span>),
+                            <span class="dt">annotation_name_side =</span> <span class="st">&quot;left&quot;</span>,
+                            <span class="dt">annotation_name_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>),
+                            <span class="dt">annotation_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                                           <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)))
+  <span class="co">#heatmap</span>
+  m &lt;-<span class="st"> </span><span class="kw">densityHeatmap</span>(mat, 
+                    <span class="dt">ylim =</span> <span class="kw">c</span>(-<span class="dv">2</span>, <span class="dv">2</span>),
+                    <span class="dt">title =</span> <span class="kw">paste0</span>(nam),
+                    <span class="dt">top_annotation =</span> ha_den,
+                    <span class="dt">show_column_names =</span> <span class="ot">FALSE</span>,
+                    <span class="dt">tick_label_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">14</span>),
+                    <span class="dt">heatmap_legend_param =</span> <span class="kw">list</span>(<span class="dt">labels_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">12</span>),
+                                      <span class="dt">title_gp =</span> <span class="kw">gpar</span>(<span class="dt">fontsize =</span> <span class="dv">18</span>)),
+                    )
+  <span class="kw">saveRDS</span>(m, <span class="kw">paste0</span>(out_path_fig,<span class="st">&quot;_&quot;</span>, nam, <span class="st">&quot;_lfc_dist_by_ct.rds&quot;</span>))
+  <span class="kw">draw</span>(m)
+}
+
+<span class="kw">plot_den_ct</span>(<span class="st">&quot;pbmc2_pat&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/logFC%20celltype-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_ct</span>(<span class="st">&quot;pbmc2_media&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/logFC%20celltype-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_den_ct</span>(<span class="st">&quot;hca&quot;</span>)</code></pre></div>
+<p><img src="overall_batch_characteristics_files/figure-html/logFC%20celltype-3.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#plot_den_ct(&quot;pancreas&quot;)</span></code></pre></div>
 </div>
 </div>
 

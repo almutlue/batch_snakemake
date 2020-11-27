@@ -8,6 +8,7 @@ params:
   meta:
   summary:
   sce_norm:
+  fig_res:
 output:
   html_document:
     self_contained: no
@@ -67,6 +68,7 @@ names(sce_small_vec) <- sce_name
 sum_vec <- c(paste0(params$summary, sce_name, ".rds"))
 names(sum_vec) <- sce_name
 
+out_path_fig <- params$fig_res
 
 cols <-c(c(jcolors('pal6'),jcolors('pal8'))[c(1,8,14,5,2:4,6,7,9:13,15:20)],jcolors('pal4'))
 names(cols) <- c()
@@ -152,6 +154,8 @@ h_list <-  h_cells %v% h_genes %v% h_batch
 
 draw(h_list, annotation_legend_list = pd)
 
+saveRDS(h_list, paste0(out_path_fig, "_general_info.rds"))
+saveRDS(pd, paste0(out_path_fig, "_general_info_lgd.rds"))
 ```
 
 ### Batch size/strength
@@ -249,6 +253,8 @@ h_list <-  h_size1 %v% h_size2 %v% h_cms
 
 draw(h_list)
 
+h_list_plot <- h_size1 %v% h_size2
+saveRDS(h_list_plot, paste0(out_path_fig, "_size_hm.rds"))
 ```
 
 
@@ -286,6 +292,8 @@ h_cms <- Heatmap(type,
           rect_gp = gpar(col= "white"))
 
 draw(h_cms)
+
+saveRDS(h_cms, paste0(out_path_fig, "_batch_type.rds"))
 ```
 
 
@@ -374,7 +382,7 @@ rownames(over) <- "de_overlap"
 h_over <- Heatmap(over, 
           cluster_rows = FALSE, 
           cluster_columns = FALSE,
-          name = "de overlap [%]",
+          name = "de overlap",
           column_names_side = "bottom",
           column_names_rot = 0,
           column_names_centered = TRUE,
@@ -386,6 +394,9 @@ h_over <- Heatmap(over,
 h_list <-  h_cor %v% h_over %v% h_cms
 
 draw(h_list)
+
+h_list_plot <-  h_cor %v% h_over
+saveRDS(h_list_plot, paste0(out_path_fig, "_ct_spec.rds"))
 ```
 
 
@@ -439,6 +450,7 @@ plot_den <- function(nam){
                     top_annotation = ha_den,
                     show_column_names = FALSE
                     )
+  saveRDS(m, paste0(out_path_fig,"_", nam, "_lfc_dist.rds"))
   draw(m)
 }
 
@@ -459,4 +471,63 @@ plots_dens<- lapply(sce_name,
 
 `r knitr::knit(text = unlist(plots_dens))`
 
+### Further logFC plots
+For figure plot
+```{r fig plot den}
+plot_den_fig <- function(nam){
+  mat <- as.matrix(gene_info[[nam]])
+  be <- gsub("_.*","",colnames(mat)) %>% as.factor() %>% levels()
+  be <- be[1:ifelse(length(be > 3), 3, length(be))]
+  mat <- mat[,grep(paste(be, collapse="|"), colnames(mat))]
+  ct <- ct_info[[nam]]
+  #col and factors
+  ba_tab <- data.frame("batch" = gsub("_.*","",colnames(mat)),
+                     "celltype" = gsub(".*_logFC_", "", colnames(mat)))
+  ba_tab$cells <- ct[ba_tab$celltype]
+  col_den_b <- rev(cols)[3:(2 + length(levels(as.factor(ba_tab$batch))))] %>% 
+  set_names(levels(as.factor(ba_tab$batch)))
+  col_den_c <- cols[1:length(levels(as.factor(ba_tab$celltype)))] %>% 
+  set_names(levels(as.factor(ba_tab$celltype)))
+  q_cells <- sequential_hcl(3, palette = "Red-Blue")
+  col_cells <- colorRamp2(c(max(ct), mean(ct), min(ct)), q_cells)
+  #annotations
+  ha_den = HeatmapAnnotation("batch" = ba_tab$batch,
+                            "cell_type" = ba_tab$celltype,
+                            simple_anno_size = unit(0.8, "cm"),
+                            col = list("batch" = col_den_b,
+                                       "cell_type" = col_den_c,
+                                       "cells" = col_cells),
+                            show_legend = c(cell_type = FALSE),
+                            annotation_name_side = "right",
+                            annotation_name_gp = gpar(fontsize = 18),
+                            annotation_legend_param = list(labels_gp = gpar(fontsize = 12),
+                                                           title_gp = gpar(fontsize = 18)))
+  #heatmap
+  m <- densityHeatmap(mat, 
+                    ylab = "batch logFC",
+                    ylim = c(-2, 2),
+                    quantile_gp = gpar(fontsize = 14),
+                    title = paste0("Simulated data from: ", nam),
+                    title_gp = gpar(fontsize = 18),
+                    ylab_gp = gpar(fontsize = 18),
+                    top_annotation = ha_den,
+                    show_column_names = FALSE,
+                    tick_label_gp = gpar(fontsize = 14),
+                    heatmap_legend_param = list(labels_gp = gpar(fontsize = 12),
+                                      title_gp = gpar(fontsize = 18)),
+                    )
+  saveRDS(m, paste0(out_path_fig,"_", nam, "_lfc_dist.rds"))
+  draw(m)
+}
 
+plot_den_fig("pbmc2_pat")
+plot_den_fig("pbmc2_media")
+plot_den_fig("cellbench")
+plot_den_fig("hca")
+plot_den_fig("kang")
+plot_den_fig("csf_media")
+plot_den_fig("csf_patient")
+plot_den_fig("pbmc_roche")
+
+
+```

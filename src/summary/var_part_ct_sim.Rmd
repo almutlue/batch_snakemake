@@ -1,0 +1,121 @@
+---
+title: "Variance partition cell type specific: Simulation"
+author: "Almut Lütge"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+params:
+  data_path:
+  out_path:
+output:
+  html_document:
+    self_contained: no
+    lib_dir: '../../docs/site_libs'
+    code_folding: show
+    theme: journal
+    highlight: tango
+    number_sections: no
+    toc: yes
+    toc_depth: 3
+    toc_float: true
+    collapsed: no
+    smooth_scroll: yes
+---
+
+
+[Back to home](index.html)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Generate ternary plots for batch characterization
+
+libraries
+```{r libs}
+suppressPackageStartupMessages({
+    library(scater)
+    library(ggtern)
+    library(gridExtra)
+    library(scran)
+    library(cowplot)
+    library(dplyr)
+    library(magrittr)
+    library(purrr)
+    library(jcolors)
+    library(hrbrthemes)
+    library(tidyr)
+  library(here)
+    })
+```
+
+Data
+```{r data}
+#data_path <- c("/run/user/1000/gvfs/sftp:host=imlsportmacquarie.uzh.ch/home/aluetg/batch_characterization/batch_snakemake/out/sim_variance_part_ct/")
+data_path <- params$data_path
+datasets <- list.files(path = data_path, pattern = "sce.rds")
+
+cols_data <-c(c(jcolors('pal6'),jcolors('pal8'))[c(1,8,14,2:4,6,12:13,15:20)],jcolors('pal4'))
+names(cols_data) <- c()
+out_path <- params$out_path
+```
+
+Ternary plots
+```{r tern}
+#prepare data frame
+prep_data <- function(dat){
+    data_nam <- gsub("vp_ct_", "", dat) %>% gsub("_sce.rds", "",.)
+    sce <- readRDS(paste0(data_path, dat))
+    type <-  grep("_ct$", names(rowData(sce)), value = TRUE)
+    tab <- as.data.frame(rowData(sce)[,type])
+    tab$dataset <- rep(data_nam, nrow(tab))
+    rm(sce)
+    gc()
+    tab
+}
+
+type_data <- datasets %>% map(prep_data) %>% bind_rows()
+type_data$dataset <- as.factor(type_data$dataset)
+type_data <- type_data %>% dplyr::filter(vp_residuals_ct < 0.95)
+```
+
+Plot
+```{r plot, fig.width=9, fig.height=18}
+t1 <- ggtern(data=type_data, aes(vp_celltype_ct, vp_batch_ct, vp_cellt_by_batch_ct)) +
+  guides(color = guide_legend(override.aes = list(size = 3, alpha = 1))) +
+  geom_point(aes(colour = dataset),size= 1.6, alpha = 0.9)  +
+  scale_colour_manual(values = cols_data) +
+  #stat_density_tern(aes(fill=..level.., alpha=..level..),geom='polygon',bdl = 0.01,bdl.val = 1, base = "identity", n = 20) +
+  geom_density_tern(
+        bins=10,
+        bdl = 0.02,
+        color='black',
+        base = "identity", n = 20,
+        bdl.val = 0.1) +
+  Llab("cell\n \t type") +
+  Tlab("batch") +
+  Rlab("int.") +
+  ggtitle("Percent variance explained by ...:") +
+  theme_ipsum(axis = TRUE,
+              base_family = 'Helvetica',
+              base_size = 19,
+              axis_title_size = 20,
+              strip_text_face = "bold",
+              grid_col = "#cccccc",
+              plot_margin = margin(0, 0, 0, 0)) +
+   facet_wrap(~dataset, ncol = 2) +
+    theme(plot.title = element_text(size=24, hjust = 0.3),
+          plot.subtitle = element_text(size=20),
+          panel.grid.major = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          panel.spacing = unit(0.2, "lines"),
+          legend.position = "none",
+          strip.text = element_text(face="bold", size=22)
+        )
+
+t1
+
+saveRDS(t1, paste0(out_path, "ternary_ct_sim.rds"))
+ggtern::ggsave(filename = paste0(out_path, "ternary_ct_sim.pdf"), plot = t1, dpi = 600)
+```
+
+

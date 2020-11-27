@@ -1,0 +1,170 @@
+---
+title: "Batch types variance partition"
+author: "Almut Lütge"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+params:
+  data_path:
+  out_path:
+output:
+  html_document:
+    self_contained: no
+    lib_dir: '../../docs/site_libs'
+    code_folding: show
+    theme: journal
+    highlight: tango
+    number_sections: no
+    toc: yes
+    toc_depth: 3
+    toc_float: true
+    collapsed: no
+    smooth_scroll: yes
+---
+
+
+[Back to home](index.html)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Generate ternary plots for batch characterization
+
+libraries
+```{r libs}
+suppressPackageStartupMessages({
+    library(scater)
+    library(ggtern)
+    library(gridExtra)
+    library(scran)
+    library(cowplot)
+    library(dplyr)
+    library(magrittr)
+    library(purrr)
+    library(jcolors)
+    library(hrbrthemes)
+    library(tidyr)
+  library(here)
+    })
+```
+
+Data
+```{r data}
+data_path <- params$data_path
+datasets <- list.files(path = data_path, pattern = "sce.rds")
+datasets <- datasets[-grep("pancreas", datasets)]
+
+
+cols_data <-c(c(jcolors('pal6'),jcolors('pal8'))[c(1,8,14,2:4,6,12:13,15:20)],jcolors('pal4'))
+names(cols_data) <- c()
+out_path <- params$out_path
+```
+
+Ternary plots
+```{r tern, fig.width=9, fig.height=9}
+#prepare data frame
+prep_data <- function(dat){
+    data_nam <- gsub("type_var_", "", dat) %>% gsub("_sce.rds", "",.)
+    sce <- readRDS(paste0(data_path, dat))
+    type <-  grep("vp_residuals.*_", names(rowData(sce)), value = TRUE)
+    tab <- as.data.frame(rowData(sce)[,type])
+    sub <- function(x)x-tab$vp_residuals_no_adjust
+    tab_sub <- tab %>% transmute_all(sub)
+    # filter for genes with one model having a relevant effect
+    tab_filtered <- tab_sub[rowMins(as.matrix(tab_sub)) < -0.01,] *-1
+    tab_filtered$dataset <- rep(data_nam, nrow(tab_filtered))
+    rm(sce)
+    gc()
+    tab_filtered
+}
+
+type_data <- datasets %>% map(prep_data) %>% bind_rows()
+type_data$dataset <- as.factor(type_data$dataset)
+
+t1 <- ggtern(data=type_data, aes(vp_residuals_Xadj1, vp_residuals_Xadj2, vp_residuals_Xadj3)) +
+  stat_density_tern(
+        geom='polygon',
+        aes(fill=..level..),
+        bins=10,
+        color='grey',
+        bdl = 0.1,
+        bdl.val = 0.1) +
+  guides(color = guide_legend(override.aes = list(size = 3, alpha = 1))) +
+  geom_point(aes(colour = dataset),size= 1, alpha = 0.8)  +
+  scale_colour_manual(values = cols_data) +
+  Llab("ct + be") +
+  Tlab("ct:be") +
+  Rlab("ct + be + ct:be") +
+  ggtitle("Additional variance explained by batch type models") +
+  theme_ipsum(axis = TRUE,
+              base_family = 'Helvetica',
+              strip_text_face = "bold",
+              plot_margin = margin(0, 0, 0, 0)) +
+   facet_wrap(~dataset)
+  #   theme(plot.title = element_text(size=18),
+  #         plot.subtitle = element_text(size=20),
+  #         panel.grid.major = element_blank(),
+  #         axis.text.x = element_blank(),
+  #         axis.text.y = element_blank(),
+  #         panel.spacing = unit(1, "lines"),
+  #         legend.position = "none"
+  #       )
+
+t1
+
+saveRDS(t1, paste0(out_path, "ternary_type.rds"))
+ggsave(filename = paste0(out_path, "ternary_type.pdf"), plot = t1, dpi = 600)
+```
+
+
+```{r tern2, fig.width=9, fig.height=9}
+#prepare data frame
+prep_data2 <- function(dat){
+    data_nam <- gsub("type_var_", "", dat) %>% gsub("_sce.rds", "",.)
+    sce <- readRDS(paste0(data_path, dat))
+    type <-  grep("vp_residuals.*_", names(rowData(sce)), value = TRUE)
+    tab <- as.data.frame(rowData(sce)[,type])
+    sub <- function(x)1-x
+    tab_sub <- tab %>% transmute_all(sub)
+    tab_sub$dataset <- rep(data_nam, nrow(tab_sub))
+    rm(sce)
+    gc()
+    tab_sub
+}
+
+type_data <- datasets %>% map(prep_data2) %>% bind_rows()
+type_data$dataset <- as.factor(type_data$dataset)
+
+t2 <- ggtern(data=type_data, aes(vp_residuals_no_adjust, vp_residuals_Xadj1, vp_residuals_Xadj3)) +
+  stat_density_tern(
+        geom='polygon',
+        aes(fill=..level..),
+        bins=10,
+        color='grey',
+        bdl = 0.1,
+        bdl.val = 0.1) +
+  guides(color = guide_legend(override.aes = list(size = 3, alpha = 1))) +
+  geom_point(aes(colour = dataset),size= 1, alpha = 0.8)  +
+  scale_colour_manual(values = cols_data) +
+  Llab("ct") +
+  Tlab("ct + be") +
+  Rlab("ct + be + ct:be") +
+  ggtitle("Additional variance explained by batch type models") +
+  theme_ipsum(axis = TRUE,
+              base_family = 'Helvetica',
+              strip_text_face = "bold",
+              plot_margin = margin(0, 0, 0, 0)) +
+   facet_wrap(~dataset)
+  #   theme(plot.title = element_text(size=18),
+  #         plot.subtitle = element_text(size=20),
+  #         panel.grid.major = element_blank(),
+  #         axis.text.x = element_blank(),
+  #         axis.text.y = element_blank(),
+  #         panel.spacing = unit(1, "lines"),
+  #         legend.position = "none"
+  #       )
+
+t2
+
+saveRDS(t2, paste0(out_path, "ternary_type2.rds"))
+ggsave(filename = paste0(out_path, "ternary_type2.pdf"), plot = t2, dpi = 600)
+```

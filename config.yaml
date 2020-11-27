@@ -23,21 +23,25 @@ src_sim: "src/simulation/"
 out_set: "out/settings/"
 out_norm: "out/normalization/"
 out_vp: "out/variance_part/"
+out_vp_ct: "out/variance_part_ct/"
 out_abund: "out/abundance/"
 out_cms: "out/cms/"
 out_de: "out/de/"
 out_type: "out/type/"
+out_type_var: "out/type_var/"
 out_summary: "out/summary/"
 out_edger: "out/edger/"
 out_sim: "out/sim/"
 out_sim_char: "out/sim_char/"
 out_adjust_params: "out/adjust_params/"
 out_sim_vp: "out/sim_variance_part/"
+out_sim_vp_ct: "out/sim_variance_part_ct/"
 out_sim_abund: "out/sim_abundance/"
 out_sim_de: "out/sim_de/"
 out_sim_type: "out/sim_type/"
 out_sim_summary: "out/sim_summary/"
 out_sim_sumcms: "out/sim_sumcms/"
+out_fig: "out/figure/"
 
 
 
@@ -47,16 +51,19 @@ log_sim_vars: "log/sim_vars/"
 log_set: "log/settings/"
 log_norm: "log/normalization/"
 log_vp: "log/variance_part/"
+log_vp_ct: "log/variance_part_ct/"
 log_abund: "log/abundance/"
 log_cms: "log/cms/"
 log_de: "log/de/"
 log_type: "log/type/"
+log_type_var: "log/type_var/"
 log_summary: "log/summary/"
 log_edger: "log/edger/"
 log_sim: "log/sim/"
 log_sim_char: "log/sim_char/"
 log_adjust_params: "log/adjust_params/"
 log_sim_vp: "log/sim_variance_part/"
+log_sim_vp_ct: "log/sim_variance_part_ct/"
 log_sim_abund: "log/sim_abundance/"
 log_sim_de: "log/sim_de/"
 log_sim_type: "log/sim_type/"
@@ -71,6 +78,6 @@ docs_libs: "docs/site_libs"
 ## Subdirectory names 
 ### Names of subfdirectories to be generated in output and log directories
 ### Here they correspond to the rule names
-dir_names: settings,normalization,abundance,variance_part,cms,de,type,summary,edger,sim,sim_vars,sim_char,adjust_params,sim_variance_part,sim_abundance,sim_de,sim_type,sim_summary,sim_sumcms,sim_QC
+dir_names: settings,normalization,abundance,variance_part,cms,de,type,summary,edger,sim,sim_vars,sim_char,adjust_params,sim_variance_part,sim_abundance,sim_de,sim_type,sim_summary,sim_sumcms,sim_QC,figure, variance_part_ct,sim_variance_part_ct
 
 

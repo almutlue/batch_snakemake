@@ -45,12 +45,14 @@ A systematic analysis of different kinds of unwanted varaition in single cell RN
 
 ## Real data
 [Summary real data](overall_batch_characteristics.html)
+[Variance partition real data](var_part_ct.html)
 
 ![](overall_batch_characteristics_files/figure-html/densitycellbench-1.png)
 
 
 ## Simulations
 [Summary simulated data](overall_sim_batch_characteristics.html)
+[Variance partition simulations](var_part_ct_sim.html)
 
 ![](overall_sim_batch_characteristics_files/figure-html/plot batch size-1.png)
 
